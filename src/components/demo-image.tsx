@@ -3,20 +3,21 @@ import Image from "next/image";
 type DemoImageProps = {
   src: string;
   alt: string;
-  priority?: boolean;
+  isDemo: boolean;
+  eager?: boolean;
 };
 
-export function DemoImage({ src, alt, priority = false }: DemoImageProps) {
+export function DemoImage({ src, alt, isDemo, eager = false }: DemoImageProps) {
   return (
     <div className="demo-image">
       <Image
         alt={alt}
         fill
-        priority={priority}
+        loading={eager ? "eager" : undefined}
         sizes="(max-width: 760px) 100vw, 60vw"
         src={src}
       />
-      <span className="demo-image-label">Foto de demostración</span>
+      {isDemo && <span className="demo-image-label">Foto de demostración</span>}
     </div>
   );
 }

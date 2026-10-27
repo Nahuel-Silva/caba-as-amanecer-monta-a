@@ -23,7 +23,9 @@ export default function CabinsPage() {
         </header>
         <section aria-label="Cabañas disponibles" className="wrap section" style={{ paddingTop: 0 }}>
           <div className="cabin-grid">
-            {cabins.map((cabin) => <CabinCard cabin={cabin} key={cabin.slug} />)}
+            {cabins.map((cabin, index) => (
+              <CabinCard cabin={cabin} eager={index === 0} key={cabin.slug} />
+            ))}
           </div>
         </section>
       </main>

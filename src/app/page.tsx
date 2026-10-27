@@ -9,12 +9,14 @@ import { getCabins } from "@/lib/cabins";
 
 export default function Home() {
   const cabins = getCabins();
+  const heroImage = {
+    src: "/images/demo-landscape-03.jpg",
+    alt: "Paisaje de montaña y lago de demostración; no es una fotografía del complejo.",
+    isDemo: true,
+  };
   const gallery = [
-    {
-      src: "/images/demo-landscape-01.jpg",
-      alt: "Paisaje abierto de demostración; no es una fotografía del complejo.",
-    },
-    ...cabins[0].images,
+    heroImage,
+    ...cabins[0].images.filter((image) => image.src !== heroImage.src),
   ];
 
   return (
@@ -24,12 +26,13 @@ export default function Home() {
         <section aria-labelledby="hero-title" className="hero">
           <div className="hero-image">
             <Image
-              alt="Paisaje de montaña de demostración; no es una fotografía del complejo."
+              alt={heroImage.alt}
               fill
-              priority
+              loading="eager"
               sizes="100vw"
-              src="/images/demo-landscape-01.jpg"
+              src={heroImage.src}
             />
+            {heroImage.isDemo && <span className="hero-demo-label">Foto de demostración</span>}
           </div>
           <div aria-hidden="true" className="hero-shade" />
           <div className="hero-content">

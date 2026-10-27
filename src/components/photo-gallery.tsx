@@ -1,17 +1,40 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-type GalleryImage = { src: string; alt: string };
+type GalleryImage = { src: string; alt: string; isDemo: boolean };
 
 export function PhotoGallery({ images }: { images: GalleryImage[] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const wasOpen = useRef(false);
+  const isOpen = activeIndex !== null;
 
   useEffect(() => {
-    if (activeIndex === null) return;
+    if (!isOpen) {
+      if (wasOpen.current) {
+        triggerRef.current?.focus();
+        wasOpen.current = false;
+      }
+      return;
+    }
 
-    function closeOnEscape(event: KeyboardEvent) {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const root = document.documentElement;
+    const previousRootOverflow = root.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+
+    root.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    dialog.showModal();
+    dialog.querySelector<HTMLButtonElement>(".gallery-close")?.focus();
+    wasOpen.current = true;
+
+    function moveWithArrowKeys(event: KeyboardEvent) {
       if (event.key === "Escape") setActiveIndex(null);
       if (event.key === "ArrowRight") {
         setActiveIndex((index) => (index === null ? null : (index + 1) % images.length));
@@ -23,9 +46,14 @@ export function PhotoGallery({ images }: { images: GalleryImage[] }) {
       }
     }
 
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [activeIndex, images.length]);
+    window.addEventListener("keydown", moveWithArrowKeys);
+    return () => {
+      window.removeEventListener("keydown", moveWithArrowKeys);
+      if (dialog.open) dialog.close();
+      root.style.overflow = previousRootOverflow;
+      document.body.style.overflow = previousBodyOverflow;
+    };
+  }, [isOpen, images.length]);
 
   function move(direction: number) {
     setActiveIndex((index) =>
@@ -38,34 +66,43 @@ export function PhotoGallery({ images }: { images: GalleryImage[] }) {
       <div className="gallery-grid">
         {images.map((image, index) => (
           <button
-            aria-label={`Ampliar foto de demostración ${index + 1}`}
+            aria-label={`Ampliar foto${image.isDemo ? " de demostración" : ""} ${index + 1}`}
             className="gallery-item"
             key={image.src}
-            onClick={() => setActiveIndex(index)}
+            onClick={(event) => {
+              triggerRef.current = event.currentTarget;
+              setActiveIndex(index);
+            }}
             type="button"
           >
             <span className="demo-image">
               <Image
                 alt={image.alt}
                 fill
-                priority={index === 0}
                 sizes="(max-width: 760px) 100vw, 40vw"
                 src={image.src}
               />
-              <span className="demo-image-label">Foto de demostración</span>
+              {image.isDemo && (
+                <span aria-hidden="true" className="demo-image-label">
+                  Foto de demostración
+                </span>
+              )}
             </span>
           </button>
         ))}
       </div>
       {activeIndex !== null && (
-        <div
-          aria-label="Galería de fotos de demostración"
+        <dialog
+          aria-label={`Galería${images[activeIndex].isDemo ? " de fotos de demostración" : " de fotos"}`}
           aria-modal="true"
           className="gallery-dialog"
-          onClick={() => setActiveIndex(null)}
-          role="dialog"
+          onClose={() => setActiveIndex(null)}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setActiveIndex(null);
+          }}
+          ref={dialogRef}
         >
-          <div className="gallery-dialog-content" onClick={(event) => event.stopPropagation()}>
+          <div className="gallery-dialog-content">
             <button
               aria-label="Cerrar galería"
               className="gallery-controls gallery-close"
@@ -78,8 +115,7 @@ export function PhotoGallery({ images }: { images: GalleryImage[] }) {
               <Image
                 alt={images[activeIndex].alt}
                 fill
-                priority
-                sizes="100vw"
+                sizes="(max-width: 1148px) 100vw, 1100px"
                 src={images[activeIndex].src}
               />
             </div>
@@ -88,14 +124,14 @@ export function PhotoGallery({ images }: { images: GalleryImage[] }) {
                 Anterior
               </button>
               <span>
-                Foto de demostración {activeIndex + 1} de {images.length}
+                Foto{images[activeIndex].isDemo ? " de demostración" : ""} {activeIndex + 1} de {images.length}
               </span>
               <button onClick={() => move(1)} type="button">
                 Siguiente
               </button>
             </div>
           </div>
-        </div>
+        </dialog>
       )}
     </>
   );
