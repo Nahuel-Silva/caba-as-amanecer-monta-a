@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { DM_Sans, Cormorant_Garamond } from "next/font/google";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
+import { site } from "@/content/site";
+import { defaultDescription, metadataBase, robotsMetadata } from "@/lib/seo";
 import "./globals.css";
 
 const sans = DM_Sans({
@@ -15,9 +17,18 @@ const serif = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Cabañas Amanecer de Montaña | Malargüe",
-  description:
-    "Cabañas Amanecer de Montaña en Malargüe, Mendoza. Información y detalles del alojamiento en preparación.",
+  metadataBase,
+  title: {
+    default: `${site.name} | Malargüe`,
+    template: `%s | ${site.name}`,
+  },
+  description: defaultDescription,
+  robots: robotsMetadata,
+  openGraph: {
+    type: "website",
+    locale: "es_AR",
+    siteName: site.name,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -35,7 +35,9 @@ Los mensajes precargados se arman en `src/lib/whatsapp.ts` (mensaje general y me
 
 | Qué | Archivo |
 | --- | --- |
-| Nombre, ubicación, dirección, textos generales, servicios, atractivos, preguntas frecuentes | `src/content/site.ts` |
+| Nombre, ubicación, dirección, coordenadas, indicaciones, textos generales y servicios | `src/content/site.ts` |
+| Atractivos de Malargüe (con enlace opcional a la fuente oficial) | `src/content/attractions.ts` |
+| Preguntas frecuentes | `src/content/faqs.ts` |
 | Cabañas (nombre, descripción, capacidad, camas, baños, servicios, reglas, fotos) | `src/content/cabins.ts` |
 | Fotos | `public/images/` (y se referencian desde `cabins.ts`) |
 
@@ -44,6 +46,29 @@ Todo dato sin confirmar dice `PENDIENTE`. No se publican precios, disponibilidad
 Para agregar una cabaña, sumá un objeto al arreglo de `src/content/cabins.ts` con un `slug` nuevo: la página `/cabanas/<slug>` se genera sola.
 
 Cuando cargues fotos reales, poné `isDemo: false` en cada imagen para que desaparezca el rótulo "Foto de demostración".
+
+## Ubicación y mapa
+
+En `src/content/site.ts` completá:
+
+- `address`: la dirección confirmada (por ejemplo `"Ruta 40 km 123"`; la localidad se agrega sola).
+- `coordinates`: opcional, por ejemplo `{ lat: -35.1234, lng: -69.1234 }`. Si las cargás, tienen prioridad sobre la dirección y el pin queda exacto. Las podés copiar desde Google Maps (clic derecho sobre el lugar).
+- `directions`: indicaciones para llegar, escritas o verificadas por el propietario.
+
+Mientras `address` diga `PENDIENTE` y no haya coordenadas, la sección muestra un aviso y no hay mapa. Con datos cargados aparecen el mapa incrustado y los botones "Cómo llegar" y "Ver en el mapa" (abren Google Maps), y las coordenadas se suman a los datos estructurados para Google.
+
+El mapa usa la incrustación de Google Maps que no requiere clave de API. Si Google la cambiara, el cambio se hace en un solo lugar: `src/lib/location.ts`.
+
+## SEO y publicación en Google
+
+La URL pública se configura con `NEXT_PUBLIC_SITE_URL` (ver `.env.example`).
+
+- **Sin esa variable, el sitio no es indexable:** todas las páginas salen con `noindex`, `robots.txt` bloquea todo y no se publica sitemap. Es a propósito: evita que Google indexe una versión con datos `PENDIENTE`.
+- **Con la variable cargada** se activan `robots.txt` (permite todo e indica el sitemap), `sitemap.xml` (inicio, `/cabanas` y cada cabaña), URL canónica, Open Graph y datos estructurados Schema.org (`LodgingBusiness`).
+- Los datos estructurados solo incluyen datos confirmados: nombre, localidad, provincia y país; la calle y el teléfono recién aparecen cuando cargás la dirección y el número de WhatsApp. No hay reseñas, valoraciones ni precios.
+- Open Graph todavía no incluye imagen: se agrega cuando haya una fotografía real del complejo (las de demostración no se usan).
+
+**Cuándo cargarla:** en Vercel, solo en el entorno *Production* y cuando el contenido real esté listo. Después, dar de alta el sitio en Google Search Console y enviar `https://tu-dominio/sitemap.xml`.
 
 ## Estructura
 
@@ -57,8 +82,7 @@ public/images/    fotografías
 
 ## Pendiente (ver BRIEF.md, sección 12)
 
-- SEO técnico: sitemap, robots, canonical, Open Graph y datos estructurados.
-- Separar atracciones y preguntas frecuentes en archivos propios.
-- Mapa y botón "Cómo llegar" cuando haya dirección confirmada.
-- Fotos reales y datos reales de las cabañas.
+- Cargar la dirección, las coordenadas y las indicaciones reales (ver "Ubicación y mapa").
+- Fotos reales y datos reales de las cabañas, atractivos y preguntas frecuentes.
+- Imagen de Open Graph con una foto real.
 - Despliegue (hosting y dominio) y guía de publicación.

@@ -3,11 +3,13 @@ import { CabinCard } from "@/components/cabin-card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getCabins } from "@/lib/cabins";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Cabañas | Amanecer de Montaña",
-  description: "Conocé las cabañas de Amanecer de Montaña en Malargüe. Características e información en preparación.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Cabañas en Malargüe",
+  description: "Conocé las cabañas de Amanecer de Montaña en Malargüe, Mendoza. Consultá disponibilidad y tarifas.",
+  path: "/cabanas",
+});
 
 export default function CabinsPage() {
   const cabins = getCabins();

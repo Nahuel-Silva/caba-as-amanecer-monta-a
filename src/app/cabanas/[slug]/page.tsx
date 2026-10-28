@@ -5,7 +5,9 @@ import { PhotoGallery } from "@/components/photo-gallery";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WhatsAppButton } from "@/components/whatsapp-button";
+import { site } from "@/content/site";
 import { getCabinBySlug, getCabins } from "@/lib/cabins";
+import { pageMetadata } from "@/lib/seo";
 
 type CabinPageProps = { params: Promise<{ slug: string }> };
 
@@ -19,8 +21,13 @@ export async function generateMetadata({ params }: CabinPageProps): Promise<Meta
   const { slug } = await params;
   const cabin = getCabinBySlug(slug);
 
-  if (!cabin) return { title: "Cabaña no encontrada | Amanecer de Montaña" };
-  return { title: `${cabin.displayName} | Amanecer de Montaña` };
+  if (!cabin) return { title: "Cabaña no encontrada", robots: { index: false, follow: false } };
+
+  return pageMetadata({
+    title: cabin.displayName,
+    description: `${cabin.displayName} en ${site.name}, Malargüe, Mendoza. Consultá disponibilidad y tarifas.`,
+    path: `/cabanas/${cabin.slug}`,
+  });
 }
 
 export default async function CabinPage({ params }: CabinPageProps) {

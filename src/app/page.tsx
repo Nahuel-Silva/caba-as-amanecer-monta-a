@@ -3,14 +3,27 @@ import Link from "next/link";
 import { CabinCard } from "@/components/cabin-card";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { SiteFooter } from "@/components/site-footer";
+import { JsonLd } from "@/components/json-ld";
+import { LocationSection } from "@/components/location-section";
 import { SiteHeader } from "@/components/site-header";
 import { WhatsAppButton } from "@/components/whatsapp-button";
-import { attractions, amenities, faqs, site } from "@/content/site";
+import { site } from "@/content/site";
 import { getCabins } from "@/lib/cabins";
+import { getAmenities, getAttractions, getFaqs } from "@/lib/content";
+import { buildLodgingJsonLd, defaultDescription, pageMetadata } from "@/lib/seo";
 import { isWhatsAppConfigured } from "@/lib/whatsapp";
+
+export const metadata = pageMetadata({
+  title: "Cabañas en Malargüe, Mendoza",
+  description: defaultDescription,
+  path: "/",
+});
 
 export default function Home() {
   const cabins = getCabins();
+  const amenities = getAmenities();
+  const attractions = getAttractions();
+  const faqs = getFaqs();
   const heroImage = {
     src: "/images/demo-landscape-03.jpg",
     alt: "Paisaje de montaña y lago de demostración; no es una fotografía del complejo.",
@@ -23,6 +36,7 @@ export default function Home() {
 
   return (
     <>
+      <JsonLd data={buildLodgingJsonLd()} />
       <SiteHeader />
       <main>
         <section aria-labelledby="hero-title" className="hero">
@@ -131,6 +145,11 @@ export default function Home() {
                 <article key={attraction.name}>
                   <h3>{attraction.name}</h3>
                   <p>{attraction.detail}</p>
+                  {attraction.sourceUrl && (
+                    <a className="text-link" href={attraction.sourceUrl} rel="noopener noreferrer" target="_blank">
+                      Fuente oficial <span className="sr-only">(se abre en una pestaña nueva)</span>
+                    </a>
+                  )}
                 </article>
               ))}
             </div>
@@ -141,21 +160,7 @@ export default function Home() {
           <div className="wrap">
             <p className="eyebrow">Cómo llegar</p>
             <h2 className="section-title" id="location-title">En Malargüe, Mendoza.</h2>
-            <div className="location-grid">
-              <div className="location-copy">
-                <div>
-                  <span className="pending-note">Dirección: {site.address}</span>
-                  <p>La ubicación exacta y las indicaciones se agregarán cuando estén confirmadas.</p>
-                </div>
-                <p>{site.location}</p>
-              </div>
-              <div aria-label="Mapa pendiente de ubicación confirmada" className="map-placeholder" role="img">
-                <div className="map-placeholder-inner">
-                  <span className="pending-note">Mapa: {site.address}</span>
-                  <p>Se mostrará aquí la ubicación del alojamiento.</p>
-                </div>
-              </div>
-            </div>
+            <LocationSection />
           </div>
         </section>
 
