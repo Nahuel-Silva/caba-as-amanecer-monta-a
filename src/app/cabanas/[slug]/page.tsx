@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 import { getCabinBySlug, getCabins } from "@/lib/cabins";
 
 type CabinPageProps = { params: Promise<{ slug: string }> };
@@ -59,6 +60,11 @@ export default async function CabinPage({ params }: CabinPageProps) {
             <p className="eyebrow">Sobre esta cabaña</p>
             <h2>Un espacio para tu estadía.</h2>
             <p>{cabin.description}</p>
+            <div className="detail-cta">
+              <WhatsAppButton cabinName={cabin.displayName} className="button button-primary">
+                Consultar por esta cabaña <span aria-hidden="true">↗</span>
+              </WhatsAppButton>
+            </div>
             <Link className="back-link" href="/cabanas">← Volver a las cabañas</Link>
           </div>
           <div>

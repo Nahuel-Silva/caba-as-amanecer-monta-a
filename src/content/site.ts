@@ -4,7 +4,6 @@ export const site = {
   name: "Cabañas Amanecer de Montaña",
   location: "Malargüe, Mendoza, Argentina",
   address: PENDING,
-  whatsappNumber: PENDING,
   intro:
     "Un lugar para hacer una pausa, descansar y descubrir los paisajes del sur mendocino. Estamos preparando cada detalle para compartir más información pronto.",
   contactNote: "Los datos de contacto se publicarán cuando estén confirmados.",

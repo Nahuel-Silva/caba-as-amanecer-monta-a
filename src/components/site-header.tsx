@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 import { site } from "@/content/site";
 
 export function SiteHeader() {
@@ -19,9 +20,9 @@ export function SiteHeader() {
           <Link href="/cabanas">Cabañas</Link>
           <Link href="/#malargue">Malargüe</Link>
         </nav>
-        <Link className="button button-primary header-cta" href="/#contacto">
+        <WhatsAppButton className="button button-primary header-cta" fallbackHref="/#contacto">
           Consultar <span aria-hidden="true">↗</span>
-        </Link>
+        </WhatsAppButton>
       </div>
     </header>
   );

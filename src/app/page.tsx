@@ -4,8 +4,10 @@ import { CabinCard } from "@/components/cabin-card";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 import { attractions, amenities, faqs, site } from "@/content/site";
 import { getCabins } from "@/lib/cabins";
+import { isWhatsAppConfigured } from "@/lib/whatsapp";
 
 export default function Home() {
   const cabins = getCabins();
@@ -16,7 +18,7 @@ export default function Home() {
   };
   const gallery = [
     heroImage,
-    ...cabins[0].images.filter((image) => image.src !== heroImage.src),
+    ...(cabins[0]?.images ?? []).filter((image) => image.src !== heroImage.src),
   ];
 
   return (
@@ -43,9 +45,9 @@ export default function Home() {
             </h1>
             <p className="hero-copy">Un descanso entre paisajes abiertos, aire de montaña y la calma del sur mendocino.</p>
             <div className="hero-actions">
-              <a className="button button-light" href="#contacto">
+              <WhatsAppButton className="button button-light" fallbackHref="#contacto">
                 Consultar disponibilidad <span aria-hidden="true">↗</span>
-              </a>
+              </WhatsAppButton>
               <Link className="button button-outline" href="/cabanas">
                 Conocer las cabañas
               </Link>
@@ -176,9 +178,19 @@ export default function Home() {
           <div>
             <p className="eyebrow">Contacto</p>
             <h2>¿Planeando una visita a Malargüe?</h2>
-            <p>{site.contactNote}</p>
+            <p>
+              {isWhatsAppConfigured
+                ? "Escribinos por WhatsApp para consultar disponibilidad, tarifas y servicios."
+                : site.contactNote}
+            </p>
           </div>
-          <span className="pending-note">WhatsApp: {site.whatsappNumber}</span>
+          {isWhatsAppConfigured ? (
+            <WhatsAppButton className="button button-primary">
+              Escribir por WhatsApp <span aria-hidden="true">↗</span>
+            </WhatsAppButton>
+          ) : (
+            <span className="pending-note">WhatsApp: pendiente de configurar</span>
+          )}
         </section>
       </main>
       <SiteFooter />

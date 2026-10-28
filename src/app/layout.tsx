@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Cormorant_Garamond } from "next/font/google";
+import { WhatsAppFloat } from "@/components/whatsapp-float";
 import "./globals.css";
 
 const sans = DM_Sans({
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full" suppressHydrationWarning>
         {children}
+        <WhatsAppFloat />
       </body>
     </html>
   );

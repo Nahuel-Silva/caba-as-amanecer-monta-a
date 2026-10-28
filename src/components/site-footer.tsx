@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { site } from "@/content/site";
+import { WhatsAppButton } from "@/components/whatsapp-button";
+import { PENDING, site } from "@/content/site";
+import { isWhatsAppConfigured } from "@/lib/whatsapp";
 
 export function SiteFooter() {
   return (
@@ -15,7 +17,11 @@ export function SiteFooter() {
               <span className="brand-location">Malargüe · Mendoza</span>
             </span>
           </Link>
-          <p className="footer-pending">Contacto y redes sociales: {site.whatsappNumber}</p>
+          {isWhatsAppConfigured ? (
+            <WhatsAppButton className="footer-wa">Consultar por WhatsApp</WhatsAppButton>
+          ) : (
+            <p className="footer-pending">Contacto y redes sociales: {PENDING}</p>
+          )}
         </div>
         <nav aria-label="Enlaces del pie de página" className="footer-links">
           <Link href="/cabanas">Cabañas</Link>
