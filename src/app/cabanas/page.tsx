@@ -21,7 +21,7 @@ export default function CabinsPage() {
         <header className="wrap page-heading">
           <p className="eyebrow">Amanecer de Montaña · Malargüe</p>
           <h1>Nuestras cabañas.</h1>
-          <p className="section-intro">La información de cada alojamiento se completará cuando estén confirmados sus nombres y características.</p>
+          <p className="section-intro">Dos cabañas para 5 personas cada una, dentro del mismo complejo.</p>
         </header>
         <section aria-label="Cabañas disponibles" className="wrap section" style={{ paddingTop: 0 }}>
           <div className="cabin-grid">

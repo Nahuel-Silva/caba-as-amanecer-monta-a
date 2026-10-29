@@ -53,9 +53,9 @@ export default async function CabinPage({ params }: CabinPageProps) {
       <main>
         <div className="wrap cabin-detail-heading">
           <header className="page-heading">
-            <p className="eyebrow">Alojamiento · Información pendiente</p>
+            <p className="eyebrow">Alojamiento · Malargüe</p>
             <h1>{cabin.displayName}</h1>
-            <p className="section-intro">Nombre real, descripción y datos del alojamiento: {cabin.nameStatus}.</p>
+            <p className="section-intro">{cabin.cardSummary}</p>
           </header>
           <Link className="button button-primary" href="/cabanas">Todas las cabañas</Link>
         </div>

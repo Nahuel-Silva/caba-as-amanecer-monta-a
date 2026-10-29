@@ -40,7 +40,7 @@ type PageSeo = {
   /** Título de la página; el layout le agrega " | Cabañas Amanecer de Montaña". */
   title: string;
   description: string;
-  /** Ruta de la página, por ejemplo "/cabanas" o "/cabanas/cabana-1". */
+  /** Ruta de la página, por ejemplo "/cabanas" o "/cabanas/payunia". */
   path: string;
 };
 

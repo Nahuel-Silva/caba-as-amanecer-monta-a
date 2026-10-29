@@ -1,4 +1,4 @@
-import { attractions } from "@/content/attractions";
+import { attractions, attractionsIntro } from "@/content/attractions";
 import { faqs } from "@/content/faqs";
 import { amenities } from "@/content/site";
 
@@ -9,6 +9,10 @@ import { amenities } from "@/content/site";
  */
 export function getAttractions() {
   return attractions;
+}
+
+export function getAttractionsIntro() {
+  return attractionsIntro;
 }
 
 export function getFaqs() {

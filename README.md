@@ -36,7 +36,7 @@ Los mensajes precargados se arman en `src/lib/whatsapp.ts` (mensaje general y me
 | Qué | Archivo |
 | --- | --- |
 | Nombre, ubicación, dirección, coordenadas, indicaciones, textos generales y servicios | `src/content/site.ts` |
-| Atractivos de Malargüe (con enlace opcional a la fuente oficial) | `src/content/attractions.ts` |
+| Atractivos de Malargüe (texto, fuente y fotos con crédito) | `src/content/attractions.ts` |
 | Preguntas frecuentes | `src/content/faqs.ts` |
 | Cabañas (nombre, descripción, capacidad, camas, baños, servicios, reglas, fotos) | `src/content/cabins.ts` |
 | Fotos | `public/images/` (y se referencian desde `cabins.ts`) |
@@ -46,6 +46,24 @@ Todo dato sin confirmar dice `PENDIENTE`. No se publican precios, disponibilidad
 Para agregar una cabaña, sumá un objeto al arreglo de `src/content/cabins.ts` con un `slug` nuevo: la página `/cabanas/<slug>` se genera sola.
 
 Cuando cargues fotos reales, poné `isDemo: false` en cada imagen para que desaparezca el rótulo "Foto de demostración".
+
+## Atractivos de Malargüe y sus fotos
+
+Los textos de `src/content/attractions.ts` están escritos con palabras propias a partir de fuentes del Gobierno de Mendoza (cada atractivo enlaza a la suya). Solo se incluyen distancias que figuran en esas fuentes; no hay horarios, tarifas ni condiciones de acceso, que cambian: la sección remite a la Dirección de Turismo de Malargüe.
+
+**Fotos:** por ahora no hay. Para agregar una, copiá el archivo a `public/images/malargue/` y sumá al atractivo:
+
+```ts
+image: {
+  src: "/images/malargue/payunia.jpg",
+  alt: "Descripción de lo que se ve en la foto",
+  credit: "Nombre del autor",
+  license: "CC BY-SA 4.0",            // o "Uso autorizado por ..."
+  creditUrl: "https://...",           // página de origen (opcional)
+},
+```
+
+Usá solo fotos propias, con autorización escrita de quien las tenga, o con una licencia que permita uso comercial (por ejemplo CC BY o CC BY-SA en Wikimedia Commons, citando autor y licencia). No sirven las licencias "NC" (no comercial) ni las fotos tomadas de Google, redes o sitios de turismo sin permiso.
 
 ## Ubicación y mapa
 
@@ -83,6 +101,7 @@ public/images/    fotografías
 ## Pendiente (ver BRIEF.md, sección 12)
 
 - Cargar la dirección, las coordenadas y las indicaciones reales (ver "Ubicación y mapa").
-- Fotos reales y datos reales de las cabañas, atractivos y preguntas frecuentes.
+- Fotos reales de las cabañas y del complejo, y fotos con licencia de los atractivos.
+- Tarifas vigentes, si se quieren publicar.
 - Imagen de Open Graph con una foto real.
 - Despliegue (hosting y dominio) y guía de publicación.
