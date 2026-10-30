@@ -78,6 +78,7 @@ export function buildLodgingJsonLd(): Record<string, unknown> | null {
     "@type": "LodgingBusiness",
     name: site.name,
     url: siteUrl,
+    logo: absoluteUrl("/brand/logo-negro.png"),
     address: {
       "@type": "PostalAddress",
       addressLocality: "Malargüe",

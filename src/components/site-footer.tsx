@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { PENDING, site } from "@/content/site";
 import { isWhatsAppConfigured } from "@/lib/whatsapp";
@@ -9,13 +10,7 @@ export function SiteFooter() {
       <div className="wrap footer-inner">
         <div>
           <Link aria-label={`${site.name}, inicio`} className="brand" href="/">
-            <span aria-hidden="true" className="brand-symbol">
-              A
-            </span>
-            <span className="brand-copy">
-              <span className="brand-name">Amanecer de Montaña</span>
-              <span className="brand-location">Malargüe · Mendoza</span>
-            </span>
+            <BrandLogo tone="light" />
           </Link>
           {isWhatsAppConfigured ? (
             <WhatsAppButton className="footer-wa">Consultar por WhatsApp</WhatsAppButton>

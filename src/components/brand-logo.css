@@ -1,0 +1,11 @@
+/* Selectores con .brand para ganar a las reglas generales de globals.css. */
+.brand .brand-logo { display: block; width: auto; max-width: none; height: 84px; }
+.site-footer .brand .brand-logo { height: 100px; }
+.brand:has(.brand-logo) { min-width: 0; }
+.site-footer .brand { display: flex; width: fit-content; }
+.site-header .header-inner { min-height: 104px; }
+@media (max-width: 760px) {
+  .site-header .header-inner { min-height: 0; }
+  .brand .brand-logo { height: 60px; }
+  .site-footer .brand .brand-logo { height: 84px; }
+}
