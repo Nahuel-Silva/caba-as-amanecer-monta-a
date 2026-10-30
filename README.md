@@ -51,7 +51,7 @@ Cuando cargues fotos reales, poné `isDemo: false` en cada imagen para que desap
 
 Los textos de `src/content/attractions.ts` están escritos con palabras propias a partir de fuentes del Gobierno de Mendoza (cada atractivo enlaza a la suya). Solo se incluyen distancias que figuran en esas fuentes; no hay horarios, tarifas ni condiciones de acceso, que cambian: la sección remite a la Dirección de Turismo de Malargüe.
 
-**Fotos:** por ahora no hay. Para agregar una, copiá el archivo a `public/images/malargue/` y sumá al atractivo:
+**Fotos:** las actuales vienen de Wikimedia Commons, con licencias CC BY-SA, y la página muestra autor y licencia de cada una. Para agregar otra, copiá el archivo a `public/images/malargue/` y sumá al atractivo:
 
 ```ts
 image: {
@@ -60,6 +60,7 @@ image: {
   credit: "Nombre del autor",
   license: "CC BY-SA 4.0",            // o "Uso autorizado por ..."
   creditUrl: "https://...",           // página de origen (opcional)
+  licenseUrl: "https://...",          // texto de la licencia (opcional)
 },
 ```
 

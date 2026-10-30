@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AttractionCard } from "@/components/attraction-card";
 import { ContactBand } from "@/components/contact-band";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -24,20 +25,12 @@ export default function MalarguePage() {
           <p className="section-intro">{getAttractionsIntro()}</p>
         </header>
         <section aria-label="Atractivos de Malargüe" className="wrap section" style={{ paddingTop: 0 }}>
-          <div className="destination-list" style={{ marginTop: 0 }}>
-            {attractions.map((attraction) => (
-              <article key={attraction.name}>
-                <h3>{attraction.name}</h3>
-                <p>{attraction.detail}</p>
-                {attraction.sourceUrl && (
-                  <a className="text-link" href={attraction.sourceUrl} rel="noopener noreferrer" target="_blank">
-                    {attraction.sourceLabel ?? "Fuente oficial"}{" "}
-                    <span className="sr-only">(se abre en una pestaña nueva)</span>
-                  </a>
-                )}
-              </article>
+          <div className="attraction-grid">
+            {attractions.map((attraction, index) => (
+              <AttractionCard attraction={attraction} eager={index < 2} key={attraction.name} />
             ))}
           </div>
+          <p className="attraction-credits-note">Fotos de Wikimedia Commons, redimensionadas para la web. Las licencias se indican en cada una.</p>
         </section>
         <ContactBand />
       </main>

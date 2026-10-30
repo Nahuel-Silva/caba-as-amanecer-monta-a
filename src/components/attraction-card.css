@@ -1,0 +1,16 @@
+.attraction-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.attraction-card { display: flex; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
+.attraction-photo { position: relative; aspect-ratio: 3 / 2; background: #c9c4b5; }
+.attraction-photo img { object-fit: cover; }
+.attraction-body { display: flex; flex: 1; flex-direction: column; padding: 22px; }
+.attraction-body h2 { margin: 0 0 8px; font-family: var(--font-display), serif; font-size: 24px; font-weight: 600; line-height: 1.2; }
+.attraction-body p { margin: 0; color: var(--muted); font-size: 14px; }
+.attraction-body .text-link { margin-top: auto; padding-top: 16px; }
+.attraction-credit { padding-top: 10px; color: var(--muted); font-size: 12px; }
+.attraction-credit a { text-decoration: underline; text-underline-offset: 2px; }
+.attraction-credits-note { margin: 24px 0 0; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 760px) {
+  .attraction-grid { grid-template-columns: 1fr; }
+  .attraction-body { padding: 18px; }
+}
