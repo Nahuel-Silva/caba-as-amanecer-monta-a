@@ -11,6 +11,7 @@ export function SiteFooter() {
         </Link>
         <nav aria-label="Enlaces del pie de página" className="footer-links">
           <Link href="/cabanas">Cabañas</Link>
+          <Link href="/promociones">Promociones</Link>
           <Link href="/malargue">Malargüe</Link>
           <Link href="/ubicacion">Ubicación</Link>
           <Link href="/preguntas">Preguntas</Link>

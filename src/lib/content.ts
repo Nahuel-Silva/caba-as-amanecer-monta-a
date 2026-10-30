@@ -1,5 +1,7 @@
 import { attractions, attractionsIntro } from "@/content/attractions";
 import { faqs } from "@/content/faqs";
+import { promotions } from "@/content/promotions";
+import { ratingsCheckedAt, ratingSummaries, reviews } from "@/content/reviews";
 import { amenities } from "@/content/site";
 
 /**
@@ -17,6 +19,26 @@ export function getAttractionsIntro() {
 
 export function getFaqs() {
   return faqs;
+}
+
+export function getPromotions() {
+  return promotions.filter((promotion) => promotion.active);
+}
+
+export function getPromotionBySlug(slug: string) {
+  return getPromotions().find((promotion) => promotion.slug === slug);
+}
+
+export function getReviews() {
+  return reviews;
+}
+
+export function getRatingSummaries() {
+  return ratingSummaries;
+}
+
+export function getRatingsCheckedAt() {
+  return ratingsCheckedAt;
 }
 
 export function getAmenities() {

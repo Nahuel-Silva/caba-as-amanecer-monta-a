@@ -7,6 +7,7 @@ import "./site-nav.css";
 export const navItems = [
   { href: "/", label: "Inicio" },
   { href: "/cabanas", label: "Cabañas" },
+  { href: "/promociones", label: "Promociones" },
   { href: "/malargue", label: "Malargüe" },
   { href: "/ubicacion", label: "Ubicación" },
   { href: "/preguntas", label: "Preguntas" },

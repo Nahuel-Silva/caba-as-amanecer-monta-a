@@ -28,12 +28,12 @@ export const faqs: Faq[] = [
   {
     question: "¿Cuántas personas entran en cada cabaña?",
     answer:
-      "Cada cabaña es para 5 personas: un dormitorio matrimonial (Queen Size), otro con dos camas individuales de 1 plaza y media, y un sofá cama de 1 plaza y media en la sala comedor.",
+      "Cada cabaña es para 4 personas: un dormitorio matrimonial (Queen Size) y otro con dos camas individuales de 1 plaza y media. Si lo pedís, se puede agregar una cama extra de 1 plaza con costo adicional.",
   },
   {
     question: "¿Qué servicios incluye la estadía?",
     answer:
-      "WiFi, televisor con DIRECTV, aire acondicionado, calefacción a gas natural y estufa a leña, cocina equipada, cochera cubierta, parrilla y servicio de ropa blanca.",
+      "WiFi, televisor con DIRECTV, aire acondicionado, calefacción a gas natural y estufa a leña, cocina equipada, cochera individual techada, parrilla y servicio de ropa blanca.",
   },
   {
     question: "¿Cómo funciona la limpieza y el cambio de ropa blanca?",
@@ -46,12 +46,17 @@ export const faqs: Faq[] = [
       "No se reconocen cambios de fecha ni devoluciones sobre las reservas confirmadas por inconvenientes de transporte aéreo o terrestre ni por condiciones climáticas. La seña del 50 % no es reembolsable.",
   },
   {
+    question: "¿Qué actividades se pueden hacer en la zona?",
+    answer:
+      "En los alrededores hay senderos y montañas para hacer trekking, mountain bike, tirolesa y rapel en todas las épocas del año.",
+  },
+  {
     question: "¿Se aceptan mascotas?",
     answer: "No, no se aceptan mascotas.",
   },
   {
     question: "¿Cómo llego?",
     answer:
-      "Estamos a 100 metros de la Ruta Nacional 40, por el acceso Norte a la ciudad de Malargüe, y a aproximadamente 1 kilómetro del centro.",
+      "Estamos a 100 metros de la Ruta Nacional 40, por el acceso Norte a la ciudad de Malargüe, y a aproximadamente 1 kilómetro del centro. El centro de ski Las Leñas está a 80 km.",
   },
 ];

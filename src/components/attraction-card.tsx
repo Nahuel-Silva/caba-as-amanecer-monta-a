@@ -13,6 +13,7 @@ export function AttractionCard({ attraction, eager = false }: { attraction: Attr
             alt={image.alt}
             fill
             loading={eager ? "eager" : undefined}
+            quality={90}
             sizes="(max-width: 760px) 100vw, 590px"
             src={image.src}
           />

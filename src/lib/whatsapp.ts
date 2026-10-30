@@ -19,9 +19,28 @@ export const isWhatsAppConfigured = whatsappNumber !== null;
 export type Inquiry = {
   /** Nombre de la cabaña desde la que consulta el visitante, si corresponde. */
   cabinName?: string;
+  /** Título de la promoción por la que consulta, si corresponde. */
+  promotionTitle?: string;
+  promotionCode?: string;
+  /** Fechas en formato AAAA-MM-DD. */
+  arrival?: string;
+  departure?: string;
+  guests?: string;
 };
 
-export function buildWhatsAppMessage({ cabinName }: Inquiry = {}): string {
+/** "2026-07-15" -> "15/07/2026" */
+function formatDate(date: string) {
+  return date.split("-").reverse().join("/");
+}
+
+export function buildWhatsAppMessage({ cabinName, promotionTitle, promotionCode, arrival, departure, guests }: Inquiry = {}): string {
+  if (promotionTitle) {
+    const stay = arrival && departure ? ` Llegada: ${formatDate(arrival)}. Salida: ${formatDate(departure)}.` : "";
+    const people = guests ? ` Personas: ${guests}.` : "";
+    const code = promotionCode ? ` Código: ${promotionCode}.` : "";
+    return `Hola, quisiera consultar por la promoción "${promotionTitle}" de ${site.name} en Malargüe.${stay}${people}${code} ¿Podrían darme más información?`;
+  }
+
   const subject = cabinName ? `${cabinName} de ${site.name}` : site.name;
   return `Hola, quisiera recibir información sobre ${subject} en Malargüe. ¿Podrían indicarme disponibilidad, tarifas y servicios?`;
 }

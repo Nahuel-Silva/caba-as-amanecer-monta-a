@@ -14,6 +14,7 @@ export function DemoImage({ src, alt, isDemo, eager = false }: DemoImageProps) {
         alt={alt}
         fill
         loading={eager ? "eager" : undefined}
+        quality={90}
         sizes="(max-width: 760px) 100vw, 60vw"
         src={src}
       />

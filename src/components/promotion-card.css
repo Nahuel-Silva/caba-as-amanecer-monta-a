@@ -1,0 +1,46 @@
+.promotion-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 20px; }
+.promotion-card { display: flex; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
+.promotion-photo { position: relative; aspect-ratio: 3 / 2; overflow: hidden; background: #c9c4b5; }
+.promotion-photo img { object-fit: cover; }
+.promotion-badge { position: absolute; top: 14px; left: 14px; z-index: 1; padding: 7px 14px; border-radius: 999px; background: var(--clay); color: #fffdf7; font-size: 15px; font-weight: 800; }
+.promotion-badge-inline { position: static; align-self: flex-start; margin-bottom: 12px; }
+.promotion-body { display: flex; flex: 1; flex-direction: column; padding: 24px; }
+.promotion-body h2 { margin: 0 0 8px; font-family: var(--font-display), serif; font-size: 26px; font-weight: 600; line-height: 1.2; }
+.promotion-body > p { margin: 0; color: var(--muted); font-size: 15px; }
+.promotion-validity { margin: 0 0 8px; color: var(--clay); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.promotion-body .promotion-validity { color: var(--clay); font-size: 12px; margin-bottom: 8px; }
+.promotion-body .button { align-self: flex-start; margin-top: 20px; }
+.promotion-empty { max-width: 640px; padding: 28px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; }
+.promotion-empty h2 { margin: 0 0 8px; font-family: var(--font-display), serif; font-size: 26px; font-weight: 600; }
+.promotion-empty p { margin: 0; color: var(--muted); }
+
+/* Página de cada promoción. */
+.promotion-detail { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); align-items: start; gap: clamp(28px, 5vw, 64px); padding-block: 40px 96px; }
+.promotion-detail .back-link { display: inline-block; margin: 0 0 18px; }
+.promotion-detail-photo { margin-bottom: 26px; border-radius: var(--radius); box-shadow: var(--shadow-card); }
+.promotion-detail h1 { margin: 0 0 12px; font-family: var(--font-display), serif; font-size: clamp(38px, 5vw, 58px); font-weight: 600; line-height: 1.05; letter-spacing: -.012em; }
+.promotion-lead { margin: 0; color: var(--muted); font-size: 17px; }
+.promotion-details { display: grid; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+.promotion-details li { position: relative; padding-left: 24px; }
+.promotion-details li::before { content: "✓"; position: absolute; left: 0; color: var(--olive); font-weight: 800; }
+.promotion-code { margin: 22px 0 0; font-size: 15px; }
+.promotion-code strong { padding: 3px 10px; border: 1px dashed var(--clay); border-radius: 8px; letter-spacing: .05em; }
+.promotion-conditions { margin: 18px 0 0; color: var(--muted); font-size: 13px; }
+.promotion-share { margin-top: 20px; padding: 0; border: 0; background: none; color: var(--olive-dark); cursor: pointer; font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.promotion-inquiry { position: sticky; top: 24px; display: grid; gap: 14px; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-card); }
+.promotion-inquiry h2 { margin: 0; font-family: var(--font-display), serif; font-size: 25px; font-weight: 600; line-height: 1.15; }
+.promotion-inquiry > p { margin: 0; color: var(--muted); font-size: 14px; }
+.promotion-inquiry label { display: grid; gap: 6px; font-size: 14px; font-weight: 700; }
+.promotion-inquiry input, .promotion-inquiry select { width: 100%; padding: 11px 13px; border: 1px solid #b9b09f; border-radius: var(--radius-sm); background: #fffdf7; color: var(--ink); font: inherit; font-weight: 400; }
+.promotion-inquiry input:focus-visible, .promotion-inquiry select:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 1px; }
+.promotion-inquiry .promotion-inquiry-error { color: #9c3d24; font-weight: 700; }
+.promotion-inquiry small { color: var(--muted); font-size: 12px; text-align: center; }
+
+@media (max-width: 960px) {
+  .promotion-detail { grid-template-columns: 1fr; padding-bottom: 64px; }
+  .promotion-inquiry { position: static; }
+}
+@media (max-width: 760px) {
+  .promotion-grid { grid-template-columns: 1fr; }
+  .promotion-body { padding: 20px; }
+}

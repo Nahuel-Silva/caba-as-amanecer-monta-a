@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { LocationSection } from "@/components/location-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -21,6 +22,18 @@ export default function LocationPage() {
         </header>
         <section aria-label="Mapa y dirección" className="wrap section" style={{ paddingTop: 0 }}>
           <LocationSection />
+          <figure className="location-entrance">
+            <div className="location-entrance-photo">
+              <Image
+                alt="Portón negro de la entrada al complejo, con el cartel de Amanecer de Montaña."
+                fill
+                quality={90}
+                sizes="(max-width: 1264px) 100vw, 1200px"
+                src="/images/alrededor/entrada.jpg"
+              />
+            </div>
+            <figcaption>La entrada al complejo, con nuestro cartel en el portón.</figcaption>
+          </figure>
         </section>
       </main>
       <SiteFooter />

@@ -66,6 +66,14 @@ image: {
 
 Usá solo fotos propias, con autorización escrita de quien las tenga, o con una licencia que permita uso comercial (por ejemplo CC BY o CC BY-SA en Wikimedia Commons, citando autor y licencia). No sirven las licencias "NC" (no comercial) ni las fotos tomadas de Google, redes o sitios de turismo sin permiso.
 
+## Promociones
+
+Las promociones de `/promociones` se cargan en `src/content/promotions.ts`: copiá el ejemplo de ese archivo dentro de la lista y, si tiene foto, guardala en `public/images/promociones/`. Cada una necesita `slug`, `title`, `description` y `active`; `discount`, `validity`, `details`, `conditions`, `code` e `image` son opcionales. Cada promoción tiene su propia página en `/promociones/<slug>`, con un formulario que arma la consulta por WhatsApp con fechas y personas; no reserva ni confirma disponibilidad. Con `active: false` deja de mostrarse sin borrarla, y sin promociones activas la página muestra un aviso. La vigencia es solo un texto: la promoción no se oculta sola al vencer.
+
+## Opiniones
+
+Las reseñas del inicio se cargan en `src/content/reviews.ts`. Usá solo opiniones reales, copiadas tal cual y con el enlace a su fuente, y actualizá `ratingsCheckedAt` cuando revises los puntajes. El formulario para dejar una reseña es por ahora un mock: `src/lib/reviews-service.ts` no guarda nada y la web avisa que está en prueba. Para activarlo de verdad hay que reemplazar esa función por una base de datos con aprobación previa. No se agregan reseñas a los datos estructurados de Google.
+
 ## Ubicación y mapa
 
 En `src/content/site.ts` completá:

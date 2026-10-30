@@ -1,0 +1,15 @@
+/* Selectores dobles para ganar a las reglas de .cta-band de globals.css. */
+.contact-panel.cta-band { position: relative; isolation: isolate; min-height: 340px; margin-block: 0 96px; padding: clamp(36px, 6vw, 72px); overflow: hidden; border-radius: var(--radius-lg); background: var(--olive-dark); box-shadow: var(--shadow-card); color: #fffdf7; }
+.contact-panel-photo, .contact-panel-shade { position: absolute; inset: 0; z-index: -1; }
+.contact-panel-photo img { object-fit: cover; object-position: center 60%; }
+.contact-panel-shade { background: linear-gradient(90deg, rgb(39 49 34 / 94%) 15%, rgb(39 49 34 / 62%) 70%, rgb(39 49 34 / 38%)); }
+.contact-panel .eyebrow { color: #f0c3a4; }
+.contact-panel.cta-band h2 { color: #fffdf7; }
+.contact-panel.cta-band p:not(.eyebrow) { color: rgb(255 253 247 / 86%); }
+.contact-panel .button { flex: none; }
+.contact-panel .pending-note { color: #e9b398; }
+
+@media (max-width: 760px) {
+  .contact-panel.cta-band { min-height: 0; margin-block-end: 64px; }
+  .contact-panel-shade { background: rgb(39 49 34 / 82%); }
+}

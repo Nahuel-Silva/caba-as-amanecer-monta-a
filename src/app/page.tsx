@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ContactBand } from "@/components/contact-band";
 import { CabinCard } from "@/components/cabin-card";
+import { PhotoGallery } from "@/components/photo-gallery";
+import { ReviewsSection } from "@/components/reviews-section";
 import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/json-ld";
 import { SiteHeader } from "@/components/site-header";
@@ -20,10 +22,52 @@ export default function Home() {
   const cabins = getCabins();
   const amenities = getAmenities();
   const heroImage = {
-    src: "/images/demo-landscape-03.jpg",
-    alt: "Paisaje de montaña y lago de demostración; no es una fotografía del complejo.",
-    isDemo: true,
+    src: "/images/alrededor/portada.jpg",
+    alt: "Dos cabañas del complejo a los lados de un camino, al pie de una hilera de álamos.",
+    isDemo: false,
   };
+  const surroundings = [
+    {
+      src: "/images/alrededor/20.jpg",
+      alt: "Parque de césped con las galerías de las cabañas a un lado y árboles al fondo.",
+      isDemo: false,
+    },
+    {
+      src: "/images/alrededor/sauce.jpg",
+      alt: "Cabaña verde junto a un sauce y un camino de tierra, con álamos al fondo.",
+      isDemo: false,
+    },
+    {
+      src: "/images/alrededor/jardin.jpg",
+      alt: "Parque de césped con arbustos y árboles, y una cabaña al fondo.",
+      isDemo: false,
+    },
+    {
+      src: "/images/alrededor/parque.jpg",
+      alt: "Dos cabañas del complejo con sus cocheras techadas, frente al parque y los álamos.",
+      isDemo: false,
+    },
+    {
+      src: "/images/alrededor/hojas.jpg",
+      alt: "Cabaña con galería vista entre las hojas de un árbol, con el parque delante.",
+      isDemo: false,
+    },
+    {
+      src: "/images/alrededor/cabana-alamos.jpg",
+      alt: "Cabaña en el parque, al pie de una hilera de álamos y un cielo de tormenta.",
+      isDemo: false,
+    },
+    {
+      src: "/images/alrededor/cabana-piedra.jpg",
+      alt: "Cabaña con chimenea de piedra y galería, rodeada de plantas y álamos.",
+      isDemo: false,
+    },
+    {
+      src: "/images/alrededor/cabana-tormenta.jpg",
+      alt: "Cabaña entre plantas, con álamos altos y el cielo cubierto.",
+      isDemo: false,
+    },
+  ];
 
   return (
     <>
@@ -36,6 +80,7 @@ export default function Home() {
               alt={heroImage.alt}
               fill
               loading="eager"
+              quality={90}
               sizes="100vw"
               src={heroImage.src}
             />
@@ -55,13 +100,21 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <span className="hero-stamp">Una pausa en el sur mendocino</span>
         </section>
 
         <section className="intro-section">
           <div className="wrap intro-grid">
-            <div className="intro-label">El lugar · 01</div>
+            <div className="intro-photo">
+              <Image
+                alt="Lateral de una cabaña con el parque de césped y árboles, bajo un cielo con nubes."
+                fill
+                quality={90}
+                sizes="(max-width: 760px) 100vw, 420px"
+                src="/images/alrededor/intro.jpg"
+              />
+            </div>
             <div className="intro-copy">
+              <p className="intro-label">El lugar</p>
               <h2>
                 Despertar con tiempo,
                 <br />
@@ -90,8 +143,8 @@ export default function Home() {
           <div className="wrap feature-band">
             <div>
               <p className="eyebrow">Una estadía a tu ritmo</p>
-              <h2 className="section-title" id="amenities-title">Lo esencial, en preparación.</h2>
-              <p className="section-intro">Estamos reuniendo la información confirmada de cada servicio para compartirla pronto.</p>
+              <h2 className="section-title" id="amenities-title">Lo esencial, resuelto.</h2>
+              <p className="section-intro">El complejo está atendido por sus dueños, con atención personalizada.</p>
             </div>
             <ul className="feature-list">
               {amenities.map((amenity) => (
@@ -103,6 +156,16 @@ export default function Home() {
             </ul>
           </div>
         </section>
+
+        <section aria-labelledby="surroundings-title" className="section section-muted photo-zoom">
+          <div className="wrap">
+            <p className="eyebrow">El entorno</p>
+            <h2 className="section-title section-title-spaced" id="surroundings-title">Espacio verde para estar afuera.</h2>
+            <PhotoGallery images={surroundings} panOnHover />
+          </div>
+        </section>
+
+        <ReviewsSection />
 
         <ContactBand />
       </main>
