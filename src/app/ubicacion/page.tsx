@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ContactBand } from "@/components/contact-band";
 import { LocationSection } from "@/components/location-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -23,7 +22,6 @@ export default function LocationPage() {
         <section aria-label="Mapa y dirección" className="wrap section" style={{ paddingTop: 0 }}>
           <LocationSection />
         </section>
-        <ContactBand />
       </main>
       <SiteFooter />
     </>

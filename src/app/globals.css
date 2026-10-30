@@ -142,7 +142,6 @@ button { font: inherit; }
 .footer-inner { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
 .site-footer .brand-location { color: rgb(255 253 247 / 65%); }
 .footer-links { display: flex; flex-wrap: wrap; gap: 23px; color: rgb(255 253 247 / 77%); font-size: 11px; }
-.footer-pending { margin: 19px 0 0; color: rgb(255 253 247 / 55%); font-size: 10px; }
 .page-heading { padding-block: 95px 66px; }
 .page-heading h1 { max-width: 900px; font-size: clamp(54px, 8vw, 94px); }
 .page-heading .section-intro { max-width: 570px; margin-top: 22px; }
@@ -170,7 +169,6 @@ button { font: inherit; }
   .brand-name { font-size: 16px; }
   .brand-location { font-size: 9px; }
   .main-nav { gap: 15px; font-size: 11px; }
-  .header-cta { display: none; }
   .hero { min-height: min(78svh, 720px); }
   .hero-content { width: min(100% - 40px, 560px); padding-block: 90px 76px; }
   .hero h1 { font-size: clamp(56px, 14vw, 82px); }
@@ -214,15 +212,12 @@ button { font: inherit; }
 }
 
 /* WhatsApp */
-.wa-float { position: fixed; right: 16px; bottom: 16px; z-index: 15; display: none; min-height: 48px; align-items: center; padding: 0 22px; border-radius: 999px; background: var(--olive-dark); color: #fffdf7; font-size: 13px; font-weight: 600; box-shadow: 0 6px 20px rgb(0 0 0 / 28%); }
-.wa-float:hover { background: #273122; }
-.wa-float:focus-visible { outline: 2px solid #fffdf7; outline-offset: 3px; }
-.footer-wa { display: inline-block; margin-top: 19px; color: #fffdf7; font-size: 13px; text-decoration: underline; text-underline-offset: 4px; }
+.wa-float { position: fixed; right: 20px; bottom: max(20px, env(safe-area-inset-bottom)); z-index: 15; display: grid; width: 60px; height: 60px; place-items: center; border-radius: 50%; background: #25d366; color: #fff; box-shadow: 0 6px 20px rgb(0 0 0 / 28%); transition: transform 160ms ease, box-shadow 160ms ease; }
+.wa-float svg { width: 34px; height: 34px; }
+.wa-float:hover { box-shadow: 0 8px 24px rgb(0 0 0 / 34%); transform: scale(1.07); }
+.wa-float:focus-visible { outline: 3px solid var(--olive-dark); outline-offset: 3px; }
+.site-footer { padding-bottom: 96px; }
 .detail-cta { margin: 28px 0 8px; }
-@media (max-width: 760px) {
-  .wa-float { display: inline-flex; }
-  .site-footer { padding-bottom: 96px; }
-}
 
 /* Ubicación */
 .map-embed { min-height: 300px; border: 1px solid var(--line); background: #e8dfd0; }
@@ -316,9 +311,6 @@ body {
 .detail-list span { font-size: 14px; }
 .detail-content h2 { font-size: 32px; font-weight: 600; }
 .back-link { font-size: 14px; font-weight: 700; }
-
-/* WhatsApp flotante */
-.wa-float { font-size: 14px; font-weight: 700; }
 
 @media (max-width: 760px) {
   .hero { border-radius: 0 0 var(--radius) var(--radius); }

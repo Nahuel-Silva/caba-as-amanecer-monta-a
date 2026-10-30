@@ -2,11 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ContactBand } from "@/components/contact-band";
 import { CabinCard } from "@/components/cabin-card";
-import { PhotoGallery } from "@/components/photo-gallery";
 import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/json-ld";
 import { SiteHeader } from "@/components/site-header";
-import { WhatsAppButton } from "@/components/whatsapp-button";
 import { site } from "@/content/site";
 import { getCabins } from "@/lib/cabins";
 import { getAmenities } from "@/lib/content";
@@ -26,10 +24,6 @@ export default function Home() {
     alt: "Paisaje de montaña y lago de demostración; no es una fotografía del complejo.",
     isDemo: true,
   };
-  const gallery = [
-    heroImage,
-    ...(cabins[0]?.images ?? []).filter((image) => image.src !== heroImage.src),
-  ];
 
   return (
     <>
@@ -56,10 +50,7 @@ export default function Home() {
             </h1>
             <p className="hero-copy">Un descanso entre paisajes abiertos, aire de montaña y la calma del sur mendocino.</p>
             <div className="hero-actions">
-              <WhatsAppButton className="button button-light" fallbackHref="#contacto">
-                Consultar disponibilidad <span aria-hidden="true">↗</span>
-              </WhatsAppButton>
-              <Link className="button button-outline" href="/cabanas">
+              <Link className="button button-light" href="/cabanas">
                 Conocer las cabañas
               </Link>
             </div>
@@ -77,9 +68,6 @@ export default function Home() {
                 cerca de <em>la montaña.</em>
               </h2>
               <p>{site.intro}</p>
-              <Link className="text-link" href="/cabanas">
-                Explorar las cabañas <span aria-hidden="true">→</span>
-              </Link>
             </div>
           </div>
         </section>
@@ -91,9 +79,6 @@ export default function Home() {
                 <p className="eyebrow">Alojamiento</p>
                 <h2 className="section-title" id="cabins-title">Un lugar para cada viaje.</h2>
               </div>
-              <Link className="text-link" href="/cabanas">
-                Ver todas las cabañas <span aria-hidden="true">→</span>
-              </Link>
             </div>
             <div className="cabin-grid">
               {cabins.map((cabin) => <CabinCard cabin={cabin} key={cabin.slug} />)}
@@ -118,22 +103,6 @@ export default function Home() {
             </ul>
           </div>
         </section>
-
-        <section aria-labelledby="gallery-title" className="section section-muted">
-          <div className="wrap">
-            <div className="section-heading-row">
-              <div>
-                <p className="eyebrow">Paisajes de muestra</p>
-                <h2 className="section-title" id="gallery-title">Una idea de lo que inspira el viaje.</h2>
-                <p className="section-intro">Estas imágenes son ilustrativas y no corresponden a las cabañas.</p>
-              </div>
-            </div>
-            <PhotoGallery images={gallery} />
-          </div>
-        </section>
-
-
-
 
         <ContactBand />
       </main>

@@ -5,7 +5,7 @@ import { isWhatsAppConfigured } from "@/lib/whatsapp";
 /** Bloque de contacto que se repite al final de las páginas principales. */
 export function ContactBand() {
   return (
-    <section className="wrap cta-band" id="contacto">
+    <section className="wrap cta-band">
       <div>
         <p className="eyebrow">Contacto</p>
         <h2>¿Planeando una visita a Malargüe?</h2>

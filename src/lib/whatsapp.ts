@@ -4,7 +4,7 @@ import { site } from "@/content/site";
  * Única fuente del número de WhatsApp: la variable de entorno
  * NEXT_PUBLIC_WHATSAPP_NUMBER (ver .env.example y README.md).
  * Mientras no esté cargada, los botones de WhatsApp no se muestran
- * (o apuntan a la sección de contacto) y nunca se publica un número inventado.
+ * y nunca se publica un número inventado.
  */
 
 /** Deja solo dígitos ("+54 9 260 123-4567" -> "542601234567"). Devuelve null si no parece un número válido. */

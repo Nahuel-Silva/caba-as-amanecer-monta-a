@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { AttractionCard } from "@/components/attraction-card";
-import { ContactBand } from "@/components/contact-band";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getAttractions, getAttractionsIntro } from "@/lib/content";
@@ -32,7 +31,6 @@ export default function MalarguePage() {
           </div>
           <p className="attraction-credits-note">Fotos de Wikimedia Commons, redimensionadas para la web. Las licencias se indican en cada una.</p>
         </section>
-        <ContactBand />
       </main>
       <SiteFooter />
     </>

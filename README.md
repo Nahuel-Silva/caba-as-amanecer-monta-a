@@ -27,7 +27,7 @@ El número se configura en **un solo lugar**: la variable de entorno `NEXT_PUBLI
 - En local: editá `.env.local` (formato: código de país, sin `+`, espacios ni guiones).
 - En producción (Vercel): *Project Settings > Environment Variables*, y volvé a desplegar.
 
-Mientras la variable esté vacía, el botón flotante y los botones de consulta por cabaña no se muestran, y los botones "Consultar" del inicio llevan a la sección de contacto. Nunca se publica un número inventado.
+Mientras la variable esté vacía, el ícono flotante y los botones de consulta no se muestran. Nunca se publica un número inventado.
 
 Los mensajes precargados se arman en `src/lib/whatsapp.ts` (mensaje general y mensaje por cabaña).
 

@@ -57,7 +57,6 @@ export default async function CabinPage({ params }: CabinPageProps) {
             <h1>{cabin.displayName}</h1>
             <p className="section-intro">{cabin.cardSummary}</p>
           </header>
-          <Link className="button button-primary" href="/cabanas">Todas las cabañas</Link>
         </div>
         <section aria-label={`Galería de ${cabin.displayName}`} className="wrap detail-gallery">
           <PhotoGallery images={cabin.images} />
