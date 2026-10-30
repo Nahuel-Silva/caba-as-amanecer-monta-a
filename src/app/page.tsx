@@ -1,17 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ContactBand } from "@/components/contact-band";
 import { CabinCard } from "@/components/cabin-card";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/json-ld";
-import { LocationSection } from "@/components/location-section";
 import { SiteHeader } from "@/components/site-header";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { site } from "@/content/site";
 import { getCabins } from "@/lib/cabins";
-import { getAmenities, getAttractions, getFaqs } from "@/lib/content";
+import { getAmenities } from "@/lib/content";
 import { buildLodgingJsonLd, defaultDescription, pageMetadata } from "@/lib/seo";
-import { isWhatsAppConfigured } from "@/lib/whatsapp";
 
 export const metadata = pageMetadata({
   title: "Cabañas en Malargüe, Mendoza",
@@ -22,8 +21,6 @@ export const metadata = pageMetadata({
 export default function Home() {
   const cabins = getCabins();
   const amenities = getAmenities();
-  const attractions = getAttractions();
-  const faqs = getFaqs();
   const heroImage = {
     src: "/images/demo-landscape-03.jpg",
     alt: "Paisaje de montaña y lago de demostración; no es una fotografía del complejo.",
@@ -135,68 +132,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section aria-labelledby="malargue-title" className="section" id="malargue">
-          <div className="wrap">
-            <p className="eyebrow">Alrededores</p>
-            <h2 className="section-title" id="malargue-title">Malargüe, por descubrir.</h2>
-            <p className="section-intro">Una selección de lugares mencionados entre los atractivos de la zona. La información práctica está pendiente de verificación.</p>
-            <div className="destination-list">
-              {attractions.map((attraction) => (
-                <article key={attraction.name}>
-                  <h3>{attraction.name}</h3>
-                  <p>{attraction.detail}</p>
-                  {attraction.sourceUrl && (
-                    <a className="text-link" href={attraction.sourceUrl} rel="noopener noreferrer" target="_blank">
-                      Fuente oficial <span className="sr-only">(se abre en una pestaña nueva)</span>
-                    </a>
-                  )}
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        <section aria-labelledby="location-title" className="section section-muted" id="ubicacion">
-          <div className="wrap">
-            <p className="eyebrow">Cómo llegar</p>
-            <h2 className="section-title" id="location-title">En Malargüe, Mendoza.</h2>
-            <LocationSection />
-          </div>
-        </section>
 
-        <section aria-labelledby="faq-title" className="section">
-          <div className="wrap">
-            <p className="eyebrow">Información útil</p>
-            <h2 className="section-title" id="faq-title">Preguntas frecuentes.</h2>
-            <div className="faq-list">
-              {faqs.map((faq) => (
-                <details key={faq.question}>
-                  <summary>{faq.question}</summary>
-                  <div className="faq-answer">{faq.answer}</div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        <section className="wrap cta-band" id="contacto">
-          <div>
-            <p className="eyebrow">Contacto</p>
-            <h2>¿Planeando una visita a Malargüe?</h2>
-            <p>
-              {isWhatsAppConfigured
-                ? "Escribinos por WhatsApp para consultar disponibilidad, tarifas y servicios."
-                : site.contactNote}
-            </p>
-          </div>
-          {isWhatsAppConfigured ? (
-            <WhatsAppButton className="button button-primary">
-              Escribir por WhatsApp <span aria-hidden="true">↗</span>
-            </WhatsAppButton>
-          ) : (
-            <span className="pending-note">WhatsApp: pendiente de configurar</span>
-          )}
-        </section>
+        <ContactBand />
       </main>
       <SiteFooter />
     </>

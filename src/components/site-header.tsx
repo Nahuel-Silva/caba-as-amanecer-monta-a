@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiteNav } from "@/components/site-nav";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { site } from "@/content/site";
 
@@ -15,11 +16,7 @@ export function SiteHeader() {
             <span className="brand-location">Malargüe · Mendoza</span>
           </span>
         </Link>
-        <nav aria-label="Navegación principal" className="main-nav">
-          <Link href="/">Inicio</Link>
-          <Link href="/cabanas">Cabañas</Link>
-          <Link href="/#malargue">Malargüe</Link>
-        </nav>
+        <SiteNav />
         <WhatsAppButton className="button button-primary header-cta" fallbackHref="/#contacto">
           Consultar <span aria-hidden="true">↗</span>
         </WhatsAppButton>
