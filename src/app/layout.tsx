@@ -1,19 +1,22 @@
 import type { Metadata } from "next";
-import { DM_Sans, Cormorant_Garamond } from "next/font/google";
+import { Nunito, Fraunces } from "next/font/google";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
 import { site } from "@/content/site";
 import { defaultDescription, metadataBase, robotsMetadata } from "@/lib/seo";
 import "./globals.css";
 
-const sans = DM_Sans({
+// Estilo rústico cálido: Nunito (redondeada, muy legible) para el texto y
+// Fraunces (serif "blanda") para los títulos.
+const sans = Nunito({
   variable: "--font-body",
   subsets: ["latin"],
 });
 
-const serif = Cormorant_Garamond({
+const serif = Fraunces({
   variable: "--font-display",
   subsets: ["latin"],
   weight: ["500", "600"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
