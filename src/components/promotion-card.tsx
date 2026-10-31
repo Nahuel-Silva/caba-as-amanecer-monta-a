@@ -14,7 +14,7 @@ export function PromotionCard({ promotion }: { promotion: Promotion }) {
             alt={image.alt}
             fill
             quality={90}
-            sizes="(max-width: 760px) 100vw, 590px"
+            sizes="(max-width: 760px) 100vw, 360px"
             src={image.src}
           />
           {discount && <span className="promotion-badge">{discount}</span>}

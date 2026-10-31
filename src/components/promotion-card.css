@@ -1,15 +1,17 @@
-.promotion-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 20px; }
+.promotion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 360px)); align-items: start; gap: 20px; }
 .promotion-card { display: flex; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
 .promotion-photo { position: relative; aspect-ratio: 3 / 2; overflow: hidden; background: #c9c4b5; }
 .promotion-photo img { object-fit: cover; }
 .promotion-badge { position: absolute; top: 14px; left: 14px; z-index: 1; padding: 7px 14px; border-radius: 999px; background: var(--clay); color: #fffdf7; font-size: 15px; font-weight: 800; }
 .promotion-badge-inline { position: static; align-self: flex-start; margin-bottom: 12px; }
-.promotion-body { display: flex; flex: 1; flex-direction: column; padding: 24px; }
-.promotion-body h2 { margin: 0 0 8px; font-family: var(--font-display), serif; font-size: 26px; font-weight: 600; line-height: 1.2; }
-.promotion-body > p { margin: 0; color: var(--muted); font-size: 15px; }
+.promotion-body { display: flex; flex: 1; flex-direction: column; padding: 18px 20px 20px; }
+.promotion-card .promotion-photo { aspect-ratio: 16 / 10; }
+.promotion-card .promotion-badge { top: 10px; left: 10px; padding: 5px 11px; font-size: 13px; }
+.promotion-body h2 { margin: 0 0 6px; font-family: var(--font-display), serif; font-size: 22px; font-weight: 600; line-height: 1.2; }
+.promotion-body > p { margin: 0; color: var(--muted); font-size: 14px; }
 .promotion-validity { margin: 0 0 8px; color: var(--clay); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .promotion-body .promotion-validity { color: var(--clay); font-size: 12px; margin-bottom: 8px; }
-.promotion-body .button { align-self: flex-start; margin-top: 20px; }
+.promotion-body .button { align-self: flex-start; min-height: 44px; margin-top: 16px; padding-inline: 20px; }
 .promotion-empty { max-width: 640px; padding: 28px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; }
 .promotion-empty h2 { margin: 0 0 8px; font-family: var(--font-display), serif; font-size: 26px; font-weight: 600; }
 .promotion-empty p { margin: 0; color: var(--muted); }
@@ -42,5 +44,4 @@
 }
 @media (max-width: 760px) {
   .promotion-grid { grid-template-columns: 1fr; }
-  .promotion-body { padding: 20px; }
 }

@@ -25,7 +25,7 @@ export function ReviewsSection() {
           ))}
         </ul>
         <ReviewBoard reviews={reviews} />
-        <p className="review-note">Puntajes consultados en {getRatingsCheckedAt()}. Las opiniones son de huéspedes y pertenecen a cada sitio.</p>
+        <p className="review-note">Calificaciones consultadas en {getRatingsCheckedAt()}. Las opiniones son de huéspedes y pertenecen a cada sitio.</p>
       </div>
     </section>
   );

@@ -66,6 +66,12 @@ image: {
 
 Usá solo fotos propias, con autorización escrita de quien las tenga, o con una licencia que permita uso comercial (por ejemplo CC BY o CC BY-SA en Wikimedia Commons, citando autor y licencia). No sirven las licencias "NC" (no comercial) ni las fotos tomadas de Google, redes o sitios de turismo sin permiso.
 
+## Solicitudes de reserva por mail
+
+El ícono flotante de mail, junto al de WhatsApp, despliega un formulario que envía la solicitud a `/api/reservas`. Si el visitante está en la página de una cabaña, esa cabaña queda elegida. El propietario recibe un mail, al que puede responder directamente, y el huésped recibe un acuse que aclara que la reserva todavía no está confirmada. No bloquea fechas.
+
+Hay que cargar `RESEND_API_KEY`, `RESERVATIONS_EMAIL_TO` y `RESERVATIONS_EMAIL_FROM` (ver `.env.example`). Para enviarle el acuse al huésped hace falta un dominio propio verificado en Resend. La protección contra abuso es básica (campo trampa, mismo origen y límite por IP en memoria): con la web publicada conviene sumar un captcha.
+
 ## Promociones
 
 Las promociones de `/promociones` se cargan en `src/content/promotions.ts`: copiá el ejemplo de ese archivo dentro de la lista y, si tiene foto, guardala en `public/images/promociones/`. Cada una necesita `slug`, `title`, `description` y `active`; `discount`, `validity`, `details`, `conditions`, `code` e `image` son opcionales. Cada promoción tiene su propia página en `/promociones/<slug>`, con un formulario que arma la consulta por WhatsApp con fechas y personas; no reserva ni confirma disponibilidad. Con `active: false` deja de mostrarse sin borrarla, y sin promociones activas la página muestra un aviso. La vigencia es solo un texto: la promoción no se oculta sola al vencer.

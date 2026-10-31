@@ -8,7 +8,7 @@ function ReviewCard({ review, isPreview = false }: { review: Review; isPreview?:
   return (
     <figure className="review-card">
       <span aria-hidden="true" className="review-stars">{"★".repeat(review.rating)}</span>
-      <span className="sr-only">Puntaje: {review.rating} de 5</span>
+      <span className="sr-only">Calificación: {review.rating} de 5</span>
       <h3>{review.title}</h3>
       <blockquote>“{review.quote}”</blockquote>
       <figcaption className="review-meta">
@@ -46,7 +46,7 @@ export function ReviewBoard({ reviews }: { reviews: Review[] }) {
     const quote = String(data.get("quote")).trim();
 
     if (rating === 0) {
-      setError("Elegí un puntaje de 1 a 5 estrellas.");
+      setError("Elegí una calificación de 1 a 5 estrellas.");
       return;
     }
     if (author.length < 2 || title.length < 3 || quote.length < 10) {
@@ -89,7 +89,7 @@ export function ReviewBoard({ reviews }: { reviews: Review[] }) {
           <p className="review-form-notice">Función en prueba: por ahora las reseñas no se guardan ni se publican.</p>
 
           <fieldset className="review-rating">
-            <legend>Tu puntaje</legend>
+            <legend>Tu calificación</legend>
             {[1, 2, 3, 4, 5].map((value) => (
               <label key={value}>
                 <input
