@@ -12,15 +12,15 @@ function ReviewCard({ review }: { review: Review }) {
       <h3>{review.title}</h3>
       <blockquote>“{review.quote}”</blockquote>
       <figcaption className="review-meta">
-        <strong>{review.author}</strong> · {review.date}
-        {review.sourceUrl && (
-          <>
-            {" · "}
-            <a href={review.sourceUrl} rel="noopener noreferrer" target="_blank">
-              {review.sourceName}
-              <span className="sr-only"> (se abre en una pestaña nueva)</span>
-            </a>
-          </>
+        <strong>{review.author}</strong> · {review.date.charAt(0).toUpperCase() + review.date.slice(1)}
+        {" · "}
+        {review.sourceUrl ? (
+          <a href={review.sourceUrl} rel="noopener noreferrer" target="_blank">
+            {review.sourceName}
+            <span className="sr-only"> (se abre en una pestaña nueva)</span>
+          </a>
+        ) : (
+          review.sourceName
         )}
       </figcaption>
     </figure>

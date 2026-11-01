@@ -46,6 +46,7 @@ export async function listApprovedReviews(): Promise<Review[]> {
     quote: String(row.quote),
     rating: Number(row.rating),
     date: format.format(new Date(`${String(row.created_at).replace(" ", "T")}Z`)),
+    sourceName: "Reseña de esta web",
   }));
 }
 
