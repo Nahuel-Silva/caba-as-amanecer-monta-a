@@ -72,13 +72,26 @@ El ícono flotante de mail, junto al de WhatsApp, despliega un formulario que en
 
 Hay que cargar `RESEND_API_KEY`, `RESERVATIONS_EMAIL_TO` y `RESERVATIONS_EMAIL_FROM` (ver `.env.example`). Para enviarle el acuse al huésped hace falta un dominio propio verificado en Resend. La protección contra abuso es básica (campo trampa, mismo origen y límite por IP en memoria): con la web publicada conviene sumar un captcha.
 
+## Base de datos y panel
+
+Las solicitudes de reserva y las reseñas se guardan en [Turso](https://turso.tech). En desarrollo, sin configurar nada, se usa el archivo `local.db`, que no se sube al repositorio. Las tablas se crean solas. Para producción hay que cargar `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN`.
+
+En `/admin`, con la contraseña `ADMIN_PASSWORD`, se confirman o rechazan reservas, se bloquean fechas, se aprueban reseñas y se cargan promociones:
+
+- Una solicitud queda pendiente y no ocupa fechas. Al confirmarla, esas noches se ocupan en el calendario.
+- Confirmar falla si otra reserva confirmada ya ocupa esas noches.
+- Cancelar una reserva confirmada libera las fechas.
+- Las reseñas se publican solas. Solo quedan pendientes las que tienen insultos o enlaces (`src/lib/review-moderation.ts`).
+
+El calendario solo recibe fechas: los datos de los huéspedes se ven únicamente en el panel.
+
 ## Promociones
 
-Las promociones de `/promociones` se cargan en `src/content/promotions.ts`: copiá el ejemplo de ese archivo dentro de la lista y, si tiene foto, guardala en `public/images/promociones/`. Cada una necesita `slug`, `title`, `description` y `active`; `discount`, `validity`, `details`, `conditions`, `code` e `image` son opcionales. Cada promoción tiene su propia página en `/promociones/<slug>`, con un formulario que arma la consulta por WhatsApp con fechas y personas; no reserva ni confirma disponibilidad. Con `active: false` deja de mostrarse sin borrarla, y sin promociones activas la página muestra un aviso. La vigencia es solo un texto: la promoción no se oculta sola al vencer.
+Las promociones se guardan en la base de datos y se cargan desde la pestaña Promociones de `/admin`: se pueden crear, editar, ocultar y borrar, y cada una puede tener foto. La foto se achica en el navegador y se guarda en la base. Cada promoción tiene su página en `/promociones/<slug>`, con un formulario que arma la consulta por WhatsApp; no reserva ni confirma disponibilidad. La vigencia es solo un texto: la promoción no se oculta sola al vencer.
 
 ## Opiniones
 
-Las reseñas del inicio se cargan en `src/content/reviews.ts`. Usá solo opiniones reales, copiadas tal cual y con el enlace a su fuente, y actualizá `ratingsCheckedAt` cuando revises los puntajes. El formulario para dejar una reseña es por ahora un mock: `src/lib/reviews-service.ts` no guarda nada y la web avisa que está en prueba. Para activarlo de verdad hay que reemplazar esa función por una base de datos con aprobación previa. No se agregan reseñas a los datos estructurados de Google.
+Las reseñas del inicio se cargan en `src/content/reviews.ts`. Usá solo opiniones reales, copiadas tal cual y con el enlace a su fuente, y actualizá `ratingsCheckedAt` cuando revises los puntajes. Las reseñas del formulario se publican solas, también las negativas. Las que tienen insultos o enlaces esperan revisión en `/admin`, y desde ahí se puede quitar cualquiera. No se agregan reseñas a los datos estructurados de Google.
 
 ## Ubicación y mapa
 

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BookingBar } from "@/components/booking-bar";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { site } from "@/content/site";
 import { getCabinBySlug, getCabins } from "@/lib/cabins";
+import { showReservationForm } from "@/lib/reservation-email";
 import { pageMetadata } from "@/lib/seo";
 
 type CabinPageProps = { params: Promise<{ slug: string }> };
@@ -58,6 +60,14 @@ export default async function CabinPage({ params }: CabinPageProps) {
             <p className="section-intro">{cabin.cardSummary}</p>
           </header>
         </div>
+        {showReservationForm && (
+          <div className="wrap booking-bar-cabin">
+            <BookingBar
+              cabins={getCabins().map(({ slug: cabinSlug, displayName }) => ({ slug: cabinSlug, name: displayName }))}
+              fixedCabin={{ slug: cabin.slug, name: cabin.displayName }}
+            />
+          </div>
+        )}
         <section aria-label={`Galería de ${cabin.displayName}`} className="wrap detail-gallery">
           <PhotoGallery images={cabin.images} />
         </section>

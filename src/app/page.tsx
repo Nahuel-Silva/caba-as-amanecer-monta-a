@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ContactBand } from "@/components/contact-band";
+import { BookingBar } from "@/components/booking-bar";
 import { CabinCard } from "@/components/cabin-card";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { ReviewsSection } from "@/components/reviews-section";
@@ -10,6 +11,7 @@ import { SiteHeader } from "@/components/site-header";
 import { site } from "@/content/site";
 import { getCabins } from "@/lib/cabins";
 import { getAmenities } from "@/lib/content";
+import { showReservationForm } from "@/lib/reservation-email";
 import { buildLodgingJsonLd, defaultDescription, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -101,6 +103,12 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {showReservationForm && (
+          <div className="wrap booking-bar-overlap">
+            <BookingBar cabins={cabins.map(({ slug, displayName }) => ({ slug, name: displayName }))} />
+          </div>
+        )}
 
         <section className="intro-section">
           <div className="wrap intro-grid">

@@ -13,6 +13,8 @@
 .reservation-form textarea { resize: vertical; }
 .reservation-form input:focus-visible, .reservation-form select:focus-visible, .reservation-form textarea:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 1px; }
 .reservation-wide { grid-column: 1 / -1; }
+.reservation-loading { margin: 0; color: var(--muted); font-size: 14px; }
+.reservation-dates { display: grid; gap: 5px; font-size: 13px; font-weight: 700; }
 .reservation-trap { position: absolute; left: -9999px; }
 .reservation-error { margin: 0; color: #9c3d24; font-size: 14px; font-weight: 700; }
 .reservation-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }

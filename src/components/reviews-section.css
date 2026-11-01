@@ -15,13 +15,13 @@
   .review-grid { grid-template-columns: 1fr; }
 }
 
-.review-preview-label { margin: 12px 0 0; color: var(--clay); font-size: 12px; font-weight: 700; }
+.review-trap { position: absolute; left: -9999px; }
 .review-message { margin: 16px 0 0; color: var(--olive-dark); font-size: 14px; font-weight: 600; }
 .review-message:empty { margin: 0; }
 .review-open { margin-top: 24px; }
 .review-form { display: grid; max-width: 640px; gap: 16px; margin-top: 24px; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
 .review-form h3 { margin: 0; font-family: var(--font-display), serif; font-size: 24px; font-weight: 600; }
-.review-form-notice { margin: -8px 0 0; color: #9c3d24; font-size: 13px; font-weight: 700; }
+.review-form-notice { margin: -8px 0 0; color: var(--muted); font-size: 13px; }
 .review-rating { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; border: 0; }
 .review-rating legend { margin-bottom: 4px; padding: 0; font-size: 14px; font-weight: 700; }
 .review-rating label { cursor: pointer; }

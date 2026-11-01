@@ -1,25 +1,47 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { guestOptions } from "@/lib/reservation";
+import { DateRangePicker } from "@/components/date-range-picker";
+import { useAvailability } from "@/components/use-availability";
+import { keepAvailableStay, type StaySelection } from "@/lib/availability";
+import { guestOptions, type ReservationPrefill } from "@/lib/reservation";
 import "./reservation-form.css";
 
+type CabinOption = { slug: string; name: string };
+
 type ReservationFormProps = {
-  cabins: string[];
+  cabins: CabinOption[];
   /** Cabaña elegida de entrada, si el visitante está en su página. */
   defaultCabin?: string;
+  /** Datos ya elegidos en la barra de reserva. */
+  prefill?: ReservationPrefill | null;
   onSent: () => void;
 };
 
 /** Formulario de solicitud de reserva. Avisa al propietario por mail; no bloquea fechas. */
-export function ReservationForm({ cabins, defaultCabin, onSent }: ReservationFormProps) {
+export function ReservationForm({ cabins, defaultCabin, prefill, onSent }: ReservationFormProps) {
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [error, setError] = useState("");
+  const [cabinName, setCabinName] = useState(prefill?.cabin ?? defaultCabin ?? cabins[0].name);
+  const [stay, setStay] = useState<StaySelection>({ arrival: prefill?.arrival ?? "", departure: prefill?.departure ?? "" });
+  const availability = useAvailability();
+
+  const slugOf = (name: string) => cabins.find((cabin) => cabin.name === name)?.slug ?? "";
+  const bookings = availability?.bookings[slugOf(cabinName)] ?? [];
+
+  function changeCabin(name: string) {
+    setCabinName(name);
+    setStay(keepAvailableStay(stay, availability?.bookings[slugOf(name)] ?? []));
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const fields = Object.fromEntries(new FormData(event.currentTarget));
+    if (!stay.departure) {
+      setError("Elegí las fechas de llegada y salida.");
+      return;
+    }
     setError("");
     setIsSending(true);
 
@@ -27,7 +49,7 @@ export function ReservationForm({ cabins, defaultCabin, onSent }: ReservationFor
       const response = await fetch("/api/reservas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fields),
+        body: JSON.stringify({ ...fields, ...stay }),
       });
       const result: { ok: boolean; error?: string } = await response.json();
 
@@ -69,38 +91,54 @@ export function ReservationForm({ cabins, defaultCabin, onSent }: ReservationFor
       </label>
       <label>
         Cabaña
-        <select defaultValue={defaultCabin ?? cabins[0]} name="cabin">
+        <select name="cabin" onChange={(event) => changeCabin(event.target.value)} value={cabinName}>
           {cabins.map((cabin) => (
-            <option key={cabin} value={cabin}>{cabin}</option>
+            <option key={cabin.slug} value={cabin.name}>{cabin.name}</option>
           ))}
         </select>
       </label>
       <label>
         Personas
-        <select defaultValue="2" name="guests">
+        <select defaultValue={prefill?.guests ?? "2"} name="guests">
           {guestOptions.map((option) => (
             <option key={option} value={option}>{option === "5" ? "5 (con cama extra)" : option}</option>
           ))}
         </select>
       </label>
-      <label>
-        Llegada
-        <input name="arrival" required type="date" />
-      </label>
-      <label>
-        Salida
-        <input name="departure" required type="date" />
-      </label>
+      <div className="reservation-wide reservation-dates">
+        <span>Fechas</span>
+        {availability ? (
+          <DateRangePicker
+            bookings={bookings}
+            notice={availability.notice}
+            months={1}
+            onChange={setStay}
+            today={availability.today}
+            value={stay}
+          />
+        ) : (
+          <p className="reservation-loading">Cargando disponibilidad…</p>
+        )}
+      </div>
       <label className="reservation-wide">
         Mensaje (opcional)
         <textarea maxLength={1000} name="message" rows={3} />
       </label>
 
-      {/* Campo trampa para robots: las personas no lo ven. */}
-      <label aria-hidden="true" className="reservation-trap">
-        Sitio web
-        <input autoComplete="off" name="website" tabIndex={-1} type="text" />
-      </label>
+      {/* Campo trampa para robots: las personas no lo ven. Sin "sitio web" ni nada que el navegador autocomplete. */}
+      <div aria-hidden="true" className="reservation-trap">
+        <input
+          aria-hidden="true"
+          autoComplete="off"
+          data-1p-ignore
+          data-bwignore
+          data-form-type="other"
+          data-lpignore="true"
+          name="hp_token"
+          tabIndex={-1}
+          type="text"
+        />
+      </div>
 
       {error && <p className="reservation-error reservation-wide" role="alert">{error}</p>}
 

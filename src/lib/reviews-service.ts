@@ -1,20 +1,28 @@
 import type { Review } from "@/content/reviews";
 
-export type NewReview = {
-  author: string;
-  rating: number;
-  title: string;
-  quote: string;
-};
+export type ReviewForm = { author: string; rating: number; title: string; quote: string; consent: boolean; hp_token: string };
 
-/**
- * Mock del envío de reseñas: no guarda nada y la reseña se pierde al recargar la página.
- * Cuando haya base de datos, reemplazar solo esta función por la llamada al servidor,
- * que debe guardar la reseña como pendiente hasta que el propietario la apruebe.
- */
-export async function submitReview(review: NewReview): Promise<Review> {
-  return {
-    ...review,
-    date: new Intl.DateTimeFormat("es-AR", { month: "long", year: "numeric" }).format(new Date()),
-  };
+/** Envía una reseña. Se publica sola, salvo que tenga insultos o enlaces. */
+export async function submitReview(review: ReviewForm): Promise<{ ok: boolean; published?: boolean; error?: string }> {
+  try {
+    const response = await fetch("/api/resenas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(review),
+    });
+    return (await response.json()) as { ok: boolean; published?: boolean; error?: string };
+  } catch {
+    return { ok: false, error: "No pudimos enviar tu reseña. Revisá tu conexión y probá de nuevo." };
+  }
+}
+
+export async function getApprovedReviews(): Promise<Review[]> {
+  try {
+    const response = await fetch("/api/resenas");
+    if (!response.ok) return [];
+    const { reviews } = (await response.json()) as { reviews: Review[] };
+    return reviews;
+  } catch {
+    return [];
+  }
 }

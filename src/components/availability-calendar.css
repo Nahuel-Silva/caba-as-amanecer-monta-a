@@ -1,0 +1,51 @@
+.availability-calendar { position: relative; }
+.availability-nav { position: absolute; top: -4px; right: 0; display: flex; gap: 6px; }
+.availability-nav button { display: grid; width: 34px; height: 34px; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: #fffdf7; color: var(--ink); cursor: pointer; font-size: 16px; }
+.availability-nav button:disabled { cursor: default; opacity: .35; }
+.availability-nav button:focus-visible, .availability-day:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 1px; }
+.availability-months { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 28px; }
+.availability-month h3 { margin: 0 0 10px; font-size: 15px; font-weight: 700; line-height: 26px; }
+.availability-month:last-child h3 { padding-right: 84px; }
+.availability-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: 3px; }
+.availability-weekday { padding-bottom: 3px; color: var(--muted); font-size: 11px; font-weight: 700; text-align: center; }
+.availability-day { display: grid; min-height: 38px; place-items: center; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--ink); cursor: pointer; font: inherit; font-size: 14px; }
+.availability-day:hover:not(:disabled):not(.is-selected) { background: rgb(85 96 71 / 16%); }
+.availability-day:disabled { color: #b3ab9b; cursor: not-allowed; }
+.availability-day.is-booked { color: #9c6a53; text-decoration: line-through; }
+.availability-day.is-booked:not(.is-past) { background: rgb(182 111 81 / 14%); }
+.availability-day.is-past { color: #c2bbad; text-decoration: none; }
+.availability-day.is-in-range { border-radius: 0; background: rgb(85 96 71 / 22%); }
+.availability-day.is-selected, .availability-day.is-preview { background: var(--olive-dark); color: #fffdf7; font-weight: 700; }
+.availability-day.is-preview, .availability-day.is-preview:hover:not(:disabled):not(.is-selected) { background: var(--olive); }
+.availability-day.is-range-start { border-radius: 10px 0 0 10px; }
+.availability-day.is-range-end { border-radius: 0 10px 10px 0; }
+
+.date-range { position: relative; min-width: 0; }
+.date-range-trigger { display: flex; width: 100%; min-height: 62px; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 14px; border: 1px solid #b9b09f; border-radius: var(--radius-sm); background: #fffdf7; color: var(--ink); cursor: pointer; font: inherit; text-align: left; }
+.date-range-trigger:focus-visible, .date-range-trigger.is-open { border-color: var(--olive-dark); outline: 1px solid var(--olive-dark); }
+.date-range-trigger span:not(.date-range-arrow) { display: grid; min-width: 0; flex: 1; gap: 1px; }
+.date-range-trigger small { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.date-range-trigger strong { overflow: hidden; font-size: 15px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.date-range-arrow { flex: none; color: var(--clay); }
+.date-range-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 6; width: min(660px, calc(100vw - 40px)); padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: 0 18px 50px rgb(0 0 0 / 22%); }
+.date-range-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.date-range-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 12px; }
+.date-range-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.date-range-legend em { color: #9c3d24; font-style: normal; font-weight: 700; }
+.date-range-swatch { width: 13px; height: 13px; border-radius: 4px; }
+.date-range-swatch.is-free { border: 1px solid #b9b09f; background: #fffdf7; }
+.date-range-swatch.is-booked { background: rgb(182 111 81 / 30%); }
+.date-range-actions { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.date-range-clear { padding: 4px 2px; border: 0; background: none; color: var(--olive-dark); cursor: pointer; font-size: 14px; font-weight: 700; }
+.date-range-clear:disabled { cursor: default; opacity: .4; }
+.date-range .date-range-done { min-height: 40px; padding: 0 20px; }
+
+/* Dentro del panel de reserva el calendario se abre en el lugar, sin flotar. */
+.reservation-form .date-range-popover { position: static; width: auto; margin-top: 8px; padding: 14px; box-shadow: none; }
+
+@media (max-width: 760px) {
+  .date-range-popover { right: 0; width: auto; padding: 14px; }
+  .availability-months { grid-auto-flow: row; }
+  .availability-month:nth-child(n + 2) { display: none; }
+  .availability-month:first-child h3 { padding-right: 84px; }
+}

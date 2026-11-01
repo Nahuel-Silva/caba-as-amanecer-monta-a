@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ReservationForm } from "@/components/reservation-form";
+import { openReservationEvent, type ReservationPrefill } from "@/lib/reservation";
 
 type CabinOption = { slug: string; name: string };
 
@@ -12,6 +13,19 @@ export function ReservationFloat({ cabins }: { cabins: CabinOption[] }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [formVersion, setFormVersion] = useState(0);
   const wasSent = useRef(false);
+  const [prefill, setPrefill] = useState<ReservationPrefill | null>(null);
+
+  // La barra de reserva abre este mismo formulario con los datos ya elegidos.
+  useEffect(() => {
+    function openWithData(event: Event) {
+      setPrefill((event as CustomEvent<ReservationPrefill>).detail);
+      setFormVersion((version) => version + 1);
+      dialogRef.current?.showModal();
+    }
+
+    window.addEventListener(openReservationEvent, openWithData);
+    return () => window.removeEventListener(openReservationEvent, openWithData);
+  }, []);
 
   const currentCabin = cabins.find((cabin) => pathname === `/cabanas/${cabin.slug}`);
 
@@ -23,6 +37,7 @@ export function ReservationFloat({ cabins }: { cabins: CabinOption[] }) {
   function handleClose() {
     if (!wasSent.current) return;
     wasSent.current = false;
+    setPrefill(null);
     setFormVersion((version) => version + 1);
   }
 
@@ -59,9 +74,10 @@ export function ReservationFloat({ cabins }: { cabins: CabinOption[] }) {
             <button aria-label="Cerrar" className="reservation-dialog-close" onClick={close} type="button">×</button>
           </div>
           <ReservationForm
-            cabins={cabins.map((cabin) => cabin.name)}
+            cabins={cabins}
             defaultCabin={currentCabin?.name}
             key={`${formVersion}-${currentCabin?.slug ?? "general"}`}
+            prefill={prefill}
             onSent={() => {
               wasSent.current = true;
             }}

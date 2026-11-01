@@ -1,4 +1,5 @@
 import { site } from "@/content/site";
+import { isDatabaseConfigured } from "@/lib/db";
 import { formatReservationDate, type ReservationRequest } from "@/lib/reservation";
 
 /**
@@ -10,6 +11,9 @@ const emailTo = process.env.RESERVATIONS_EMAIL_TO;
 const emailFrom = process.env.RESERVATIONS_EMAIL_FROM;
 
 export const isReservationEmailConfigured = Boolean(apiKey && emailTo && emailFrom);
+
+/** El formulario se muestra si hay dónde recibir la solicitud: la base de datos o el mail. */
+export const showReservationForm = isDatabaseConfigured || isReservationEmailConfigured;
 
 type Email = { to: string; subject: string; text: string; replyTo?: string };
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { Review } from "@/content/reviews";
-import { submitReview } from "@/lib/reviews-service";
+import { getApprovedReviews, submitReview } from "@/lib/reviews-service";
 
-function ReviewCard({ review, isPreview = false }: { review: Review; isPreview?: boolean }) {
+function ReviewCard({ review }: { review: Review }) {
   return (
     <figure className="review-card">
       <span aria-hidden="true" className="review-stars">{"★".repeat(review.rating)}</span>
@@ -23,19 +23,28 @@ function ReviewCard({ review, isPreview = false }: { review: Review; isPreview?:
           </>
         )}
       </figcaption>
-      {isPreview && <p className="review-preview-label">Prueba: solo se ve en este navegador</p>}
     </figure>
   );
 }
 
 /** Lista de opiniones y formulario para dejar una nueva. */
-export function ReviewBoard({ reviews }: { reviews: Review[] }) {
-  const [submitted, setSubmitted] = useState<Review[]>([]);
+export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubmit: boolean }) {
+  const [approved, setApproved] = useState<Review[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    let isCurrent = true;
+    getApprovedReviews().then((result) => {
+      if (isCurrent) setApproved(result);
+    });
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,12 +65,23 @@ export function ReviewBoard({ reviews }: { reviews: Review[] }) {
 
     setError("");
     setIsSending(true);
-    const review = await submitReview({ author, rating, title, quote });
-    setSubmitted((current) => [review, ...current]);
+    const result = await submitReview({
+      author,
+      rating,
+      title,
+      quote,
+      consent: data.get("consent") === "on",
+      hp_token: String(data.get("hp_token") ?? ""),
+    });
     setIsSending(false);
+    if (!result.ok) {
+      setError(result.error ?? "No pudimos enviar tu reseña.");
+      return;
+    }
     setRating(0);
     setIsFormOpen(false);
-    setMessage("¡Gracias! Esta función está en prueba: tu reseña no se publicó y desaparece al recargar la página.");
+    if (result.published) setApproved(await getApprovedReviews());
+    setMessage(result.published ? "¡Gracias! Tu reseña ya está publicada." : "¡Gracias por tu reseña! La vamos a revisar antes de publicarla.");
   }
 
   function closeForm() {
@@ -73,8 +93,8 @@ export function ReviewBoard({ reviews }: { reviews: Review[] }) {
   return (
     <>
       <div className="review-grid">
-        {submitted.map((review, index) => (
-          <ReviewCard isPreview key={submitted.length - index} review={review} />
+        {approved.map((review) => (
+          <ReviewCard key={`${review.author}-${review.title}`} review={review} />
         ))}
         {reviews.map((review) => (
           <ReviewCard key={`${review.author}-${review.date}`} review={review} />
@@ -86,7 +106,7 @@ export function ReviewBoard({ reviews }: { reviews: Review[] }) {
       {isFormOpen ? (
         <form className="review-form" onSubmit={handleSubmit}>
           <h3>Dejá tu reseña</h3>
-          <p className="review-form-notice">Función en prueba: por ahora las reseñas no se guardan ni se publican.</p>
+          <p className="review-form-notice">Tu reseña se publica al enviarla. Solo revisamos antes las que tienen insultos o enlaces.</p>
 
           <fieldset className="review-rating">
             <legend>Tu calificación</legend>
@@ -123,6 +143,21 @@ export function ReviewBoard({ reviews }: { reviews: Review[] }) {
             Acepto que mi nombre y mi opinión se publiquen en esta web.
           </label>
 
+          {/* Campo trampa para robots: las personas no lo ven. Sin "sitio web" ni nada que el navegador autocomplete. */}
+          <div aria-hidden="true" className="review-trap">
+            <input
+              aria-hidden="true"
+              autoComplete="off"
+              data-1p-ignore
+              data-bwignore
+              data-form-type="other"
+              data-lpignore="true"
+              name="hp_token"
+              tabIndex={-1}
+              type="text"
+            />
+          </div>
+
           {error && <p className="review-error" role="alert">{error}</p>}
 
           <div className="review-form-actions">
@@ -134,7 +169,7 @@ export function ReviewBoard({ reviews }: { reviews: Review[] }) {
             </button>
           </div>
         </form>
-      ) : (
+      ) : canSubmit && (
         <button className="button button-primary review-open" onClick={() => setIsFormOpen(true)} type="button">
           Dejar una reseña
         </button>

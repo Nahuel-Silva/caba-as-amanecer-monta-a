@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Promotion } from "@/content/promotions";
+import type { Promotion } from "@/lib/promotion";
 import "./promotion-card.css";
 
 export function PromotionCard({ promotion }: { promotion: Promotion }) {
@@ -13,9 +13,9 @@ export function PromotionCard({ promotion }: { promotion: Promotion }) {
           <Image
             alt={image.alt}
             fill
-            quality={90}
             sizes="(max-width: 760px) 100vw, 360px"
             src={image.src}
+            unoptimized
           />
           {discount && <span className="promotion-badge">{discount}</span>}
         </div>

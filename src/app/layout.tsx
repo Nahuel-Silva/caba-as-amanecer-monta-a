@@ -4,7 +4,7 @@ import { ReservationFloat } from "@/components/reservation-float";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
 import { site } from "@/content/site";
 import { getCabins } from "@/lib/cabins";
-import { isReservationEmailConfigured } from "@/lib/reservation-email";
+import { showReservationForm } from "@/lib/reservation-email";
 import { defaultDescription, metadataBase, robotsMetadata } from "@/lib/seo";
 import "./globals.css";
 
@@ -47,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full" suppressHydrationWarning>
         {children}
         <div className="contact-floats">
-          {(isReservationEmailConfigured || process.env.NODE_ENV === "development") && (
+          {showReservationForm && (
             <ReservationFloat cabins={getCabins().map(({ slug, displayName }) => ({ slug, name: displayName }))} />
           )}
           <WhatsAppFloat />

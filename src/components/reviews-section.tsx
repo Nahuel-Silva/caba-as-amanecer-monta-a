@@ -1,5 +1,6 @@
 import { ReviewBoard } from "@/components/review-board";
 import { getRatingSummaries, getRatingsCheckedAt, getReviews } from "@/lib/content";
+import { isDatabaseConfigured } from "@/lib/db";
 import "./reviews-section.css";
 
 /** Opiniones reales de huéspedes y formulario para dejar una nueva. */
@@ -24,7 +25,7 @@ export function ReviewsSection() {
             </li>
           ))}
         </ul>
-        <ReviewBoard reviews={reviews} />
+        <ReviewBoard canSubmit={isDatabaseConfigured} reviews={reviews} />
         <p className="review-note">Calificaciones consultadas en {getRatingsCheckedAt()}. Las opiniones son de huéspedes y pertenecen a cada sitio.</p>
       </div>
     </section>

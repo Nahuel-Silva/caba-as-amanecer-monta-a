@@ -12,6 +12,11 @@ export type ReservationRequest = {
 
 export const guestOptions = ["1", "2", "3", "4", "5"];
 
+/** Evento con el que la barra de reserva abre el formulario con los datos elegidos. */
+export const openReservationEvent = "reservation:open";
+
+export type ReservationPrefill = { cabin: string; arrival: string; departure: string; guests: string };
+
 const fieldLimits = { name: 80, email: 120, phone: 30, message: 1000 };
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
