@@ -30,7 +30,7 @@ async function sendEmail({ to, subject, text, replyTo }: Email) {
 
 /** Aviso para el propietario. Responder el mail le contesta directamente al huésped. */
 export function sendOwnerNotification(reservation: ReservationRequest) {
-  const { name, email, phone, arrival, departure, guests, cabin, message } = reservation;
+  const { name, email, phone, arrival, departure, guests, hasBaby, cabin, message } = reservation;
   const stay = `${formatReservationDate(arrival)} al ${formatReservationDate(departure)}`;
 
   return sendEmail({
@@ -39,10 +39,12 @@ export function sendOwnerNotification(reservation: ReservationRequest) {
     replyTo: email,
     text: [
       "Nueva solicitud de reserva desde la web.",
+      "Las fechas quedan bloqueadas por 24 horas. Confirmala desde el panel para que no se liberen.",
       "",
       `Cabaña: ${cabin}`,
       `Fechas: ${stay}`,
       `Personas: ${guests}`,
+      `Viajan con bebé: ${hasBaby ? "Sí" : "No"}`,
       "",
       `Nombre: ${name}`,
       `Email: ${email}`,
@@ -55,7 +57,7 @@ export function sendOwnerNotification(reservation: ReservationRequest) {
 
 /** Acuse para el huésped. Aclara que todavía no es una reserva confirmada. */
 export function sendGuestAcknowledgement(reservation: ReservationRequest) {
-  const { name, email, arrival, departure, guests, cabin } = reservation;
+  const { name, email, arrival, departure, guests, hasBaby, cabin } = reservation;
 
   return sendEmail({
     to: email,
@@ -63,9 +65,9 @@ export function sendGuestAcknowledgement(reservation: ReservationRequest) {
     text: [
       `Hola ${name}:`,
       "",
-      `Recibimos tu solicitud para ${cabin}, del ${formatReservationDate(arrival)} al ${formatReservationDate(departure)}, para ${guests} ${guests === "1" ? "persona" : "personas"}.`,
+      `Recibimos tu solicitud para ${cabin}, del ${formatReservationDate(arrival)} al ${formatReservationDate(departure)}, para ${guests} ${guests === "1" ? "persona" : "personas"}${hasBaby ? " y un bebé" : ""}.`,
       "",
-      "Esto todavía no confirma la reserva. Te vamos a responder con la disponibilidad y la tarifa, y la reserva queda confirmada con el pago de la seña.",
+      "Bloqueamos esas fechas por 24 horas. Esto todavía no confirma la reserva: te vamos a responder con la tarifa, y queda confirmada con el pago de la seña. Si no se confirma en ese plazo, las fechas se liberan.",
       "",
       site.name,
       site.location,

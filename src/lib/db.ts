@@ -19,6 +19,7 @@ const schema = [
     arrival TEXT NOT NULL,
     departure TEXT NOT NULL,
     guests TEXT NOT NULL,
+    has_baby INTEGER NOT NULL DEFAULT 0,
     message TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'rejected')),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -55,6 +56,14 @@ let database: Promise<Client> | null = null;
 async function connect() {
   const client = createClient({ url: databaseUrl, authToken: process.env.TURSO_AUTH_TOKEN });
   await client.batch(schema, "write");
+
+  // Bases creadas antes de sumar el dato del bebé.
+  const { rows } = await client.execute("SELECT 1 FROM pragma_table_info('reservations') WHERE name = 'has_baby'");
+  if (rows.length === 0) {
+    await client.execute("ALTER TABLE reservations ADD COLUMN has_baby INTEGER NOT NULL DEFAULT 0").catch((error: unknown) => {
+      if (!String(error).includes("duplicate column")) throw error;
+    });
+  }
   return client;
 }
 

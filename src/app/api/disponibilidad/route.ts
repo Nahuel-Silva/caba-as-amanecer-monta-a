@@ -1,7 +1,7 @@
 import { connection } from "next/server";
 import { todayInMendoza, type Availability } from "@/lib/availability";
 import { isDatabaseConfigured } from "@/lib/db";
-import { getConfirmedStays } from "@/lib/reservations-db";
+import { getOccupiedStays } from "@/lib/reservations-db";
 
 export async function GET() {
   await connection();
@@ -14,7 +14,7 @@ export async function GET() {
   }
 
   try {
-    const body: Availability = { today, bookings: await getConfirmedStays(today) };
+    const body: Availability = { today, bookings: await getOccupiedStays(today) };
     return Response.json(body, { headers });
   } catch (error) {
     console.error("No se pudo leer la disponibilidad", error);

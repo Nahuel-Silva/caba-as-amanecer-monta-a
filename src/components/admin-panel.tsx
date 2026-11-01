@@ -19,6 +19,10 @@ const statusLabels: Record<string, string> = {
   rejected: "Rechazada",
 };
 
+function formatMoment(iso: string) {
+  return new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Argentina/Mendoza" }).format(new Date(iso));
+}
+
 async function sendAction(body: Record<string, unknown>) {
   const response = await fetch("/api/admin/datos", {
     method: "POST",
@@ -176,7 +180,15 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
                   <h3>{cabinName(item.cabinSlug)}</h3>
                   <span className="admin-status">{statusLabels[item.status]}</span>
                 </div>
-                <p><strong>{formatReservationDate(item.arrival)} al {formatReservationDate(item.departure)}</strong> · {item.guests} personas</p>
+                <p>
+                  <strong>{formatReservationDate(item.arrival)} al {formatReservationDate(item.departure)}</strong> · {item.guests} personas
+                  {item.hasBaby && " · Con bebé"}
+                </p>
+                {item.status === "pending" && (
+                  <p className="admin-hold">
+                    {item.isHolding ? `Fechas bloqueadas hasta el ${formatMoment(item.holdUntil)}` : "Bloqueo vencido: las fechas ya están libres"}
+                  </p>
+                )}
                 <p>{item.name} · <a href={`mailto:${item.email}`}>{item.email}</a> · <a href={`tel:${item.phone}`}>{item.phone}</a></p>
                 {item.message && <p className="admin-message">{item.message}</p>}
                 <div className="admin-actions">

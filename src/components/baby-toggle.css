@@ -1,0 +1,5 @@
+.baby-toggle { display: inline-flex; min-height: 62px; align-items: center; justify-content: center; gap: 8px; padding: 0 14px; border: 1px solid #b9b09f; border-radius: var(--radius-sm); background: #fffdf7; color: var(--ink); cursor: pointer; font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap; transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; }
+.baby-toggle svg { width: 26px; height: 26px; flex: none; }
+.baby-toggle:hover { border-color: var(--olive-dark); }
+.baby-toggle:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 1px; }
+.baby-toggle[aria-pressed="true"] { border-color: var(--olive-dark); background: var(--olive-dark); color: #fffdf7; }

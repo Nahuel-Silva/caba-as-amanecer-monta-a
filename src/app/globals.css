@@ -211,10 +211,6 @@ button { font: inherit; }
 
 /* WhatsApp */
 .contact-floats { position: fixed; right: 20px; bottom: max(20px, env(safe-area-inset-bottom)); z-index: 15; display: flex; align-items: center; gap: 12px; }
-.mail-float { display: grid; width: 60px; height: 60px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: var(--olive-dark); color: #fffdf7; box-shadow: 0 6px 20px rgb(0 0 0 / 28%); cursor: pointer; transition: transform 160ms ease, box-shadow 160ms ease; }
-.mail-float svg { width: 30px; height: 30px; }
-.mail-float:hover { box-shadow: 0 8px 24px rgb(0 0 0 / 34%); transform: scale(1.07); }
-.mail-float:focus-visible { outline: 3px solid var(--clay); outline-offset: 3px; }
 .wa-float { display: grid; width: 60px; height: 60px; place-items: center; border-radius: 50%; background: #25d366; color: #fff; box-shadow: 0 6px 20px rgb(0 0 0 / 28%); transition: transform 160ms ease, box-shadow 160ms ease; }
 .wa-float svg { width: 34px; height: 34px; }
 .wa-float:hover { box-shadow: 0 8px 24px rgb(0 0 0 / 34%); transform: scale(1.07); }
@@ -377,4 +373,9 @@ body {
   .intro-photo { aspect-ratio: 4 / 3; }
   .location-entrance-photo { aspect-ratio: 3 / 2; }
   .hero-image img { object-position: 76% 72%; }
+}
+
+/* En celulares chicos las tarjetas de cabañas no entran de a dos. */
+@media (max-width: 520px) {
+  .cabin-grid { grid-template-columns: 1fr; }
 }

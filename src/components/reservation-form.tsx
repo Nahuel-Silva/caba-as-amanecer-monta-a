@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { BabyToggle } from "@/components/baby-toggle";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { useAvailability } from "@/components/use-availability";
 import { keepAvailableStay, type StaySelection } from "@/lib/availability";
@@ -11,20 +12,19 @@ type CabinOption = { slug: string; name: string };
 
 type ReservationFormProps = {
   cabins: CabinOption[];
-  /** Cabaña elegida de entrada, si el visitante está en su página. */
-  defaultCabin?: string;
-  /** Datos ya elegidos en la barra de reserva. */
-  prefill?: ReservationPrefill | null;
+  /** Datos elegidos en la barra de reserva. */
+  prefill: ReservationPrefill;
   onSent: () => void;
 };
 
 /** Formulario de solicitud de reserva. Avisa al propietario por mail; no bloquea fechas. */
-export function ReservationForm({ cabins, defaultCabin, prefill, onSent }: ReservationFormProps) {
+export function ReservationForm({ cabins, prefill, onSent }: ReservationFormProps) {
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [error, setError] = useState("");
-  const [cabinName, setCabinName] = useState(prefill?.cabin ?? defaultCabin ?? cabins[0].name);
-  const [stay, setStay] = useState<StaySelection>({ arrival: prefill?.arrival ?? "", departure: prefill?.departure ?? "" });
+  const [cabinName, setCabinName] = useState(prefill.cabin);
+  const [stay, setStay] = useState<StaySelection>({ arrival: prefill.arrival, departure: prefill.departure });
+  const [hasBaby, setHasBaby] = useState(prefill.hasBaby);
   const availability = useAvailability();
 
   const slugOf = (name: string) => cabins.find((cabin) => cabin.name === name)?.slug ?? "";
@@ -49,7 +49,7 @@ export function ReservationForm({ cabins, defaultCabin, prefill, onSent }: Reser
       const response = await fetch("/api/reservas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, ...stay }),
+        body: JSON.stringify({ ...fields, ...stay, hasBaby }),
       });
       const result: { ok: boolean; error?: string } = await response.json();
 
@@ -70,7 +70,7 @@ export function ReservationForm({ cabins, defaultCabin, prefill, onSent }: Reser
     return (
       <div className="reservation-sent" role="status">
         <h3>¡Recibimos tu solicitud!</h3>
-        <p>Te vamos a responder con la disponibilidad y la tarifa. Esto todavía no confirma la reserva.</p>
+        <p>Bloqueamos tus fechas por 24 horas. Te vamos a responder con la tarifa, y la reserva queda confirmada con el pago de la seña.</p>
       </div>
     );
   }
@@ -99,7 +99,7 @@ export function ReservationForm({ cabins, defaultCabin, prefill, onSent }: Reser
       </label>
       <label>
         Personas
-        <select defaultValue={prefill?.guests ?? "2"} name="guests">
+        <select defaultValue={prefill.guests} name="guests">
           {guestOptions.map((option) => (
             <option key={option} value={option}>{option === "5" ? "5 (con cama extra)" : option}</option>
           ))}
@@ -119,6 +119,9 @@ export function ReservationForm({ cabins, defaultCabin, prefill, onSent }: Reser
         ) : (
           <p className="reservation-loading">Cargando disponibilidad…</p>
         )}
+      </div>
+      <div className="reservation-wide reservation-baby">
+        <BabyToggle checked={hasBaby} onChange={setHasBaby} />
       </div>
       <label className="reservation-wide">
         Mensaje (opcional)
@@ -146,7 +149,7 @@ export function ReservationForm({ cabins, defaultCabin, prefill, onSent }: Reser
         <button className="button button-primary" disabled={isSending} type="submit">
           {isSending ? "Enviando…" : "Solicitar reserva"}
         </button>
-        <small>Usamos tus datos solo para responder esta solicitud. No confirma la reserva.</small>
+        <small>Usamos tus datos solo para responder esta solicitud. Las fechas se bloquean por 24 horas y se liberan si no se confirma.</small>
       </div>
     </form>
   );

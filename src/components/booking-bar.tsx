@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BabyToggle } from "@/components/baby-toggle";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { useAvailability } from "@/components/use-availability";
 import { keepAvailableStay, type StaySelection } from "@/lib/availability";
@@ -21,6 +22,7 @@ export function BookingBar({ cabins, fixedCabin }: BookingBarProps) {
   const [slug, setSlug] = useState(fixedCabin?.slug ?? cabins[0].slug);
   const [stay, setStay] = useState<StaySelection>({ arrival: "", departure: "" });
   const [guests, setGuests] = useState("2");
+  const [hasBaby, setHasBaby] = useState(false);
   const [error, setError] = useState("");
 
   const cabin = cabins.find((option) => option.slug === slug) ?? cabins[0];
@@ -41,7 +43,7 @@ export function BookingBar({ cabins, fixedCabin }: BookingBarProps) {
       setError("Elegí la fecha de llegada y la de salida.");
       return;
     }
-    const detail: ReservationPrefill = { cabin: cabin.name, ...stay, guests };
+    const detail: ReservationPrefill = { cabin: cabin.name, ...stay, guests, hasBaby };
     window.dispatchEvent(new CustomEvent(openReservationEvent, { detail }));
   }
 
@@ -50,7 +52,7 @@ export function BookingBar({ cabins, fixedCabin }: BookingBarProps) {
       {!fixedCabin && (
         <label className="booking-field">
           Cabaña
-          <select onChange={(event) => changeCabin(event.target.value)} value={slug}>
+          <select data-cabin onChange={(event) => changeCabin(event.target.value)} value={slug}>
             {cabins.map((option) => (
               <option key={option.slug} value={option.slug}>{option.name}</option>
             ))}
@@ -81,6 +83,8 @@ export function BookingBar({ cabins, fixedCabin }: BookingBarProps) {
           ))}
         </select>
       </label>
+
+      <BabyToggle checked={hasBaby} onChange={setHasBaby} />
 
       <button className="button button-primary booking-submit" onClick={openForm} type="button">
         Solicitar reserva

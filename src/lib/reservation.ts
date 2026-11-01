@@ -6,16 +6,20 @@ export type ReservationRequest = {
   arrival: string;
   departure: string;
   guests: string;
+  hasBaby: boolean;
   cabin: string;
   message: string;
 };
 
 export const guestOptions = ["1", "2", "3", "4", "5"];
 
+/** Tope por solicitud: cada una bloquea fechas por 24 horas y cualquiera puede enviarla. */
+const maxStayNights = 30;
+
 /** Evento con el que la barra de reserva abre el formulario con los datos elegidos. */
 export const openReservationEvent = "reservation:open";
 
-export type ReservationPrefill = { cabin: string; arrival: string; departure: string; guests: string };
+export type ReservationPrefill = { cabin: string; arrival: string; departure: string; guests: string; hasBaby: boolean };
 
 const fieldLimits = { name: 80, email: 120, phone: 30, message: 1000 };
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -58,9 +62,12 @@ export function validateReservation(
   if (!isRealDate(arrival) || !isRealDate(departure)) return { error: "Elegí las fechas de llegada y salida." };
   if (arrival < today) return { error: "La fecha de llegada no puede ser anterior a hoy." };
   if (departure <= arrival) return { error: "La fecha de salida tiene que ser posterior a la de llegada." };
+  if (Date.parse(departure) - Date.parse(arrival) > maxStayNights * 86_400_000) {
+    return { error: `Para estadías de más de ${maxStayNights} noches, escribinos por WhatsApp.` };
+  }
   if (!guestOptions.includes(guests)) return { error: "Elegí la cantidad de personas." };
   if (!cabins.includes(cabin)) return { error: "Elegí una cabaña." };
   if (message.length > fieldLimits.message) return { error: "El mensaje es demasiado largo." };
 
-  return { data: { name, email, phone, arrival, departure, guests, cabin, message } };
+  return { data: { name, email, phone, arrival, departure, guests, hasBaby: input.hasBaby === true, cabin, message } };
 }

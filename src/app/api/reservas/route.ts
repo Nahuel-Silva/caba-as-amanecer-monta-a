@@ -8,7 +8,7 @@ import {
   sendGuestAcknowledgement,
   sendOwnerNotification,
 } from "@/lib/reservation-email";
-import { createReservation, isStayFree } from "@/lib/reservations-db";
+import { createReservation } from "@/lib/reservations-db";
 
 const respond = (status: number, body: { ok: boolean; error?: string }) => Response.json(body, { status });
 
@@ -40,10 +40,9 @@ export async function POST(request: Request) {
 
   if (isDatabaseConfigured) {
     try {
-      if (!(await isStayFree(cabinSlug, data.arrival, data.departure))) {
+      if (!(await createReservation(cabinSlug, data, looksLikeSpam))) {
         return respond(409, { ok: false, error: "Esas fechas ya están ocupadas. Elegí otras o probá con la otra cabaña." });
       }
-      await createReservation(cabinSlug, data, looksLikeSpam ? "rejected" : "pending");
       isSaved = true;
     } catch (saveError) {
       console.error("No se pudo guardar la solicitud", saveError);

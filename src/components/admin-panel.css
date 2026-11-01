@@ -21,6 +21,7 @@
 .admin-card p { margin: 6px 0 0; font-size: 14px; }
 .admin-card a { text-decoration: underline; text-underline-offset: 2px; }
 .admin-message { color: var(--muted); white-space: pre-wrap; }
+.admin-card .admin-hold { color: #9c3d24; font-size: 13px; font-weight: 700; }
 .admin-status { flex: none; padding: 3px 10px; border-radius: 999px; background: rgb(85 96 71 / 14%); font-size: 12px; font-weight: 700; }
 .admin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 12px; }
 .admin-actions .button { min-height: 40px; padding: 0 18px; }

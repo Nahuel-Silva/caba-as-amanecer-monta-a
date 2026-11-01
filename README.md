@@ -68,7 +68,7 @@ Usá solo fotos propias, con autorización escrita de quien las tenga, o con una
 
 ## Solicitudes de reserva por mail
 
-El ícono flotante de mail, junto al de WhatsApp, despliega un formulario que envía la solicitud a `/api/reservas`. Si el visitante está en la página de una cabaña, esa cabaña queda elegida. El propietario recibe un mail, al que puede responder directamente, y el huésped recibe un acuse que aclara que la reserva todavía no está confirmada. No bloquea fechas.
+La barra de reserva abre un formulario con los datos elegidos, que envía la solicitud a `/api/reservas`. El propietario recibe un mail, al que puede responder directamente, y el huésped recibe un acuse que aclara que la reserva todavía no está confirmada. No bloquea fechas.
 
 Hay que cargar `RESEND_API_KEY`, `RESERVATIONS_EMAIL_TO` y `RESERVATIONS_EMAIL_FROM` (ver `.env.example`). Para enviarle el acuse al huésped hace falta un dominio propio verificado en Resend. La protección contra abuso es básica (campo trampa, mismo origen y límite por IP en memoria): con la web publicada conviene sumar un captcha.
 
@@ -78,8 +78,9 @@ Las solicitudes de reserva y las reseñas se guardan en [Turso](https://turso.te
 
 En `/admin`, con la contraseña `ADMIN_PASSWORD`, se confirman o rechazan reservas, se bloquean fechas, se aprueban reseñas y se cargan promociones:
 
-- Una solicitud queda pendiente y no ocupa fechas. Al confirmarla, esas noches se ocupan en el calendario.
-- Confirmar falla si otra reserva confirmada ya ocupa esas noches.
+- Una solicitud queda pendiente y bloquea sus fechas por 24 horas. Si no se confirma, se liberan solas.
+- Una solicitud admite hasta 30 noches, y no puede tomar noches ocupadas.
+- Confirmar falla si otra reserva ocupa esas noches.
 - Cancelar una reserva confirmada libera las fechas.
 - Las reseñas se publican solas. Solo quedan pendientes las que tienen insultos o enlaces (`src/lib/review-moderation.ts`).
 

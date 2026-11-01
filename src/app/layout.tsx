@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito, Fraunces } from "next/font/google";
-import { ReservationFloat } from "@/components/reservation-float";
+import { ReservationDialog } from "@/components/reservation-dialog";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
 import { site } from "@/content/site";
 import { getCabins } from "@/lib/cabins";
@@ -48,7 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <div className="contact-floats">
           {showReservationForm && (
-            <ReservationFloat cabins={getCabins().map(({ slug, displayName }) => ({ slug, name: displayName }))} />
+            <ReservationDialog cabins={getCabins().map(({ slug, displayName }) => ({ slug, name: displayName }))} />
           )}
           <WhatsAppFloat />
         </div>
