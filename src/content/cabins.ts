@@ -1,24 +1,22 @@
-import { PENDING } from "@/content/site";
-
 export type CabinImage = {
   src: string;
   alt: string;
   isDemo: boolean;
 };
 
+/** Dato corto que se lee de un vistazo, como "Dormitorios: 2". */
+export type CabinFact = { label: string; value: string };
+
+/** Grupo de características con su lista de ítems. */
+export type CabinFeatureGroup = { title: string; items: string[] };
+
 export type Cabin = {
   slug: string;
   displayName: string;
   cardSummary: string;
   description: string;
-  capacity: string;
-  bedrooms: number | typeof PENDING;
-  beds: string;
-  bathrooms: number | typeof PENDING;
-  kitchen: string;
-  services: string;
-  access: string;
-  rules: string;
+  facts: CabinFact[];
+  featureGroups: CabinFeatureGroup[];
   images: CabinImage[];
 };
 
@@ -30,20 +28,71 @@ export type Cabin = {
 const sharedDetails = {
   cardSummary: "Para 4 personas · 2 dormitorios · baño completo",
   description:
-    "Cabaña para 4 personas, con opción de agregar una cama extra de 1 plaza con costo adicional, dentro del complejo Amanecer de Montaña, a 100 metros de la Ruta Nacional 40 por el acceso Norte a Malargüe y a aproximadamente 1 kilómetro del centro de la ciudad. Tiene dos dormitorios, sala comedor, baño completo y cocina-comedor equipada.",
-  capacity: "4 personas, con opción de cama extra de 1 plaza (costo adicional)",
-  bedrooms: 2,
-  beds:
-    "Un dormitorio matrimonial con sommier Queen Size y otro con dos sommiers individuales (1 plaza y media). Si lo pedís, se puede agregar una cama extra de 1 plaza con costo adicional.",
-  bathrooms: 1,
-  kitchen:
-    "Cocina-comedor equipada con anafe de 4 hornallas (no tiene horno), heladera, microondas, pava eléctrica, cafetera, tostadora, vajilla completa e infusiones.",
-  services:
-    "Baño completo con ducha y antebaño, placares, tomacorrientes y conectores USB, sillones, WiFi, televisor de 32 pulgadas con DIRECTV, aire acondicionado, calefacción a gas natural (tiro balanceado) y estufa hogar a leña. Cada cabaña tiene cochera individual techada y el complejo cuenta con parrilla. Incluye servicio de ropa blanca (cambio de sábanas y toallas cada 3 días) y limpieza día por medio de 9 a 12 hs.",
-  access:
-    "Entrada privada con control eléctrico y sillones de exterior en el patio. A 100 metros de la Ruta Nacional 40 por el acceso Norte a Malargüe y a aproximadamente 1 kilómetro del centro.",
-  rules:
-    "Check-in a partir de las 14 hs y check-out hasta las 10 hs. La limpieza se hace sin huéspedes: los objetos personales deben guardarse dentro del placard, y el complejo no se hace cargo de su pérdida. Si el ingreso es más tarde o el retiro más temprano de lo acordado, se cobra la estadía completa. No se aceptan mascotas.",
+    "Una cabaña completa dentro del complejo Amanecer de Montaña, con dos dormitorios, sala comedor con estufa hogar a leña, cocina-comedor equipada y baño completo. Si viajan cinco, se puede sumar una cama extra de 1 plaza con costo adicional.",
+  facts: [
+    { label: "Capacidad", value: "4 personas + cama extra opcional" },
+    { label: "Dormitorios", value: "2" },
+    { label: "Baño", value: "1 completo" },
+    { label: "Cochera", value: "Individual techada" },
+  ],
+  featureGroups: [
+    {
+      title: "Dormitorios y baño",
+      items: [
+        "Dormitorio matrimonial con sommier Queen Size",
+        "Dormitorio con dos sommiers individuales de 1 plaza y media",
+        "Cama extra de 1 plaza a pedido, con costo adicional",
+        "Placares en los dormitorios",
+        "Baño completo con ducha y antebaño",
+      ],
+    },
+    {
+      title: "Cocina-comedor",
+      items: [
+        "Anafe de 4 hornallas (no tiene horno)",
+        "Heladera y microondas",
+        "Pava eléctrica, cafetera y tostadora",
+        "Vajilla completa e infusiones",
+      ],
+    },
+    {
+      title: "Confort",
+      items: [
+        "Aire acondicionado",
+        "Calefacción a gas natural (tiro balanceado)",
+        "Estufa hogar a leña",
+        "WiFi y televisor de 32 pulgadas con DIRECTV",
+        "Sillones, tomacorrientes y conectores USB",
+      ],
+    },
+    {
+      title: "Servicios incluidos",
+      items: [
+        "Ropa blanca, con cambio de sábanas y toallas cada 3 días",
+        "Limpieza día por medio, de 9 a 12 hs",
+        "Cochera individual techada",
+        "Parrilla en el complejo",
+      ],
+    },
+    {
+      title: "Exterior y ubicación",
+      items: [
+        "Entrada privada con control eléctrico",
+        "Sillones de exterior en el patio",
+        "A 100 metros de la Ruta Nacional 40, por el acceso Norte a Malargüe",
+        "A aproximadamente 1 kilómetro del centro",
+      ],
+    },
+    {
+      title: "Normas de la casa",
+      items: [
+        "Check-in desde las 14 hs y check-out hasta las 10 hs",
+        "La limpieza se hace sin huéspedes: los objetos personales se guardan en el placard. El complejo no se hace cargo de su pérdida.",
+        "Si el ingreso es más tarde o el retiro más temprano de lo acordado, se cobra la estadía completa",
+        "No se aceptan mascotas",
+      ],
+    },
+  ],
 };
 
 export const cabins: Cabin[] = [

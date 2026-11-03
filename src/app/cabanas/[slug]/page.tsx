@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BookingBar } from "@/components/booking-bar";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -10,6 +9,7 @@ import { site } from "@/content/site";
 import { getCabinBySlug, getCabins } from "@/lib/cabins";
 import { showReservationForm } from "@/lib/reservation-email";
 import { pageMetadata } from "@/lib/seo";
+import "./cabin-page.css";
 
 type CabinPageProps = { params: Promise<{ slug: string }> };
 
@@ -38,17 +38,6 @@ export default async function CabinPage({ params }: CabinPageProps) {
 
   if (!cabin) notFound();
 
-  const details = [
-    ["Capacidad", cabin.capacity],
-    ["Dormitorios", cabin.bedrooms],
-    ["Camas", cabin.beds],
-    ["Baños", cabin.bathrooms],
-    ["Cocina y equipamiento", cabin.kitchen],
-    ["Servicios incluidos", cabin.services],
-    ["Acceso", cabin.access],
-    ["Reglas", cabin.rules],
-  ];
-
   return (
     <>
       <SiteHeader />
@@ -60,40 +49,52 @@ export default async function CabinPage({ params }: CabinPageProps) {
             <p className="section-intro">{cabin.cardSummary}</p>
           </header>
         </div>
-        {showReservationForm && (
-          <div className="wrap booking-bar-cabin">
-            <BookingBar
-              cabins={getCabins().map(({ slug: cabinSlug, displayName }) => ({ slug: cabinSlug, name: displayName }))}
-              fixedCabin={{ slug: cabin.slug, name: cabin.displayName }}
-            />
-          </div>
-        )}
         <section aria-label={`Galería de ${cabin.displayName}`} className="wrap detail-gallery">
           <PhotoGallery images={cabin.images} />
         </section>
-        <section className="wrap detail-content">
+
+        <section className="wrap cabin-overview">
           <div>
             <p className="eyebrow">Sobre esta cabaña</p>
             <h2>Un espacio para tu estadía.</h2>
             <p>{cabin.description}</p>
-            <div className="detail-cta">
+            <div className="cabin-actions">
               <WhatsAppButton cabinName={cabin.displayName} className="button button-primary">
                 Consultar por esta cabaña <span aria-hidden="true">↗</span>
               </WhatsAppButton>
+              {showReservationForm && (
+                <Link className="text-link" href="/#reservar">
+                  Solicitar reserva <span aria-hidden="true">→</span>
+                </Link>
+              )}
             </div>
-            <Link className="back-link" href="/cabanas">← Volver a las cabañas</Link>
           </div>
-          <div>
-            <p className="eyebrow">Características</p>
-            <ul className="detail-list">
-              {details.map(([label, value]) => (
-                <li key={label}>
-                  <strong>{label}</strong>
-                  <span>{value}</span>
-                </li>
-              ))}
-            </ul>
+          <dl className="cabin-facts">
+            {cabin.facts.map((fact) => (
+              <div key={fact.label}>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section aria-labelledby="cabin-features-title" className="wrap cabin-features">
+          <p className="eyebrow">Características</p>
+          <h2 id="cabin-features-title">Qué vas a encontrar.</h2>
+          <div className="cabin-feature-grid">
+            {cabin.featureGroups.map((group) => (
+              <article className="cabin-feature-card" key={group.title}>
+                <h3>{group.title}</h3>
+                <ul>
+                  {group.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
           </div>
+          <Link className="back-link" href="/cabanas">← Volver a las cabañas</Link>
         </section>
       </main>
       <SiteFooter />

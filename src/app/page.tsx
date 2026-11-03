@@ -105,7 +105,7 @@ export default function Home() {
         </section>
 
         {showReservationForm && (
-          <div className="wrap booking-bar-overlap">
+          <div className="wrap booking-bar-overlap" id="reservar">
             <BookingBar cabins={cabins.map(({ slug, displayName }) => ({ slug, name: displayName }))} />
           </div>
         )}

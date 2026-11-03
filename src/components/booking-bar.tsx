@@ -10,16 +10,10 @@ import "./booking-bar.css";
 
 type CabinOption = { slug: string; name: string };
 
-type BookingBarProps = {
-  cabins: CabinOption[];
-  /** En la página de una cabaña se reserva esa, sin selector. */
-  fixedCabin?: CabinOption;
-};
-
 /** Barra para elegir cabaña, fechas y personas. Abre el formulario de reserva con esos datos. */
-export function BookingBar({ cabins, fixedCabin }: BookingBarProps) {
+export function BookingBar({ cabins }: { cabins: CabinOption[] }) {
   const availability = useAvailability();
-  const [slug, setSlug] = useState(fixedCabin?.slug ?? cabins[0].slug);
+  const [slug, setSlug] = useState(cabins[0].slug);
   const [stay, setStay] = useState<StaySelection>({ arrival: "", departure: "" });
   const [guests, setGuests] = useState("2");
   const [hasBaby, setHasBaby] = useState(false);
@@ -52,17 +46,15 @@ export function BookingBar({ cabins, fixedCabin }: BookingBarProps) {
   }
 
   return (
-    <div className={`booking-bar ${fixedCabin ? "has-fixed-cabin" : ""}`}>
-      {!fixedCabin && (
-        <label className="booking-field">
-          Cabaña
-          <select data-cabin onChange={(event) => changeCabin(event.target.value)} value={slug}>
-            {cabins.map((option) => (
-              <option key={option.slug} value={option.slug}>{option.name}</option>
-            ))}
-          </select>
-        </label>
-      )}
+    <div className="booking-bar">
+      <label className="booking-field">
+        Cabaña
+        <select data-cabin onChange={(event) => changeCabin(event.target.value)} value={slug}>
+          {cabins.map((option) => (
+            <option key={option.slug} value={option.slug}>{option.name}</option>
+          ))}
+        </select>
+      </label>
 
       <div className="booking-field booking-dates">
         Fechas
