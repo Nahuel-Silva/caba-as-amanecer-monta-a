@@ -2,12 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ReservationForm } from "@/components/reservation-form";
-import { openReservationEvent, type ReservationPrefill } from "@/lib/reservation";
-
-type CabinOption = { slug: string; name: string };
+import { openReservationEvent, reservationClosedEvent, type ReservationPrefill } from "@/lib/reservation";
 
 /** Panel del formulario de reserva. Lo abre la barra de reserva con los datos ya elegidos. */
-export function ReservationDialog({ cabins }: { cabins: CabinOption[] }) {
+export function ReservationDialog() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [formVersion, setFormVersion] = useState(0);
   const [prefill, setPrefill] = useState<ReservationPrefill | null>(null);
@@ -29,6 +27,7 @@ export function ReservationDialog({ cabins }: { cabins: CabinOption[] }) {
 
   // Al cerrar después de enviar, el formulario vuelve a quedar vacío. Si no se envió, conserva lo escrito.
   function handleClose() {
+    window.dispatchEvent(new Event(reservationClosedEvent));
     if (!wasSent.current) return;
     wasSent.current = false;
     setPrefill(null);
@@ -55,8 +54,8 @@ export function ReservationDialog({ cabins }: { cabins: CabinOption[] }) {
         </div>
         {prefill && (
           <ReservationForm
-            cabins={cabins}
-            key={`${formVersion}-${JSON.stringify(prefill)}`}
+            key={formVersion}
+            onEdit={close}
             onSent={() => {
               wasSent.current = true;
             }}

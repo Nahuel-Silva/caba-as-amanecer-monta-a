@@ -56,3 +56,7 @@ export function keepAvailableStay(stay: StaySelection, bookings: Booking[]): Sta
 export function countNights(arrival: string, departure: string) {
   return Math.round((Date.parse(departure) - Date.parse(arrival)) / 86_400_000);
 }
+
+export function formatDay(day: string) {
+  return new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
+}

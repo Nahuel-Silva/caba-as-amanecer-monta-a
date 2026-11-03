@@ -40,9 +40,6 @@
 .date-range-clear:disabled { cursor: default; opacity: .4; }
 .date-range .date-range-done { min-height: 40px; padding: 0 20px; }
 
-/* Dentro del panel de reserva el calendario se abre en el lugar, sin flotar. */
-.reservation-form .date-range-popover { position: static; width: auto; margin-top: 8px; padding: 14px; box-shadow: none; }
-
 @media (max-width: 760px) {
   .date-range-popover { right: 0; width: auto; padding: 14px; }
   .availability-months { grid-auto-flow: row; }

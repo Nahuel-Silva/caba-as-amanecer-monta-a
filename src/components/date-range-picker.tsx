@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
-import { countNights, selectDay, type Booking, type StaySelection } from "@/lib/availability";
+import { countNights, formatDay, selectDay, type Booking, type StaySelection } from "@/lib/availability";
 import "./availability-calendar.css";
 
 type DateRangePickerProps = {
@@ -10,18 +10,12 @@ type DateRangePickerProps = {
   today: string;
   value: StaySelection;
   onChange: (value: StaySelection) => void;
-  /** Meses visibles a la vez. */
-  months?: number;
   /** Aviso cuando las fechas no se pudieron verificar. */
   notice?: string;
 };
 
-function formatDay(day: string) {
-  return new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
-}
-
 /** Selector de fechas: dos campos que despliegan el calendario para marcar llegada y salida. */
-export function DateRangePicker({ bookings, today, value, onChange, months = 2, notice }: DateRangePickerProps) {
+export function DateRangePicker({ bookings, today, value, onChange, notice }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -74,7 +68,7 @@ export function DateRangePicker({ bookings, today, value, onChange, months = 2, 
         <div className="date-range-popover">
           <AvailabilityCalendar
             bookings={bookings}
-            months={months}
+            months={2}
             onSelectDay={(day) => onChange(selectDay(day, value))}
             selection={value}
             today={today}

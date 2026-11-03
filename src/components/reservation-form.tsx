@@ -1,55 +1,44 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { BabyToggle } from "@/components/baby-toggle";
-import { DateRangePicker } from "@/components/date-range-picker";
-import { useAvailability } from "@/components/use-availability";
-import { keepAvailableStay, type StaySelection } from "@/lib/availability";
-import { guestOptions, type ReservationPrefill } from "@/lib/reservation";
+import { countNights, formatDay } from "@/lib/availability";
+import type { ReservationPrefill } from "@/lib/reservation";
 import "./reservation-form.css";
 
-type CabinOption = { slug: string; name: string };
-
 type ReservationFormProps = {
-  cabins: CabinOption[];
   /** Datos elegidos en la barra de reserva. */
   prefill: ReservationPrefill;
+  /** Vuelve a la barra de reserva para cambiar esos datos. */
+  onEdit: () => void;
   onSent: () => void;
 };
 
-/** Formulario de solicitud de reserva. Avisa al propietario por mail; no bloquea fechas. */
-export function ReservationForm({ cabins, prefill, onSent }: ReservationFormProps) {
+function guestsLabel(guests: string) {
+  if (guests === "5") return "5 personas (con cama extra)";
+  return `${guests} ${guests === "1" ? "persona" : "personas"}`;
+}
+
+/** Pide los datos de contacto para la estadía elegida en la barra. El servidor bloquea las fechas por 24 horas. */
+export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProps) {
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
-  const [error, setError] = useState("");
-  const [cabinName, setCabinName] = useState(prefill.cabin);
-  const [stay, setStay] = useState<StaySelection>({ arrival: prefill.arrival, departure: prefill.departure });
-  const [hasBaby, setHasBaby] = useState(prefill.hasBaby);
-  const availability = useAvailability();
+  const [failure, setFailure] = useState<{ message: string; prefill: ReservationPrefill } | null>(null);
 
-  const slugOf = (name: string) => cabins.find((cabin) => cabin.name === name)?.slug ?? "";
-  const bookings = availability?.bookings[slugOf(cabinName)] ?? [];
-
-  function changeCabin(name: string) {
-    setCabinName(name);
-    setStay(keepAvailableStay(stay, availability?.bookings[slugOf(name)] ?? []));
-  }
+  // Un error vale para los datos con los que se envió: desaparece al volver de la barra.
+  const error = failure?.prefill === prefill ? failure.message : "";
+  const nights = countNights(prefill.arrival, prefill.departure);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const fields = Object.fromEntries(new FormData(event.currentTarget));
-    if (!stay.departure) {
-      setError("Elegí las fechas de llegada y salida.");
-      return;
-    }
-    setError("");
+    setFailure(null);
     setIsSending(true);
 
     try {
       const response = await fetch("/api/reservas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, ...stay, hasBaby }),
+        body: JSON.stringify({ ...fields, ...prefill }),
       });
       const result: { ok: boolean; error?: string } = await response.json();
 
@@ -57,10 +46,10 @@ export function ReservationForm({ cabins, prefill, onSent }: ReservationFormProp
         setIsSent(true);
         onSent();
       } else {
-        setError(result.error ?? "No pudimos enviar tu solicitud.");
+        setFailure({ message: result.error ?? "No pudimos enviar tu solicitud.", prefill });
       }
     } catch {
-      setError("No pudimos enviar tu solicitud. Revisá tu conexión o escribinos por WhatsApp.");
+      setFailure({ message: "No pudimos enviar tu solicitud. Revisá tu conexión o escribinos por WhatsApp.", prefill });
     } finally {
       setIsSending(false);
     }
@@ -77,6 +66,14 @@ export function ReservationForm({ cabins, prefill, onSent }: ReservationFormProp
 
   return (
     <form className="reservation-form" onSubmit={handleSubmit}>
+      <div className="reservation-summary reservation-wide">
+        <div>
+          <strong>{prefill.cabin}</strong>
+          <p>{formatDay(prefill.arrival)} → {formatDay(prefill.departure)} · {nights} {nights === 1 ? "noche" : "noches"}</p>
+          <p>{guestsLabel(prefill.guests)}{prefill.hasBaby && " · Con bebé"}</p>
+        </div>
+        <button className="reservation-summary-edit" onClick={onEdit} type="button">Cambiar</button>
+      </div>
       <label className="reservation-wide">
         Nombre y apellido
         <input autoComplete="name" maxLength={80} name="name" required type="text" />
@@ -89,40 +86,6 @@ export function ReservationForm({ cabins, prefill, onSent }: ReservationFormProp
         Teléfono
         <input autoComplete="tel" maxLength={30} name="phone" required type="tel" />
       </label>
-      <label>
-        Cabaña
-        <select name="cabin" onChange={(event) => changeCabin(event.target.value)} value={cabinName}>
-          {cabins.map((cabin) => (
-            <option key={cabin.slug} value={cabin.name}>{cabin.name}</option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Personas
-        <select defaultValue={prefill.guests} name="guests">
-          {guestOptions.map((option) => (
-            <option key={option} value={option}>{option === "5" ? "5 (con cama extra)" : option}</option>
-          ))}
-        </select>
-      </label>
-      <div className="reservation-wide reservation-dates">
-        <span>Fechas</span>
-        {availability ? (
-          <DateRangePicker
-            bookings={bookings}
-            notice={availability.notice}
-            months={1}
-            onChange={setStay}
-            today={availability.today}
-            value={stay}
-          />
-        ) : (
-          <p className="reservation-loading">Cargando disponibilidad…</p>
-        )}
-      </div>
-      <div className="reservation-wide reservation-baby">
-        <BabyToggle checked={hasBaby} onChange={setHasBaby} />
-      </div>
       <label className="reservation-wide">
         Mensaje (opcional)
         <textarea maxLength={1000} name="message" rows={3} />

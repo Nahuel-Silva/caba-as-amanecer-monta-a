@@ -4,7 +4,7 @@ import { useState } from "react";
 import { BabyToggle } from "@/components/baby-toggle";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { useAvailability } from "@/components/use-availability";
-import { keepAvailableStay, type StaySelection } from "@/lib/availability";
+import { isStayAvailable, keepAvailableStay, type StaySelection } from "@/lib/availability";
 import { guestOptions, openReservationEvent, type ReservationPrefill } from "@/lib/reservation";
 import "./booking-bar.css";
 
@@ -41,6 +41,10 @@ export function BookingBar({ cabins, fixedCabin }: BookingBarProps) {
   function openForm() {
     if (!stay.departure) {
       setError("Elegí la fecha de llegada y la de salida.");
+      return;
+    }
+    if (!isStayAvailable(stay.arrival, stay.departure, bookings)) {
+      setError("Esas fechas ya no están disponibles. Elegí otras.");
       return;
     }
     const detail: ReservationPrefill = { cabin: cabin.name, ...stay, guests, hasBaby };

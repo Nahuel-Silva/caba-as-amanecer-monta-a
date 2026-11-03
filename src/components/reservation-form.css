@@ -9,14 +9,15 @@
 
 .reservation-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 14px; }
 .reservation-form label { display: grid; align-content: start; gap: 5px; font-size: 13px; font-weight: 700; }
-.reservation-form input, .reservation-form select, .reservation-form textarea { width: 100%; min-width: 0; padding: 9px 11px; border: 1px solid #b9b09f; border-radius: var(--radius-sm); background: #fffdf7; color: var(--ink); font: inherit; font-size: 15px; font-weight: 400; }
+.reservation-form input, .reservation-form textarea { width: 100%; min-width: 0; padding: 9px 11px; border: 1px solid #b9b09f; border-radius: var(--radius-sm); background: #fffdf7; color: var(--ink); font: inherit; font-size: 15px; font-weight: 400; }
 .reservation-form textarea { resize: vertical; }
-.reservation-form input:focus-visible, .reservation-form select:focus-visible, .reservation-form textarea:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 1px; }
+.reservation-form input:focus-visible, .reservation-form textarea:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 1px; }
 .reservation-wide { grid-column: 1 / -1; }
-.reservation-loading { margin: 0; color: var(--muted); font-size: 14px; }
-.reservation-dates { display: grid; gap: 5px; font-size: 13px; font-weight: 700; }
-.reservation-baby { display: flex; }
-.reservation-baby .baby-toggle { min-height: 46px; }
+.reservation-summary { display: flex; align-items: start; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: var(--radius-sm); background: rgb(85 96 71 / 10%); }
+.reservation-summary strong { font-size: 15px; font-weight: 700; }
+.reservation-summary p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.reservation-summary-edit { flex: none; padding: 2px 0; border: 0; background: none; color: var(--ink); cursor: pointer; font: inherit; font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.reservation-summary-edit:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 2px; }
 .reservation-trap { position: absolute; left: -9999px; }
 .reservation-error { margin: 0; color: #9c3d24; font-size: 14px; font-weight: 700; }
 .reservation-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }

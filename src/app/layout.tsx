@@ -3,7 +3,6 @@ import { Nunito, Fraunces } from "next/font/google";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
 import { site } from "@/content/site";
-import { getCabins } from "@/lib/cabins";
 import { showReservationForm } from "@/lib/reservation-email";
 import { defaultDescription, metadataBase, robotsMetadata } from "@/lib/seo";
 import "./globals.css";
@@ -47,9 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full" suppressHydrationWarning>
         {children}
         <div className="contact-floats">
-          {showReservationForm && (
-            <ReservationDialog cabins={getCabins().map(({ slug, displayName }) => ({ slug, name: displayName }))} />
-          )}
+          {showReservationForm && <ReservationDialog />}
           <WhatsAppFloat />
         </div>
       </body>

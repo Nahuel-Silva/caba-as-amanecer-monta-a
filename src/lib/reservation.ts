@@ -19,6 +19,9 @@ const maxStayNights = 30;
 /** Evento con el que la barra de reserva abre el formulario con los datos elegidos. */
 export const openReservationEvent = "reservation:open";
 
+/** Evento al cerrar el formulario: la solicitud pudo cambiar qué fechas están libres. */
+export const reservationClosedEvent = "reservation:closed";
+
 export type ReservationPrefill = { cabin: string; arrival: string; departure: string; guests: string; hasBaby: boolean };
 
 const fieldLimits = { name: 80, email: 120, phone: 30, message: 1000 };
