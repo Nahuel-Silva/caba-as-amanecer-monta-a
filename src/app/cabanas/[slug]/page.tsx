@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowUpRightIcon } from "@/components/arrow-icon";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -60,7 +61,7 @@ export default async function CabinPage({ params }: CabinPageProps) {
             <p>{cabin.description}</p>
             <div className="cabin-actions">
               <WhatsAppButton cabinName={cabin.displayName} className="button button-primary">
-                Consultar por esta cabaña <span aria-hidden="true">↗</span>
+                Consultar por esta cabaña <ArrowUpRightIcon />
               </WhatsAppButton>
               {showReservationForm && (
                 <Link className="text-link" href="/#reservar">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Cabin } from "@/content/cabins";
+import { ArrowUpRightIcon } from "@/components/arrow-icon";
 import { DemoImage } from "@/components/demo-image";
 
 export function CabinCard({ cabin, eager = false }: { cabin: Cabin; eager?: boolean }) {
@@ -18,7 +19,7 @@ export function CabinCard({ cabin, eager = false }: { cabin: Cabin; eager?: bool
             <p>{cabin.cardSummary}</p>
           </div>
           <span aria-hidden="true" className="cabin-arrow">
-            ↗
+            <ArrowUpRightIcon />
           </span>
         </div>
       </Link>

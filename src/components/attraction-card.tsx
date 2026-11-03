@@ -14,7 +14,7 @@ export function AttractionCard({ attraction, eager = false }: { attraction: Attr
             fill
             loading={eager ? "eager" : undefined}
             quality={90}
-            sizes="(max-width: 760px) 100vw, 590px"
+            sizes="(max-width: 600px) 100vw, (max-width: 1100px) 40vw, 420px"
             src={image.src}
           />
         </div>

@@ -351,14 +351,8 @@ body {
 .intro-photo img { object-fit: cover; }
 .intro-copy .intro-label { margin: 0 0 14px; padding: 0; }
 
-/* Foto de la entrada en Ubicación. */
-.location-entrance { margin: 22px 0 0; }
-.location-entrance-photo { position: relative; aspect-ratio: 5 / 2; overflow: hidden; border-radius: var(--radius); box-shadow: var(--shadow-card); }
-.location-entrance-photo img { object-fit: cover; object-position: center 72%; }
-.location-entrance figcaption { margin-top: 12px; color: var(--muted); font-size: 13px; }
 @media (max-width: 760px) {
   .intro-photo { aspect-ratio: 4 / 3; }
-  .location-entrance-photo { aspect-ratio: 3 / 2; }
   .hero-image img { object-position: 76% 72%; }
 }
 

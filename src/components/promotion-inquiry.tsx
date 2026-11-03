@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { buildWhatsAppUrl, isWhatsAppConfigured } from "@/lib/whatsapp";
+import { ArrowUpRightIcon } from "@/components/arrow-icon";
 
 const guestOptions = ["1", "2", "3", "4", "5 (con cama extra)"];
 
@@ -55,7 +56,7 @@ export function PromotionInquiry({ title, code }: { title: string; code?: string
       </label>
       {error && <p className="promotion-inquiry-error" role="alert">{error}</p>}
       <button className="button button-primary" type="submit">
-        Consultar por WhatsApp <span aria-hidden="true">↗</span>
+        Consultar por WhatsApp <ArrowUpRightIcon />
       </button>
       <small>La consulta no confirma la reserva.</small>
     </form>

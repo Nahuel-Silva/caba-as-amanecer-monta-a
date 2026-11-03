@@ -1,5 +1,6 @@
 import { site } from "@/content/site";
 import { getLocation, isConfirmed } from "@/lib/location";
+import { ArrowUpRightIcon } from "@/components/arrow-icon";
 
 /** Panel de dirección + mapa. Solo muestra datos confirmados; si faltan, deja un aviso claro. */
 export function LocationSection() {
@@ -35,7 +36,7 @@ export function LocationSection() {
         </div>
         <div className="location-actions">
           <a className="button button-light" href={location.directionsUrl} rel="noopener noreferrer" target="_blank">
-            Cómo llegar <span aria-hidden="true">↗</span>
+            Cómo llegar <ArrowUpRightIcon />
             <span className="sr-only"> (se abre Google Maps en una pestaña nueva)</span>
           </a>
           <a className="button button-outline" href={location.openUrl} rel="noopener noreferrer" target="_blank">

@@ -26,6 +26,8 @@ export type Inquiry = {
   arrival?: string;
   departure?: string;
   guests?: string;
+  /** El huésped ya reservó y quiere avisar a qué hora llega. */
+  isArrivalNotice?: boolean;
 };
 
 /** "2026-07-15" -> "15/07/2026" */
@@ -33,7 +35,11 @@ function formatDate(date: string) {
   return date.split("-").reverse().join("/");
 }
 
-export function buildWhatsAppMessage({ cabinName, promotionTitle, promotionCode, arrival, departure, guests }: Inquiry = {}): string {
+export function buildWhatsAppMessage({ cabinName, promotionTitle, promotionCode, arrival, departure, guests, isArrivalNotice }: Inquiry = {}): string {
+  if (isArrivalNotice) {
+    return `Hola, tengo una reserva en ${site.name} y quería avisarles mi horario de llegada: `;
+  }
+
   if (promotionTitle) {
     const stay = arrival && departure ? ` Llegada: ${formatDate(arrival)}. Salida: ${formatDate(departure)}.` : "";
     const people = guests ? ` Personas: ${guests}.` : "";

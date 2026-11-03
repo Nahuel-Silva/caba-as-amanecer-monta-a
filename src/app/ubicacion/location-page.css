@@ -1,0 +1,31 @@
+.location-info { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 18px; margin-top: 22px; }
+.location-card { display: flex; flex-direction: column; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
+.location-card h2 { margin: 0 0 14px; font-family: var(--font-display), serif; font-size: 22px; font-weight: 600; }
+.location-card > p { margin: 14px 0 0; color: var(--muted); font-size: 14px; }
+
+.location-distances { display: grid; margin: 0; padding: 0; list-style: none; }
+.location-distances li { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.location-distances li:first-child { padding-top: 0; }
+.location-distances span { color: var(--muted); }
+.location-distances sup { color: var(--clay); }
+.location-distances strong { flex: none; font-weight: 700; }
+.location-card > .location-note { margin-top: 12px; font-size: 12px; }
+
+.location-steps { display: grid; gap: 12px; margin: 0; padding: 0; counter-reset: step; list-style: none; }
+.location-steps li { position: relative; padding-left: 38px; color: var(--muted); font-size: 14px; line-height: 1.5; counter-increment: step; }
+.location-steps li::before { position: absolute; top: -2px; left: 0; display: grid; width: 26px; height: 26px; place-items: center; border-radius: 50%; background: var(--olive-dark); color: #fffdf7; content: counter(step); font-size: 13px; font-weight: 700; }
+
+.location-times { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.location-times div { padding: 12px 14px; border-radius: var(--radius-sm); background: rgb(85 96 71 / 10%); }
+.location-times dt { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.location-times dd { margin: 4px 0 0; font-size: 15px; font-weight: 700; }
+.location-arrival-button { align-self: start; margin-top: 16px; }
+
+@media (max-width: 960px) {
+  .location-info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .location-info .location-card:first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .location-info { grid-template-columns: 1fr; }
+  .location-card { padding: 18px; }
+}

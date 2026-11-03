@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ArrowUpRightIcon } from "@/components/arrow-icon";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { site } from "@/content/site";
 import { isWhatsAppConfigured } from "@/lib/whatsapp";
@@ -23,7 +24,7 @@ export function ContactBand() {
       </div>
       {isWhatsAppConfigured ? (
         <WhatsAppButton className="button button-light">
-          Escribir por WhatsApp <span aria-hidden="true">↗</span>
+          Escribir por WhatsApp <ArrowUpRightIcon />
         </WhatsAppButton>
       ) : (
         <span className="pending-note">WhatsApp: pendiente de configurar</span>
