@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BabyToggle } from "@/components/baby-toggle";
 import { DateRangePicker } from "@/components/date-range-picker";
+import { StayWeather } from "@/components/stay-weather";
 import { useAvailability } from "@/components/use-availability";
 import { isStayAvailable, keepAvailableStay, type StaySelection } from "@/lib/availability";
 import { guestOptions, openReservationEvent, type ReservationPrefill } from "@/lib/reservation";
@@ -87,6 +88,8 @@ export function BookingBar({ cabins }: { cabins: CabinOption[] }) {
       </button>
 
       {error && <p className="booking-error" role="alert">{error}</p>}
+
+      {stay.departure && <StayWeather arrival={stay.arrival} departure={stay.departure} />}
     </div>
   );
 }

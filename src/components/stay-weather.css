@@ -1,0 +1,13 @@
+.stay-weather { display: grid; gap: 8px; padding: 12px 14px; border-radius: var(--radius-sm); background: rgb(85 96 71 / 8%); color: var(--ink); font-size: 14px; font-weight: 400; }
+.stay-weather p { margin: 0; text-align: left; }
+.stay-weather-title { color: var(--olive-dark); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.stay-weather-days { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.stay-weather-days li { display: grid; grid-template-columns: auto auto; align-items: center; gap: 1px 8px; min-width: 112px; padding: 7px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fffdf7; }
+.stay-weather-icon { width: 26px; height: 26px; grid-row: span 3; color: var(--olive); }
+.stay-weather-day { color: var(--muted); font-size: 12px; text-transform: capitalize; }
+.stay-weather-temp strong { font-weight: 700; }
+.stay-weather-label { color: var(--muted); font-size: 12px; }
+.stay-weather-climate { display: grid; gap: 4px; }
+.stay-weather-source { color: var(--muted); font-size: 11px; }
+.stay-weather-source a { text-decoration: underline; text-underline-offset: 2px; }
+.booking-bar .stay-weather { grid-column: 1 / -1; }

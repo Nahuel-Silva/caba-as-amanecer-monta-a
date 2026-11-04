@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { StayWeather } from "@/components/stay-weather";
 import { countNights, formatDay } from "@/lib/availability";
 import type { ReservationPrefill } from "@/lib/reservation";
 import "./reservation-form.css";
@@ -73,6 +74,9 @@ export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProp
           <p>{guestsLabel(prefill.guests)}{prefill.hasBaby && " · Con bebé"}</p>
         </div>
         <button className="reservation-summary-edit" onClick={onEdit} type="button">Cambiar</button>
+      </div>
+      <div className="reservation-wide">
+        <StayWeather arrival={prefill.arrival} departure={prefill.departure} />
       </div>
       <label className="reservation-wide">
         Nombre y apellido
