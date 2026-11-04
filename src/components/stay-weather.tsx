@@ -3,7 +3,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { climateTip } from "@/content/climate";
 import {
-  climateSource,
   conditionLabels,
   forecastSource,
   formatDegrees,
@@ -101,10 +100,12 @@ export function StayWeather({ arrival, departure }: { arrival: string; departure
         </div>
       )}
 
-      <p className="stay-weather-source">
-        {forecast.length > 0 && <>Pronóstico: <a href={forecastSource.url} rel="noopener noreferrer" target="_blank">{forecastSource.label}<span className="sr-only"> (se abre en una pestaña nueva)</span></a>. </>}
-        {showClimate && <>Promedios: <a href={climateSource.url} rel="noopener noreferrer" target="_blank">{climateSource.label}<span className="sr-only"> (se abre en una pestaña nueva)</span></a> ({climateSource.detail}).</>}
-      </p>
+      {/* MET Norway pide citarlo junto a su pronóstico (CC BY 4.0). Los promedios del SMN se citan en la página de Malargüe. */}
+      {forecast.length > 0 && (
+        <p className="stay-weather-source">
+          Pronóstico: <a href={forecastSource.url} rel="noopener noreferrer" target="_blank">{forecastSource.label}<span className="sr-only"> (se abre en una pestaña nueva)</span></a>.
+        </p>
+      )}
     </div>
   );
 }
