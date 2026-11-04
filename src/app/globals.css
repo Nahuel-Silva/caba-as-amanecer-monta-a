@@ -360,3 +360,9 @@ body {
 @media (max-width: 520px) {
   .cabin-grid { grid-template-columns: 1fr; }
 }
+
+/* Párrafos justificados en toda la web. La división en sílabas evita huecos grandes en pantallas angostas. */
+p, .faq-answer { text-align: justify; hyphens: auto; }
+/* Líneas cortas de datos: justificadas quedarían con espacios estirados. */
+.map-placeholder p { text-align: center; }
+.cabin-card-meta p { text-align: left; }

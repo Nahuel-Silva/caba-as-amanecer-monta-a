@@ -1,21 +1,27 @@
-.distances { max-width: 880px; margin: 64px auto 0; padding: 32px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
+.distances { margin-top: 22px; padding: 36px 40px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
 .distances > .eyebrow, .distances > h2 { text-align: center; }
-.distances > h2 { margin: 0 0 8px; font-family: var(--font-display), serif; font-size: 32px; font-weight: 600; }
+.distances > h2 { margin: 0 0 8px; font-family: var(--font-display), serif; font-size: 34px; font-weight: 600; }
 
-.distances-group { margin-top: 28px; }
+.distances-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr); align-items: start; gap: 48px; margin-top: 30px; }
 .distances-group h3 { margin: 0; color: var(--olive-dark); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.distances-group > p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+.distances-nearby { padding: 20px 22px; border-radius: var(--radius-sm); background: rgb(85 96 71 / 9%); }
+.distances-nearby > p { margin: 14px 0 0; color: var(--muted); font-size: 14px; }
 
-.distance-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; margin: 10px 0 0; padding: 0; list-style: none; }
-.distance-list li { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.distance-list { display: grid; margin: 10px 0 0; padding: 0; list-style: none; }
+.distances-group:not(.distances-nearby) .distance-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+.distance-list li { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
 .distance-list span { color: var(--muted); }
 .distance-list strong { flex: none; font-weight: 700; }
 
-.distances-source { margin: 22px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
+.distances-source { margin: 26px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
 .distances-source a { text-decoration: underline; text-underline-offset: 2px; }
 
-@media (max-width: 760px) {
-  .distances { margin-top: 44px; padding: 22px 18px; }
+@media (max-width: 960px) {
+  .distances-body { grid-template-columns: 1fr; gap: 28px; }
+}
+@media (max-width: 600px) {
+  .distances { padding: 24px 18px; }
   .distances > h2 { font-size: 26px; }
-  .distance-list { grid-template-columns: 1fr; }
+  .distances-group:not(.distances-nearby) .distance-list { grid-template-columns: 1fr; }
+  .distances-nearby { padding: 16px; }
 }

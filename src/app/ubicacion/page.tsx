@@ -41,15 +41,17 @@ export default function LocationPage() {
             <p className="eyebrow">Distancias</p>
             <h2 id="distances-title">¿A cuánto queda cada lugar?</h2>
 
-            <div className="distances-group">
-              <h3>Desde las cabañas</h3>
-              <DistanceList items={nearbyDistances} />
-            </div>
+            <div className="distances-body">
+              <div className="distances-group distances-nearby">
+                <h3>Desde las cabañas</h3>
+                <DistanceList items={nearbyDistances} />
+                <p>Como las cabañas están a ~1 km del centro, las distancias a los atractivos son casi las mismas desde acá.</p>
+              </div>
 
-            <div className="distances-group">
-              <h3>Atractivos, desde la ciudad de Malargüe</h3>
-              <p>Como las cabañas están a ~1 km del centro, es casi la misma distancia desde acá.</p>
-              <DistanceList items={attractionDistances} />
+              <div className="distances-group">
+                <h3>Atractivos, desde la ciudad de Malargüe</h3>
+                <DistanceList items={attractionDistances} />
+              </div>
             </div>
 
             <p className="distances-source">
