@@ -1,28 +1,31 @@
-import { site } from "@/content/site";
+export type Distance = { place: string; distance: string };
 
-export type Distance = {
-  place: string;
-  distance: string;
-  /** La distancia se mide desde la ciudad de Malargüe, no desde las cabañas. */
-  fromCity?: boolean;
-};
-
-/** Distancias informadas en la web. Las marcadas con fromCity vienen del Gobierno de Mendoza. */
-export const distances: Distance[] = [
+/** Lo que queda a pasos de las cabañas, según los datos del propietario. */
+export const nearbyDistances: Distance[] = [
   { place: "Ruta Nacional 40, acceso Norte", distance: "100 m" },
   { place: "Centro de Malargüe", distance: "~1 km" },
-  { place: "Caverna de las Brujas", distance: "~65 km", fromCity: true },
-  { place: "Centro de ski Las Leñas", distance: "80 km" },
-  { place: "La Payunia", distance: "~90 km", fromCity: true },
 ];
 
-export const arrivalSteps = [
-  "Llegá a Malargüe por la Ruta Nacional 40.",
-  "Entrá a la ciudad por el acceso Norte.",
-  `A 100 metros de la ruta, buscá ${site.address}.`,
-];
+export const attractionDistancesSource = {
+  label: "Turismo Malargüe",
+  url: "https://www.malargue.tur.ar/",
+};
 
-export const stayTimes = [
-  { label: "Check-in", value: "Desde las 14 hs" },
-  { label: "Check-out", value: "Hasta las 10 hs" },
+/**
+ * Distancias por ruta desde la ciudad de Malargüe, publicadas en los circuitos de Turismo Malargüe.
+ * La Payunia no figura porque las fuentes dan entre 90 y 208 km según el punto de llegada.
+ */
+export const attractionDistances: Distance[] = [
+  { place: "Planetario Malargüe", distance: "En la ciudad" },
+  { place: "Observatorio Pierre Auger", distance: "En la ciudad" },
+  { place: "Castillos de Pincheira", distance: "27 km" },
+  { place: "Manqui Malal", distance: "34 km" },
+  { place: "Volcán Malacara", distance: "42 km" },
+  { place: "Laguna de la Niña Encantada", distance: "55 km" },
+  { place: "Valle de Los Molles", distance: "60 km" },
+  { place: "Pozo de las Ánimas", distance: "67 km" },
+  { place: "Caverna de las Brujas", distance: "70 km" },
+  { place: "Valle de Las Leñas", distance: "75 km" },
+  { place: "Laguna de Llancanelo", distance: "75 km" },
+  { place: "Las Loicas", distance: "105 km" },
 ];

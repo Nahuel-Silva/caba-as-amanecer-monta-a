@@ -6,12 +6,10 @@ type WhatsAppButtonProps = {
   className?: string;
   /** Nombre de la cabaña, para que el mensaje precargado la mencione. */
   cabinName?: string;
-  /** Mensaje para avisar la hora de llegada, en lugar de una consulta. */
-  isArrivalNotice?: boolean;
 };
 
-export function WhatsAppButton({ children, className, cabinName, isArrivalNotice }: WhatsAppButtonProps) {
-  const url = buildWhatsAppUrl({ cabinName, isArrivalNotice });
+export function WhatsAppButton({ children, className, cabinName }: WhatsAppButtonProps) {
+  const url = buildWhatsAppUrl({ cabinName });
 
   if (!url) return null;
 

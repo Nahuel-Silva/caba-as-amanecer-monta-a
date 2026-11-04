@@ -2,16 +2,28 @@ import type { Metadata } from "next";
 import { LocationSection } from "@/components/location-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { WhatsAppButton } from "@/components/whatsapp-button";
-import { arrivalSteps, distances, stayTimes } from "@/content/location";
+import { attractionDistances, attractionDistancesSource, nearbyDistances, type Distance } from "@/content/location";
 import { pageMetadata } from "@/lib/seo";
 import "./location-page.css";
 
 export const metadata: Metadata = pageMetadata({
   title: "Cómo llegar a las cabañas en Malargüe",
-  description: "Ubicación de Cabañas Amanecer de Montaña en Malargüe, Mendoza: dirección, mapa, distancias y cómo llegar.",
+  description: "Ubicación de Cabañas Amanecer de Montaña en Malargüe, Mendoza: dirección, mapa y distancias a los atractivos de la zona.",
   path: "/ubicacion",
 });
+
+function DistanceList({ items }: { items: Distance[] }) {
+  return (
+    <ul className="distance-list">
+      {items.map((item) => (
+        <li key={item.place}>
+          <span>{item.place}</span>
+          <strong>{item.distance}</strong>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function LocationPage() {
   return (
@@ -25,45 +37,30 @@ export default function LocationPage() {
         <section aria-label="Mapa y dirección" className="wrap section" style={{ paddingTop: 0 }}>
           <LocationSection />
 
-          <div className="location-info">
-            <article className="location-card">
-              <h2>Distancias</h2>
-              <ul className="location-distances">
-                {distances.map((item) => (
-                  <li key={item.place}>
-                    <span>{item.place}{item.fromCity && <sup aria-hidden="true">*</sup>}</span>
-                    <strong>{item.distance}</strong>
-                  </li>
-                ))}
-              </ul>
-              <p className="location-note">* Desde la ciudad de Malargüe, según el Gobierno de Mendoza.</p>
-            </article>
+          <section aria-labelledby="distances-title" className="distances">
+            <p className="eyebrow">Distancias</p>
+            <h2 id="distances-title">¿A cuánto queda cada lugar?</h2>
 
-            <article className="location-card">
-              <h2>Cómo llegar</h2>
-              <ol className="location-steps">
-                {arrivalSteps.map((step) => (
-                  <li key={step}>{step}</li>
-                ))}
-              </ol>
-            </article>
+            <div className="distances-group">
+              <h3>Desde las cabañas</h3>
+              <DistanceList items={nearbyDistances} />
+            </div>
 
-            <article className="location-card">
-              <h2>Llegada y salida</h2>
-              <dl className="location-times">
-                {stayTimes.map((time) => (
-                  <div key={time.label}>
-                    <dt>{time.label}</dt>
-                    <dd>{time.value}</dd>
-                  </div>
-                ))}
-              </dl>
-              <p>Si ya tenés tu reserva, avisanos a qué hora vas a llegar.</p>
-              <WhatsAppButton className="button button-primary location-arrival-button" isArrivalNotice>
-                Avisar mi hora de llegada
-              </WhatsAppButton>
-            </article>
-          </div>
+            <div className="distances-group">
+              <h3>Atractivos, desde la ciudad de Malargüe</h3>
+              <p>Como las cabañas están a ~1 km del centro, es casi la misma distancia desde acá.</p>
+              <DistanceList items={attractionDistances} />
+            </div>
+
+            <p className="distances-source">
+              Distancias aproximadas por ruta, según{" "}
+              <a href={attractionDistancesSource.url} rel="noopener noreferrer" target="_blank">
+                {attractionDistancesSource.label}
+                <span className="sr-only"> (se abre en una pestaña nueva)</span>
+              </a>
+              . Antes de salir, confirmá el estado de los caminos.
+            </p>
+          </section>
         </section>
       </main>
       <SiteFooter />
