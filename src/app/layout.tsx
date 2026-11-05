@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito, Fraunces } from "next/font/google";
 import { ReservationDialog } from "@/components/reservation-dialog";
+import { SeasonalEffects } from "@/components/seasonal-effects";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
 import { site } from "@/content/site";
 import { showReservationForm } from "@/lib/reservation-email";
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full" suppressHydrationWarning>
         {children}
+        <SeasonalEffects />
         <div className="contact-floats">
           {showReservationForm && <ReservationDialog />}
           <WhatsAppFloat />

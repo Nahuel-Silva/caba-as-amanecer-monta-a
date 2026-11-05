@@ -229,7 +229,8 @@ body {
   background-image: radial-gradient(rgb(113 111 98 / 7%) 1px, transparent 1px);
   background-size: 22px 22px;
 }
-.site-header { background: rgb(245 240 231 / 94%); border-bottom: 0; box-shadow: 0 1px 0 var(--line); }
+/* Sin fondo propio: deja ver el fondo de la página y la decoración de la estación (seasonal-effects). */
+.site-header { background: transparent; border-bottom: 0; box-shadow: 0 1px 0 var(--line); }
 .brand-symbol { border-width: 1.5px; background: rgb(182 111 81 / 8%); }
 .brand-name { font-weight: 600; letter-spacing: -.005em; }
 .brand-location { font-weight: 700; }
