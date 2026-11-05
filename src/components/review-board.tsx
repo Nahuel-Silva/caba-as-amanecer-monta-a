@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { usePanOnHover } from "@/components/use-pan-on-hover";
 import type { Review } from "@/content/reviews";
 import { getApprovedReviews, submitReview } from "@/lib/reviews-service";
 
@@ -35,6 +36,7 @@ export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubm
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const followMouse = usePanOnHover<HTMLDivElement>();
 
   useEffect(() => {
     let isCurrent = true;
@@ -92,7 +94,8 @@ export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubm
 
   return (
     <>
-      <div className="review-grid">
+      {/* Tira que se desliza con el mouse (o con el dedo); las tarjetas se esfuman en los bordes. */}
+      <div aria-label="Opiniones de huéspedes" className="review-strip" onMouseMove={followMouse} role="region" tabIndex={0}>
         {approved.map((review) => (
           <ReviewCard key={`${review.author}-${review.title}`} review={review} />
         ))}

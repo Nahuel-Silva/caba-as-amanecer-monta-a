@@ -1,8 +1,14 @@
 .review-summaries { display: flex; flex-wrap: wrap; gap: 12px 28px; margin: 18px 0 32px; padding: 0; list-style: none; color: var(--muted); font-size: 14px; }
 .review-summaries strong { color: var(--ink); font-size: 18px; font-weight: 700; }
 .review-summaries a { text-decoration: underline; text-underline-offset: 2px; }
-.review-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.review-card { display: flex; min-width: 0; flex-direction: column; margin: 0; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
+/* La tira se estira un poco fuera del contenedor: sin esto, en pantallas justas la página se desplazaría de costado.
+   La tira es "relative" para contener los textos ocultos (sr-only) de las tarjetas que quedan fuera de vista. */
+.reviews-section { overflow-x: clip; }
+/* Tira horizontal: el margen negativo deja un borde donde las tarjetas se esfuman al pasar. */
+.review-strip { --fade: 48px; position: relative; display: flex; gap: 16px; margin-inline: calc(var(--fade) * -1); padding: 6px var(--fade) 24px; overflow-x: auto; scrollbar-width: none; scroll-padding-inline: var(--fade); scroll-snap-type: x proximity; -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); }
+.review-strip::-webkit-scrollbar { display: none; }
+.review-strip:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: -2px; }
+.review-card { display: flex; flex: 0 0 clamp(280px, 30vw, 360px); min-width: 0; flex-direction: column; scroll-snap-align: start; margin: 0; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
 .review-stars { color: var(--clay); font-size: 16px; letter-spacing: .12em; }
 .review-card h3 { margin: 10px 0 8px; font-family: var(--font-display), serif; font-size: 22px; font-weight: 600; line-height: 1.2; }
 .review-card blockquote { flex: 1; margin: 0; color: var(--muted); font-size: 15px; }
@@ -11,14 +17,18 @@
 .review-meta a { text-decoration: underline; text-underline-offset: 2px; }
 .review-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; }
 
+@media (hover: hover) and (min-width: 761px) {
+  .review-strip { scroll-snap-type: none; }
+}
 @media (max-width: 760px) {
-  .review-grid { grid-template-columns: 1fr; }
+  .review-strip { --fade: 20px; }
+  .review-card { flex-basis: 82%; }
 }
 
 .review-trap { position: absolute; left: -9999px; }
 .review-message { margin: 16px 0 0; color: var(--olive-dark); font-size: 14px; font-weight: 600; }
 .review-message:empty { margin: 0; }
-.review-open { margin-top: 24px; }
+.review-open { margin-top: 14px; }
 .review-form { display: grid; max-width: 640px; gap: 16px; margin-top: 24px; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
 .review-form h3 { margin: 0; font-family: var(--font-display), serif; font-size: 24px; font-weight: 600; }
 .review-form-notice { margin: -8px 0 0; color: var(--muted); font-size: 13px; }

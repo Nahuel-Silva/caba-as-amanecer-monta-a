@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePanOnHover } from "@/components/use-pan-on-hover";
 
 type GalleryImage = { src: string; alt: string; isDemo: boolean };
 
@@ -11,10 +12,7 @@ export function PhotoGallery({ images, panOnHover = false }: { images: GalleryIm
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const wasOpen = useRef(false);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const panFrame = useRef<number | null>(null);
-  const panTarget = useRef(0);
-  const panPosition = useRef(0);
+  const followMouse = usePanOnHover<HTMLDivElement>();
   const isOpen = activeIndex !== null;
 
   useEffect(() => {
@@ -60,36 +58,6 @@ export function PhotoGallery({ images, panOnHover = false }: { images: GalleryIm
     };
   }, [isOpen, images.length]);
 
-  useEffect(() => {
-    return () => {
-      if (panFrame.current !== null) cancelAnimationFrame(panFrame.current);
-    };
-  }, []);
-
-  function followMouse(event: MouseEvent<HTMLDivElement>) {
-    const grid = event.currentTarget;
-    const bounds = grid.getBoundingClientRect();
-    // Los extremos quedan como zona de descanso, para poder llegar a la primera y a la última foto.
-    const ratio = Math.min(1, Math.max(0, ((event.clientX - bounds.left) / bounds.width - 0.1) / 0.8));
-    panTarget.current = ratio * (grid.scrollWidth - grid.clientWidth);
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      grid.scrollLeft = panTarget.current;
-      return;
-    }
-
-    if (panFrame.current !== null) return;
-    panPosition.current = grid.scrollLeft;
-
-    const step = () => {
-      const distance = panTarget.current - panPosition.current;
-      panPosition.current = Math.abs(distance) < 0.5 ? panTarget.current : panPosition.current + distance * 0.1;
-      if (gridRef.current) gridRef.current.scrollLeft = panPosition.current;
-      panFrame.current = panPosition.current === panTarget.current ? null : requestAnimationFrame(step);
-    };
-    panFrame.current = requestAnimationFrame(step);
-  }
-
   function move(direction: number) {
     setActiveIndex((index) =>
       index === null ? null : (index + direction + images.length) % images.length,
@@ -98,7 +66,7 @@ export function PhotoGallery({ images, panOnHover = false }: { images: GalleryIm
 
   return (
     <>
-      <div className="gallery-grid" onMouseMove={panOnHover ? followMouse : undefined} ref={gridRef}>
+      <div className="gallery-grid" onMouseMove={panOnHover ? followMouse : undefined}>
         {images.map((image, index) => (
           <button
             aria-label={`Ampliar foto${image.isDemo ? " de demostración" : ""} ${index + 1}`}

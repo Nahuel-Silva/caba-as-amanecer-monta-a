@@ -9,7 +9,7 @@ export function ReviewsSection() {
   const summaries = getRatingSummaries();
 
   return (
-    <section aria-labelledby="reviews-title" className="section">
+    <section aria-labelledby="reviews-title" className="section reviews-section">
       <div className="wrap">
         <p className="eyebrow">Opiniones</p>
         <h2 className="section-title" id="reviews-title">Lo que dicen quienes nos visitaron.</h2>
