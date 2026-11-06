@@ -24,7 +24,10 @@ export async function GET() {
 
 type AdminAction =
   | { action: "confirm-reservation" | "reject-reservation" | "approve-review" | "reject-review"; id: number }
-  | { action: "block-dates"; cabinSlug: string; arrival: string; departure: string };
+  | { action: "block-dates"; cabinSlug: string; arrival: string; departure: string; name?: unknown; phone?: unknown; guests?: unknown };
+
+/** Texto opcional, limpio y recortado. */
+const optionalText = (value: unknown, limit: number) => (typeof value === "string" ? value.replace(/s+/g, " ").trim().slice(0, limit) : "");
 
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) return respond(403, { error: "Solicitud no permitida." });
@@ -41,7 +44,9 @@ export async function POST(request: Request) {
       if (!isKnownCabin || !isValidDate(arrival) || !isValidDate(departure) || departure <= arrival) {
         return respond(400, { error: "Revisá la cabaña y las fechas." });
       }
-      return (await blockDates(cabinSlug, arrival, departure))
+      const guest = { name: optionalText(input.name, 80), phone: optionalText(input.phone, 30), guests: optionalText(input.guests, 2) };
+      if (guest.guests && !/^[1-5]$/.test(guest.guests)) return respond(400, { error: "Revisá la cantidad de personas." });
+      return (await blockDates(cabinSlug, arrival, departure, guest.name ? guest : undefined))
         ? respond(200, { ok: true })
         : respond(409, { error: "Esas fechas ya están ocupadas." });
     }

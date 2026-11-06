@@ -1,6 +1,6 @@
 import type { Booking } from "@/lib/availability";
 import { getDatabase } from "@/lib/db";
-import type { ReservationRequest } from "@/lib/reservation";
+import { manualBlockName, type ReservationRequest } from "@/lib/reservation";
 
 export type ReservationStatus = "pending" | "confirmed" | "rejected";
 
@@ -127,16 +127,20 @@ export async function rejectReservation(id: number) {
 }
 
 /** Bloqueo manual (reserva telefónica, mantenimiento). Falla si esas noches ya están ocupadas. */
-export async function blockDates(cabinSlug: string, arrival: string, departure: string) {
+/** Datos opcionales de una reserva tomada por teléfono o por otra página. Sin ellos queda como "Bloqueo manual". */
+export type ManualGuest = { name: string; phone: string; guests: string };
+
+
+export async function blockDates(cabinSlug: string, arrival: string, departure: string, guest?: ManualGuest) {
   const database = await getDatabase();
   const { rowsAffected } = await database.execute({
     sql: `INSERT INTO reservations (cabin_slug, name, email, phone, arrival, departure, guests, status)
-      SELECT ?, 'Bloqueo manual', '-', '-', ?, ?, '-', 'confirmed'
+      SELECT ?, ?, '-', ?, ?, ?, ?, 'confirmed'
       WHERE NOT EXISTS (
         SELECT 1 FROM reservations
         WHERE ${occupiesDates("reservations")} AND cabin_slug = ? AND arrival < ? AND ? < departure
       )`,
-    args: [cabinSlug, arrival, departure, cabinSlug, departure, arrival],
+    args: [cabinSlug, guest?.name || manualBlockName, guest?.phone || "-", arrival, departure, guest?.guests || "-", cabinSlug, departure, arrival],
   });
   return rowsAffected === 1;
 }

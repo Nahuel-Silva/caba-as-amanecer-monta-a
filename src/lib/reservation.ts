@@ -22,6 +22,9 @@ export const openReservationEvent = "reservation:open";
 /** Evento al cerrar el formulario: la solicitud pudo cambiar qué fechas están libres. */
 export const reservationClosedEvent = "reservation:closed";
 
+/** Nombre con el que se guardan las fechas bloqueadas desde el panel sin datos de huésped. */
+export const manualBlockName = "Bloqueo manual";
+
 export type ReservationPrefill = { cabin: string; arrival: string; departure: string; guests: string; hasBaby: boolean };
 
 const fieldLimits = { name: 80, email: 120, phone: 30, message: 1000 };
