@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LocationSection } from "@/components/location-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { attractionDistances, attractionDistancesSource, nearbyDistances, type Distance } from "@/content/location";
+import { attractionDistances, type Distance } from "@/content/location";
 import { pageMetadata } from "@/lib/seo";
 import "./location-page.css";
 
@@ -41,27 +41,10 @@ export default function LocationPage() {
             <p className="eyebrow">Distancias</p>
             <h2 id="distances-title">¿A cuánto queda cada lugar?</h2>
 
-            <div className="distances-body">
-              <div className="distances-group distances-nearby">
-                <h3>Desde las cabañas</h3>
-                <DistanceList items={nearbyDistances} />
-                <p>Como las cabañas están a ~1 km del centro, las distancias a los atractivos son casi las mismas desde acá.</p>
-              </div>
-
-              <div className="distances-group">
-                <h3>Atractivos, desde la ciudad de Malargüe</h3>
-                <DistanceList items={attractionDistances} />
-              </div>
+            <div className="distances-group">
+              <h3>Atractivos, desde las Cabañas Amanecer de Montaña</h3>
+              <DistanceList items={attractionDistances} />
             </div>
-
-            <p className="distances-source">
-              Distancias aproximadas por ruta, según{" "}
-              <a href={attractionDistancesSource.url} rel="noopener noreferrer" target="_blank">
-                {attractionDistancesSource.label}
-                <span className="sr-only"> (se abre en una pestaña nueva)</span>
-              </a>
-              . Antes de salir, confirmá el estado de los caminos.
-            </p>
           </section>
         </section>
       </main>
