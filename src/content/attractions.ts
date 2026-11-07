@@ -29,7 +29,9 @@ export type Attraction = {
 };
 
 export const attractionsIntro =
-  "Lugares para conocer en los alrededores de Malargüe. Los datos provienen de fuentes del Gobierno de Mendoza y pueden cambiar: antes de ir, confirmá horarios, tarifas y condiciones de acceso en la Dirección de Turismo de Malargüe (0260 4471659).";
+  "Lugares para conocer en Malargüe y sus alrededores. Los datos provienen de fuentes oficiales (Gobierno de Mendoza y Turismo Malargüe) y pueden cambiar: antes de ir, confirmá horarios, tarifas y condiciones de acceso en la Dirección de Turismo de Malargüe (0260 4471659).";
+
+const turismoMalargue = "Turismo Malargüe";
 
 // No cargar distancias, tiempos de viaje, horarios ni condiciones de acceso que no figuren en una fuente oficial citada.
 export const attractions: Attraction[] = [
@@ -89,5 +91,64 @@ export const attractions: Attraction[] = [
       creditUrl: "https://commons.wikimedia.org/wiki/File:Laguna_de_la_Ni%C3%B1a_Encantada_-_27362553565.jpg",
       licenseUrl: "https://creativecommons.org/licenses/by-sa/2.0/",
     },
+  },
+  {
+    name: "Laguna de Llancanelo",
+    detail:
+      "Reserva faunística provincial: un humedal de unos 650 km² a 75 km de la ciudad de Malargüe por la ruta 186. Alberga una gran variedad de aves, como flamencos, cisnes de cuello negro, garzas y patos, y es sitio Ramsar desde 1995. Para visitarla hay que sacar antes los tickets de ingreso en la web del Gobierno de Mendoza y es obligatorio ir con un guía habilitado. La excursión lleva entre 6 y 8 horas, ida y vuelta desde Malargüe.",
+    sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-186/laguna-llancanelo/",
+    sourceLabel: turismoMalargue,
+    image: {
+      src: "/images/malargue/laguna-llancanelo.jpg",
+      alt: "Laguna de Llancanelo con pastizales en la orilla y montañas bajas al fondo, bajo un cielo con nubes.",
+      credit: "Pablo D. Flores",
+      license: "CC BY-SA 2.5",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Laguna_de_Llancanelo_(panorama).jpg",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/2.5/",
+    },
+  },
+  {
+    name: "Pozo de las Ánimas",
+    detail:
+      "Dos dolinas separadas por una franja angosta, que se formaron cuando el agua subterránea disolvió el yeso del suelo. Cada una mide cerca de 200 metros de diámetro y tiene unos 80 metros de profundidad hasta el agua, según mediciones de 1981. Está a 67 km de la ciudad de Malargüe por la ruta 222, tiene carteles que explican cómo se formó y la entrada es libre y gratuita.",
+    sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-222/pozo-de-las-animas/",
+    sourceLabel: turismoMalargue,
+    image: {
+      src: "/images/malargue/pozo-de-las-animas.jpg",
+      alt: "Dolina del Pozo de las Ánimas: un pozo de paredes de tierra con agua verde en el fondo.",
+      credit: "Ernesto Brunner",
+      license: "CC0",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Pozo_de_las_Animas_202212.jpg",
+      licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/",
+    },
+  },
+  // Sin foto: no hay imágenes con licencia libre en Wikimedia Commons. Se muestran como tarjetas de texto.
+  {
+    name: "Planetario Malargüe",
+    detail:
+      "Centro de divulgación astronómica en la ciudad, con tres edificios: la recepción, un museo astronómico y la sala donde se hace la función, con lugar para 65 personas. En el parque hay relojes solares, y por la noche los astrónomos locales también ofrecen observaciones del cielo.",
+    sourceUrl: "https://www.malargue.tur.ar/circuito-ciudad/planetario-malargue/",
+    sourceLabel: turismoMalargue,
+  },
+  {
+    name: "Observatorio Pierre Auger",
+    detail:
+      "El observatorio de rayos cósmicos más grande del mundo, que estudia partículas de muy alta energía que llegan del espacio. Su sala para visitantes ofrece sin costo una muestra interactiva permanente, con detectores en tiempo real, maquetas, videos y pósteres.",
+    sourceUrl: "https://www.malargue.tur.ar/circuito-ciudad/observatorio-rayos-cosmicos/",
+    sourceLabel: turismoMalargue,
+  },
+  {
+    name: "Volcán Malacara",
+    detail:
+      "Volcán de poco más de 1.800 metros sobre el nivel del mar, a 42 km al sureste de la ciudad, camino a la Laguna de Llancanelo. Se recorre con un trekking guiado de dificultad media, de unas 3 horas, que entra por sus cárcavas y sube a un mirador con vista al norte de la Payunia y a la laguna. Hay que reservar turno antes. No es apto para embarazadas ni para personas con movilidad reducida o problemas cardíacos.",
+    sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-186/volcan-malacara/",
+    sourceLabel: turismoMalargue,
+  },
+  {
+    name: "Cascada Manqui Malal",
+    detail:
+      "Cascada de unos 30 metros de altura. Su nombre viene del mapuche: «manqui» es cóndor y «malal», barda o pared de piedra. En las rocas de origen marino que la rodean hay fósiles de los períodos Jurásico y Cretácico.",
+    sourceUrl: "https://www.malargue.tur.ar/en/route-40-circuit/manqui-malal-waterfall/",
+    sourceLabel: "Turismo Malargüe (en inglés)",
   },
 ];

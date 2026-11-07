@@ -2,11 +2,18 @@ import Image from "next/image";
 import type { Attraction } from "@/content/attractions";
 import "./attraction-card.css";
 
-export function AttractionCard({ attraction, eager = false }: { attraction: Attraction; eager?: boolean }) {
+type AttractionCardProps = {
+  attraction: Attraction;
+  eager?: boolean;
+  /** Nivel del título, según la sección donde va la tarjeta. */
+  headingLevel?: "h2" | "h3";
+};
+
+export function AttractionCard({ attraction, eager = false, headingLevel: Heading = "h2" }: AttractionCardProps) {
   const { image } = attraction;
 
   return (
-    <article className="attraction-card">
+    <article className={`attraction-card${image ? "" : " is-text-only"}`}>
       {image && (
         <div className="attraction-photo">
           <Image
@@ -20,7 +27,7 @@ export function AttractionCard({ attraction, eager = false }: { attraction: Attr
         </div>
       )}
       <div className="attraction-body">
-        <h2>{attraction.name}</h2>
+        <Heading>{attraction.name}</Heading>
         <p>{attraction.detail}</p>
         {attraction.sourceUrl && (
           <a className="text-link" href={attraction.sourceUrl} rel="noopener noreferrer" target="_blank">

@@ -16,6 +16,8 @@ export const metadata: Metadata = pageMetadata({
 
 export default function MalarguePage() {
   const attractions = getAttractions();
+  const withPhoto = attractions.filter((attraction) => attraction.image);
+  const withoutPhoto = attractions.filter((attraction) => !attraction.image);
 
   return (
     <>
@@ -28,10 +30,20 @@ export default function MalarguePage() {
         </header>
         <section aria-label="Atractivos de Malargüe" className="wrap section" style={{ paddingTop: 0 }}>
           <div className="attraction-grid">
-            {attractions.map((attraction, index) => (
+            {withPhoto.map((attraction, index) => (
               <AttractionCard attraction={attraction} eager={index < 2} key={attraction.name} />
             ))}
           </div>
+          {withoutPhoto.length > 0 && (
+            <>
+              <h2 className="attraction-more-title">Más lugares para conocer</h2>
+              <div className="attraction-grid attraction-grid-text">
+                {withoutPhoto.map((attraction) => (
+                  <AttractionCard attraction={attraction} headingLevel="h3" key={attraction.name} />
+                ))}
+              </div>
+            </>
+          )}
           <p className="attraction-credits-note">Fotos de Wikimedia Commons, redimensionadas para la web. Las licencias se indican en cada una.</p>
         </section>
 
