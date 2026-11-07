@@ -122,19 +122,26 @@ export const attractions: Attraction[] = [
       licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/",
     },
   },
+  {
+    name: "Observatorio Pierre Auger",
+    detail:
+      "El observatorio de rayos cósmicos más grande del mundo, que estudia partículas de muy alta energía que llegan del espacio. Su sala para visitantes ofrece sin costo una muestra interactiva permanente, con detectores en tiempo real, maquetas, videos y pósteres.",
+    sourceUrl: "https://www.malargue.tur.ar/circuito-ciudad/observatorio-rayos-cosmicos/",
+    sourceLabel: turismoMalargue,
+    image: {
+      src: "/images/malargue/observatorio-pierre-auger.jpg",
+      alt: "Tanque detector de rayos cósmicos del Observatorio Pierre Auger, con su antena, en un campo de la Pampa Amarilla.",
+      credit: "Roberto Fiadone",
+      license: "Dominio público",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Observatorio_Pierre_Auger_Tanque_Rayos_C%C3%B3smicos.jpg",
+    },
+  },
   // Sin foto: no hay imágenes con licencia libre en Wikimedia Commons. Se muestran como tarjetas de texto.
   {
     name: "Planetario Malargüe",
     detail:
       "Centro de divulgación astronómica en la ciudad, con tres edificios: la recepción, un museo astronómico y la sala donde se hace la función, con lugar para 65 personas. En el parque hay relojes solares, y por la noche los astrónomos locales también ofrecen observaciones del cielo.",
     sourceUrl: "https://www.malargue.tur.ar/circuito-ciudad/planetario-malargue/",
-    sourceLabel: turismoMalargue,
-  },
-  {
-    name: "Observatorio Pierre Auger",
-    detail:
-      "El observatorio de rayos cósmicos más grande del mundo, que estudia partículas de muy alta energía que llegan del espacio. Su sala para visitantes ofrece sin costo una muestra interactiva permanente, con detectores en tiempo real, maquetas, videos y pósteres.",
-    sourceUrl: "https://www.malargue.tur.ar/circuito-ciudad/observatorio-rayos-cosmicos/",
     sourceLabel: turismoMalargue,
   },
   {

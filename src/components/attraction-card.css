@@ -11,6 +11,13 @@
 /* Lugares sin foto: tarjetas de texto a todo el ancho. */
 .attraction-card.is-text-only { grid-template-columns: 1fr; }
 .attraction-card.is-text-only .attraction-body { padding: 22px 24px; }
+/* Si quedan tarjetas impares, la última ocupa todo el ancho para no dejar un hueco. */
+@media (min-width: 1101px) {
+  .attraction-grid > .attraction-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .attraction-grid > .attraction-card:last-child:nth-child(odd):not(.is-text-only) { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+  .attraction-grid-text { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .attraction-grid-text > .attraction-card:last-child:nth-child(odd) { grid-column: auto; }
+}
 .attraction-more-title { margin: 44px 0 18px; font-family: var(--font-display), serif; font-size: 28px; font-weight: 600; line-height: 1.2; }
 .attraction-credits-note { margin: 24px 0 0; color: var(--muted); font-size: 12px; }
 
