@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ReservationForm } from "@/components/reservation-form";
-import { openReservationEvent, reservationClosedEvent, type ReservationPrefill } from "@/lib/reservation";
+import { openReservationEvent, reservationClosedEvent, reservationSentEvent, type ReservationPrefill } from "@/lib/reservation";
 
 /** Panel del formulario de reserva. Lo abre la barra de reserva con los datos ya elegidos. */
 export function ReservationDialog() {
@@ -10,28 +10,45 @@ export function ReservationDialog() {
   const [formVersion, setFormVersion] = useState(0);
   const [prefill, setPrefill] = useState<ReservationPrefill | null>(null);
   const wasSent = useRef(false);
+  const isOpen = useRef(false);
 
-  useEffect(() => {
-    function openWithData(event: Event) {
-      setPrefill((event as CustomEvent<ReservationPrefill>).detail);
-      dialogRef.current?.showModal();
-    }
-
-    window.addEventListener(openReservationEvent, openWithData);
-    return () => window.removeEventListener(openReservationEvent, openWithData);
-  }, []);
-
-  function close() {
-    dialogRef.current?.close();
-  }
-
-  // Al cerrar después de enviar, el formulario vuelve a quedar vacío. Si no se envió, conserva lo escrito.
-  function handleClose() {
+  /**
+   * Al cerrar después de enviar, el formulario y la barra de reserva vuelven a quedar vacíos.
+   * Si no se envió, se conserva lo escrito. Se llama al cerrar por cualquier vía (la X, Esc o un clic afuera)
+   * y solo actúa una vez por apertura.
+   */
+  const finishClose = useCallback(() => {
+    if (!isOpen.current) return;
+    isOpen.current = false;
     window.dispatchEvent(new Event(reservationClosedEvent));
     if (!wasSent.current) return;
     wasSent.current = false;
+    window.dispatchEvent(new Event(reservationSentEvent));
     setPrefill(null);
     setFormVersion((version) => version + 1);
+  }, []);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+
+    function openWithData(event: Event) {
+      setPrefill((event as CustomEvent<ReservationPrefill>).detail);
+      dialog?.showModal();
+      isOpen.current = true;
+    }
+
+    window.addEventListener(openReservationEvent, openWithData);
+    // Esc cierra el diálogo sin pasar por close(): el evento nativo "close" lo cubre.
+    dialog?.addEventListener("close", finishClose);
+    return () => {
+      window.removeEventListener(openReservationEvent, openWithData);
+      dialog?.removeEventListener("close", finishClose);
+    };
+  }, [finishClose]);
+
+  function close() {
+    dialogRef.current?.close();
+    finishClose();
   }
 
   return (
@@ -41,7 +58,6 @@ export function ReservationDialog() {
       onClick={(event) => {
         if (event.target === event.currentTarget) close();
       }}
-      onClose={handleClose}
       ref={dialogRef}
     >
       <div className="reservation-dialog-content">

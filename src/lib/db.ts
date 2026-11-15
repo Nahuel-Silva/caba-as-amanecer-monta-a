@@ -49,6 +49,17 @@ const schema = [
     active INTEGER NOT NULL DEFAULT 1,
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`,
+  // Ajustes del panel, por ejemplo los datos para el pago de la seña.
+  "CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)",
+];
+
+/** Columnas agregadas después de crear la tabla de reservas: se suman solas a las bases existentes. */
+const addedReservationColumns = [
+  ["has_baby", "INTEGER NOT NULL DEFAULT 0"],
+  // Montos en pesos de la tarifa y la seña, y cuándo se le mandó el mensaje de la seña al huésped.
+  ["price_total", "INTEGER"],
+  ["deposit", "INTEGER"],
+  ["deposit_sent_at", "TEXT NOT NULL DEFAULT ''"],
 ];
 
 let database: Promise<Client> | null = null;
@@ -57,10 +68,11 @@ async function connect() {
   const client = createClient({ url: databaseUrl, authToken: process.env.TURSO_AUTH_TOKEN });
   await client.batch(schema, "write");
 
-  // Bases creadas antes de sumar el dato del bebé.
-  const { rows } = await client.execute("SELECT 1 FROM pragma_table_info('reservations') WHERE name = 'has_baby'");
-  if (rows.length === 0) {
-    await client.execute("ALTER TABLE reservations ADD COLUMN has_baby INTEGER NOT NULL DEFAULT 0").catch((error: unknown) => {
+  const { rows } = await client.execute("SELECT name FROM pragma_table_info('reservations')");
+  const existing = new Set(rows.map((row) => String(row.name)));
+  for (const [column, definition] of addedReservationColumns) {
+    if (existing.has(column)) continue;
+    await client.execute(`ALTER TABLE reservations ADD COLUMN ${column} ${definition}`).catch((error: unknown) => {
       if (!String(error).includes("duplicate column")) throw error;
     });
   }

@@ -28,6 +28,11 @@ export type ReservationRecord = {
   /** Hasta cuándo retiene las fechas una solicitud pendiente, en formato ISO. */
   holdUntil: string;
   isHolding: boolean;
+  /** Tarifa total y seña en pesos, cargadas desde el panel. null si todavía no se cargaron. */
+  priceTotal: number | null;
+  deposit: number | null;
+  /** Cuándo se le mandó al huésped el mensaje de la seña (vacío si todavía no). */
+  depositSentAt: string;
 };
 
 /** Solo devuelve fechas: el calendario público nunca recibe datos de los huéspedes. */
@@ -98,7 +103,24 @@ export async function listReservations(): Promise<ReservationRecord[]> {
     status: row.status as ReservationStatus,
     createdAt: String(row.created_at),
     ...holdInfo(String(row.status), String(row.created_at)),
+    priceTotal: row.price_total === null || row.price_total === undefined ? null : Number(row.price_total),
+    deposit: row.deposit === null || row.deposit === undefined ? null : Number(row.deposit),
+    depositSentAt: String(row.deposit_sent_at ?? ""),
   }));
+}
+
+export async function getReservation(id: number) {
+  return (await listReservations()).find((item) => item.id === id) ?? null;
+}
+
+/** Guarda la tarifa y la seña del pedido y anota cuándo se le mandó el mensaje al huésped. */
+export async function saveDepositInfo(id: number, priceTotal: number, deposit: number) {
+  const database = await getDatabase();
+  const { rowsAffected } = await database.execute({
+    sql: "UPDATE reservations SET price_total = ?, deposit = ?, deposit_sent_at = datetime('now') WHERE id = ?",
+    args: [priceTotal, deposit, id],
+  });
+  return rowsAffected === 1;
 }
 
 /** Confirma en una sola operación: si otra reserva ocupa esas noches, no cambia nada. */

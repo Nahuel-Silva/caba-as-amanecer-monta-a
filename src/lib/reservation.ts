@@ -22,6 +22,9 @@ export const openReservationEvent = "reservation:open";
 /** Evento al cerrar el formulario: la solicitud pudo cambiar qué fechas están libres. */
 export const reservationClosedEvent = "reservation:closed";
 
+/** Evento al cerrar el formulario después de enviar una solicitud: la barra de reserva vuelve a quedar vacía. */
+export const reservationSentEvent = "reservation:sent";
+
 /** Nombre con el que se guardan las fechas bloqueadas desde el panel sin datos de huésped. */
 export const manualBlockName = "Bloqueo manual";
 

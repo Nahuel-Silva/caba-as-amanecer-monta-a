@@ -12,6 +12,13 @@ const emailFrom = process.env.RESERVATIONS_EMAIL_FROM;
 
 export const isReservationEmailConfigured = Boolean(apiKey && emailTo && emailFrom);
 
+/**
+ * Se pueden mandar mails a los huéspedes si hay clave de Resend y remitente.
+ * Ojo: con la cuenta de prueba de Resend (sin dominio verificado) solo se entregan mails al dueño de la cuenta;
+ * los envíos a huéspedes fallan hasta verificar el dominio propio.
+ */
+export const canEmailGuests = Boolean(apiKey && emailFrom);
+
 /** El formulario se muestra si hay dónde recibir la solicitud: la base de datos o el mail. */
 export const showReservationForm = isDatabaseConfigured || isReservationEmailConfigured;
 
@@ -26,6 +33,14 @@ async function sendEmail({ to, subject, text, replyTo }: Email) {
   });
 
   if (!response.ok) throw new Error(`Resend respondió ${response.status}: ${await response.text()}`);
+}
+
+/** Mail al huésped desde el panel (seña o confirmación). Las respuestas llegan al mail del propietario. */
+export function sendGuestEmail(to: string, subject: string, text: string) {
+  return sendEmail({ to, subject, text: `${text}
+
+${site.name}
+${site.location}`, replyTo: emailTo || undefined });
 }
 
 /** Aviso para el propietario. Responder el mail le contesta directamente al huésped. */

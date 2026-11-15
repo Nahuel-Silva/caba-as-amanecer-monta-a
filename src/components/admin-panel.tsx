@@ -4,9 +4,17 @@ import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from
 import { AdminCalendar, type ManualGuestInput } from "@/components/admin-calendar";
 import { AdminPromotions } from "@/components/admin-promotions";
 import { ConfirmDialog, HelpBox, NoticeBar, type ConfirmRequest, type Notice } from "@/components/admin-ui";
-import { amenities, site } from "@/content/site";
 import { countNights, todayInMendoza, type StaySelection } from "@/lib/availability";
-import { getLocation } from "@/lib/location";
+import {
+  balanceOf,
+  confirmationMessage,
+  depositMessage,
+  formatPesos,
+  guestsText,
+  helloMessage,
+  noRoomMessage,
+  type GuestMessageData,
+} from "@/lib/guest-messages";
 import type { Promotion } from "@/lib/promotion";
 import { manualBlockName } from "@/lib/reservation";
 import type { ReservationRecord } from "@/lib/reservations-db";
@@ -21,7 +29,14 @@ import "./admin-panel.css";
 
 type CabinOption = { slug: string; name: string };
 type Session = { configured: boolean; loggedIn: boolean };
-type AdminData = { reservations: ReservationRecord[]; reviews: ReviewRecord[]; promotions: Promotion[] };
+type AdminData = {
+  reservations: ReservationRecord[];
+  reviews: ReviewRecord[];
+  promotions: Promotion[];
+  settings: { paymentDetails: string };
+  /** Si el servidor tiene configurado el envío de mails a huéspedes. */
+  canEmailGuests: boolean;
+};
 type View = "inicio" | "reservas" | "resenas" | "promociones";
 type Loaded = AdminData & { today: string; loadedAt: number };
 
@@ -32,20 +47,11 @@ function formatLongDay(date: string) {
   );
 }
 
-/** "2027-01-12" -> "12 de enero" */
-function formatShortDay(date: string) {
-  return new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`));
-}
-
-function formatMoment(iso: string) {
+function formatMoment(value: string) {
+  const iso = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value) ? `${value.replace(" ", "T")}Z` : value;
   return new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "America/Argentina/Mendoza" }).format(
     new Date(iso),
   );
-}
-
-function guestsText(guests: string, hasBaby: boolean) {
-  const people = guests === "1" ? "1 persona" : `${guests} personas`;
-  return hasBaby ? `${people} y un bebé` : people;
 }
 
 /** Arma el número para WhatsApp. Si no tiene código de país, se toma como un celular de Argentina. */
@@ -61,50 +67,118 @@ function hasPhone(item: ReservationRecord) {
   return item.phone.replace(/\D/g, "").length >= 8;
 }
 
-/** Mensajes listos para mandar por WhatsApp. Los montos quedan como $____ para completarlos antes de enviar. */
+/** Mensajes listos para el huésped. El texto es el mismo que el del mail (ver src/lib/guest-messages.ts). */
 type MessageKind = "hola" | "sena" | "confirmada" | "sin-lugar";
 
-function guestMessage(kind: MessageKind, item: ReservationRecord, cabin: string) {
-  const first = item.name.split(" ")[0];
-  const from = formatShortDay(item.arrival);
-  const to = formatShortDay(item.departure);
-  const nights = countNights(item.arrival, item.departure);
-  const stay = `${nights} ${nights === 1 ? "noche" : "noches"}${item.guests !== "-" ? `, ${guestsText(item.guests, item.hasBaby)}` : ""}`;
-  const schedule = amenities.find((amenity) => amenity.name === "Horarios")?.detail;
-  const directions = getLocation()?.directionsUrl;
-
-  if (kind === "sena") {
-    return [
-      `Hola ${first}, ¡gracias por elegirnos! Tenemos lugar en ${cabin} del ${from} al ${to} (${stay}).`,
-      "",
-      "La tarifa total es de $____.",
-      "Para confirmar la reserva te pedimos una seña de $____, por transferencia o Mercado Pago.",
-      "Datos para el pago: ____",
-      "",
-      "Cuando hagas la seña, mandanos el comprobante por acá. ¡Gracias!",
-    ].join("\n");
-  }
-  if (kind === "confirmada") {
-    return [
-      `Hola ${first}, ¡tu reserva está confirmada! Te esperamos en ${cabin} del ${from} al ${to}.`,
-      "",
-      schedule ? `Horarios: ${schedule.charAt(0).toLowerCase()}${schedule.slice(1)}.` : "",
-      `Dirección: ${site.address}, ${site.location}.`,
-      directions ? `Cómo llegar: ${directions}` : "",
-      "",
-      "Cualquier consulta, escribinos por acá.",
-    ]
-      .filter((line, index, lines) => line !== "" || lines[index - 1] !== "")
-      .join("\n");
-  }
-  if (kind === "sin-lugar") {
-    return `Hola ${first}, gracias por escribirnos. Lamentablemente no tenemos lugar en ${cabin} del ${from} al ${to}. Si te sirven otras fechas, avisanos y lo vemos. ¡Saludos!`;
-  }
-  return `Hola ${first}, te escribimos de ${site.name} por tu reserva en ${cabin}, del ${from} al ${to}.`;
+function messageData(item: ReservationRecord, cabin: string, extra: Partial<GuestMessageData> = {}): GuestMessageData {
+  return {
+    guestName: item.name,
+    cabin,
+    arrival: item.arrival,
+    departure: item.departure,
+    guests: item.guests,
+    hasBaby: item.hasBaby,
+    total: item.priceTotal,
+    deposit: item.deposit,
+    ...extra,
+  };
 }
 
-function whatsappLink(kind: MessageKind, item: ReservationRecord, cabin: string) {
-  return `https://wa.me/${whatsappNumberFor(item.phone)}?text=${encodeURIComponent(guestMessage(kind, item, cabin))}`;
+function whatsappLink(kind: MessageKind, data: GuestMessageData, phone: string) {
+  const text =
+    kind === "sena" ? depositMessage(data) : kind === "confirmada" ? confirmationMessage(data) : kind === "sin-lugar" ? noRoomMessage(data) : helloMessage(data);
+  return `https://wa.me/${whatsappNumberFor(phone)}?text=${encodeURIComponent(text)}`;
+}
+
+/** Lee lo que escribió la persona en un campo de monto: "120.000" o "$ 120000" -> 120000. */
+function readAmount(value: string) {
+  return Number(value.replace(/\D/g, "")) || 0;
+}
+
+type DepositValues = { total: number; deposit: number; paymentDetails: string };
+
+/** Paso 1 de cada pedido: montos, datos para el pago y un solo botón que manda el mail y abre WhatsApp. */
+function DepositForm({
+  item,
+  defaultPaymentDetails,
+  canEmailGuests,
+  onSend,
+}: {
+  item: ReservationRecord;
+  defaultPaymentDetails: string;
+  canEmailGuests: boolean;
+  onSend: (values: DepositValues) => void;
+}) {
+  const [total, setTotal] = useState(item.priceTotal ? String(item.priceTotal) : "");
+  const [deposit, setDeposit] = useState(item.deposit ? String(item.deposit) : "");
+  const [paymentDetails, setPaymentDetails] = useState(defaultPaymentDetails);
+  const [error, setError] = useState("");
+  const totalAmount = readAmount(total);
+  const depositAmount = readAmount(deposit);
+  const balance = balanceOf({ total: totalAmount, deposit: depositAmount });
+  const hasGuestEmail = item.email.includes("@");
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!totalAmount || !depositAmount) return setError("Completá el precio total y la seña, solo con números.");
+    if (depositAmount > totalAmount) return setError("La seña no puede ser mayor que el precio total.");
+    if (!paymentDetails.trim()) return setError("Completá los datos para el pago, por ejemplo el alias.");
+    setError("");
+    onSend({ total: totalAmount, deposit: depositAmount, paymentDetails: paymentDetails.trim() });
+  }
+
+  return (
+    <form className="admin-deposit" onSubmit={submit}>
+      <label>
+        Precio total de la estadía
+        <span className="admin-money">
+          <span aria-hidden="true">$</span>
+          <input inputMode="numeric" maxLength={12} onChange={(event) => { setTotal(event.target.value); setError(""); }} placeholder="Por ejemplo: 240000" type="text" value={total} />
+        </span>
+        {totalAmount > 0 && <small className="admin-hint">{formatPesos(totalAmount)}</small>}
+      </label>
+      <label>
+        Seña
+        <span className="admin-money">
+          <span aria-hidden="true">$</span>
+          <input inputMode="numeric" maxLength={12} onChange={(event) => { setDeposit(event.target.value); setError(""); }} placeholder="Por ejemplo: 72000" type="text" value={deposit} />
+        </span>
+        {depositAmount > 0 && <small className="admin-hint">{formatPesos(depositAmount)}</small>}
+      </label>
+      <p className="admin-balance admin-wide">
+        Saldo a pagar al llegar: <strong>{balance !== null ? formatPesos(balance) : "—"}</strong>
+      </p>
+      <label className="admin-wide">
+        Datos para el pago
+        <textarea maxLength={500} onChange={(event) => { setPaymentDetails(event.target.value); setError(""); }} placeholder={"Por ejemplo:\nAlias: CABANAS.AMANECER\nTitular: Nombre Apellido"} rows={3} value={paymentDetails} />
+        <small className="admin-hint">Alias, CBU o Mercado Pago. Se guarda para los próximos pedidos.</small>
+      </label>
+      {error && <p className="admin-error admin-wide" role="alert">{error}</p>}
+      <div className="admin-wide admin-deposit-send">
+        <button className="admin-button is-whatsapp" type="submit">Mandar mensaje de la seña</button>
+        <small className="admin-hint">
+          {hasGuestEmail && canEmailGuests ? `Se envía un mail a ${item.email} y se` : "Se"} abre WhatsApp con el mismo mensaje: solo tenés que tocar Enviar.
+          {hasGuestEmail && !canEmailGuests && " (El mail todavía no se envía: falta configurar el dominio propio.)"}
+        </small>
+      </div>
+      {item.depositSentAt && <p className="admin-sent admin-wide">✓ Mensaje de la seña mandado el {formatMoment(item.depositSentAt)}</p>}
+    </form>
+  );
+}
+
+/** Pide un cambio al servidor y devuelve el error (o "") y la nota sobre el mail, si la hay. */
+async function postAction(body: Record<string, unknown>): Promise<{ error: string; emailNote?: string; emailSent?: boolean }> {
+  try {
+    const response = await fetch("/api/admin/datos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const result = (await response.json()) as { error?: string; emailNote?: string; emailSent?: boolean };
+    return response.ok ? { error: "", emailNote: result.emailNote, emailSent: result.emailSent } : { error: result.error ?? "No pudimos hacer el cambio. Probá de nuevo." };
+  } catch {
+    return { error: "No hay conexión a internet. Revisá la conexión y probá de nuevo." };
+  }
 }
 
 async function sendAction(body: Record<string, unknown>) {
@@ -286,7 +360,7 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
     );
   }
 
-  const { today } = data;
+  const { today, canEmailGuests, settings } = data;
   const isManualBlock = (item: ReservationRecord) => item.name === manualBlockName;
   const toAnswer = data.reservations.filter((item) => item.status === "pending");
   const upcoming = data.reservations
@@ -422,6 +496,70 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
       });
     }
 
+    /** Abre WhatsApp en una pestaña nueva. Se llama dentro del clic para que el navegador no la bloquee. */
+    function openWhatsApp(url: string | null) {
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
+    }
+
+    function sendDeposit(item: ReservationRecord, cabin: string, values: DepositValues) {
+      const data = messageData(item, cabin, { total: values.total, deposit: values.deposit, paymentDetails: values.paymentDetails });
+      const balance = balanceOf(data);
+      const canWhatsApp = hasPhone(item);
+      ask({
+        title: "¿Mandar el mensaje de la seña?",
+        text: (
+          <p>
+            <strong>{item.name}</strong> · {cabin}
+            <br />
+            Total {formatPesos(values.total)} · Seña {formatPesos(values.deposit)}
+            {balance !== null && ` · Saldo al llegar ${formatPesos(balance)}`}
+            <br />
+            {item.email.includes("@") && canEmailGuests ? `Se envía un mail a ${item.email}` : "No se envía mail"}
+            {canWhatsApp ? " y se abre WhatsApp con el mensaje listo: tocá Enviar." : ". Este pedido no tiene un teléfono válido para WhatsApp."}
+          </p>
+        ),
+        confirmLabel: "Sí, mandar mensaje",
+        onConfirm: async () => {
+          openWhatsApp(canWhatsApp ? whatsappLink("sena", data, item.phone) : null);
+          const result = await postAction({ action: "send-deposit", id: item.id, ...values });
+          setNotice(
+            result.error
+              ? { kind: "error", text: result.error }
+              : { kind: result.emailSent || !item.email.includes("@") ? "success" : "error", text: `Listo, se guardaron los montos. ${result.emailNote ?? ""}${canWhatsApp ? " WhatsApp se abrió en otra pestaña." : ""}` },
+          );
+          await loadData();
+        },
+      });
+    }
+
+    function sendConfirmation(item: ReservationRecord, cabin: string) {
+      const data = messageData(item, cabin);
+      const canWhatsApp = hasPhone(item);
+      ask({
+        title: "¿Mandar la confirmación?",
+        text: (
+          <p>
+            <strong>{item.name}</strong> · {cabin}
+            <br />
+            Lleva los horarios, la dirección y cómo llegar{balanceOf(data) !== null && ", y el saldo a pagar al llegar"}.
+            <br />
+            {item.email.includes("@") && canEmailGuests ? `Se envía un mail a ${item.email}` : "No se envía mail"}
+            {canWhatsApp ? " y se abre WhatsApp con el mensaje listo: tocá Enviar." : "."}
+          </p>
+        ),
+        confirmLabel: "Sí, mandar confirmación",
+        onConfirm: async () => {
+          openWhatsApp(canWhatsApp ? whatsappLink("confirmada", data, item.phone) : null);
+          const result = await postAction({ action: "send-confirmation", id: item.id });
+          setNotice(
+            result.error
+              ? { kind: "error", text: result.error }
+              : { kind: result.emailSent || !item.email.includes("@") ? "success" : "error", text: `${result.emailNote ?? "Listo."}${canWhatsApp ? " WhatsApp se abrió en otra pestaña." : ""}` },
+          );
+        },
+      });
+    }
+
     function reservationCard(item: ReservationRecord) {
       const nights = countNights(item.arrival, item.departure);
       const cabin = cabinName(item.cabinSlug);
@@ -463,6 +601,12 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
             Se va el {formatLongDay(item.departure)} · {nights} {nights === 1 ? "noche" : "noches"}
           </p>
           {item.message && <p className="admin-message">“{item.message}”</p>}
+          {item.priceTotal !== null && item.deposit !== null && (
+            <p className="admin-amounts">
+              Total {formatPesos(item.priceTotal)} · Seña {formatPesos(item.deposit)}
+              {balanceOf({ total: item.priceTotal, deposit: item.deposit }) !== null && ` · Saldo al llegar ${formatPesos(balanceOf({ total: item.priceTotal, deposit: item.deposit })!)}`}
+            </p>
+          )}
           <p className="admin-meta">
             {isManualEntry ? "Anotada" : "Pidió"} el {formatMoment(item.createdAt)}
             {canMessage && ` · Teléfono ${item.phone}`}
@@ -478,12 +622,13 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
               </p>
               <ol className="admin-steps">
                 <li>
-                  <span>Mandale la tarifa y los datos para la seña.</span>
-                  <span className="admin-contact">
-                    <a className="admin-button is-whatsapp" href={whatsappLink("sena", item, cabin)} rel="noopener noreferrer" target="_blank">Mandar mensaje de la seña</a>
-                    <a className="admin-button is-secondary" href={`tel:${item.phone}`}>Llamar</a>
-                  </span>
-                  <small className="admin-hint">Se abre WhatsApp con el mensaje ya escrito. Antes de enviarlo, completá donde dice $____ y los datos para el pago.</small>
+                  <span>Completá la tarifa y la seña, y mandale el mensaje.</span>
+                  <DepositForm
+                    canEmailGuests={canEmailGuests}
+                    defaultPaymentDetails={settings.paymentDetails}
+                    item={item}
+                    onSend={(values) => sendDeposit(item, cabin, values)}
+                  />
                 </li>
                 <li>
                   <span>Cuando pague la seña, confirmá la reserva.</span>
@@ -499,7 +644,9 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
               <div className="admin-decline">
                 <p>¿No hay lugar o no va a venir?</p>
                 <div className="admin-actions">
-                  <a className="admin-button is-secondary" href={whatsappLink("sin-lugar", item, cabin)} rel="noopener noreferrer" target="_blank">Avisarle que no hay lugar</a>
+                  {canMessage && (
+                    <a className="admin-button is-secondary" href={whatsappLink("sin-lugar", messageData(item, cabin), item.phone)} rel="noopener noreferrer" target="_blank">Avisarle que no hay lugar</a>
+                  )}
                   <button className="admin-link is-danger" onClick={() => cancelReservation(item)} type="button">Rechazar pedido</button>
                 </div>
               </div>
@@ -508,10 +655,12 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
 
           {item.status === "confirmed" && item.departure >= today && (
             <div className="admin-actions">
+              {(canMessage || item.email.includes("@")) && (
+                <button className="admin-button is-whatsapp" onClick={() => sendConfirmation(item, cabin)} type="button">Mandar confirmación y dirección</button>
+              )}
               {canMessage && (
                 <>
-                  <a className="admin-button is-whatsapp" href={whatsappLink("confirmada", item, cabin)} rel="noopener noreferrer" target="_blank">Mandar confirmación y dirección</a>
-                  <a className="admin-button is-secondary" href={whatsappLink("hola", item, cabin)} rel="noopener noreferrer" target="_blank">Escribir otro mensaje</a>
+                  <a className="admin-button is-secondary" href={whatsappLink("hola", messageData(item, cabin), item.phone)} rel="noopener noreferrer" target="_blank">Escribir otro mensaje</a>
                 </>
               )}
               <button className="admin-link is-danger" onClick={() => cancelReservation(item)} type="button">Cancelar reserva</button>

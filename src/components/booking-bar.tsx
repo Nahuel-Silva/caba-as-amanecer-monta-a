@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BabyToggle } from "@/components/baby-toggle";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { StayWeather } from "@/components/stay-weather";
 import { useAvailability } from "@/components/use-availability";
 import { isStayAvailable, keepAvailableStay, type StaySelection } from "@/lib/availability";
-import { guestOptions, openReservationEvent, type ReservationPrefill } from "@/lib/reservation";
+import { guestOptions, openReservationEvent, reservationSentEvent, type ReservationPrefill } from "@/lib/reservation";
 import "./booking-bar.css";
 
 type CabinOption = { slug: string; name: string };
@@ -19,6 +19,19 @@ export function BookingBar({ cabins }: { cabins: CabinOption[] }) {
   const [guests, setGuests] = useState("2");
   const [hasBaby, setHasBaby] = useState(false);
   const [error, setError] = useState("");
+
+  // Después de enviar una solicitud, la barra vuelve a quedar vacía para no mostrar la reserva anterior.
+  useEffect(() => {
+    function reset() {
+      setSlug(cabins[0].slug);
+      setStay({ arrival: "", departure: "" });
+      setGuests("2");
+      setHasBaby(false);
+      setError("");
+    }
+    window.addEventListener(reservationSentEvent, reset);
+    return () => window.removeEventListener(reservationSentEvent, reset);
+  }, [cabins]);
 
   const cabin = cabins.find((option) => option.slug === slug) ?? cabins[0];
   const bookings = availability?.bookings[slug] ?? [];

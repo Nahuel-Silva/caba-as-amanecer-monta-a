@@ -96,6 +96,17 @@
 .admin-decline p { margin: 0; color: var(--muted); font-weight: 700; }
 .admin-decline .admin-actions { margin-top: 10px; }
 
+/* Formulario de la seña (paso 1 de cada pedido) */
+.admin-deposit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 4px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: #fffdf7; }
+.admin-deposit label { display: grid; align-content: start; gap: 6px; font-weight: 700; }
+.admin-money { display: flex; align-items: center; gap: 8px; }
+.admin-money > span { font-size: 20px; font-weight: 800; }
+.admin-balance { margin: 0 !important; padding: 10px 14px; border-radius: 12px; background: #e6efdf; }
+.admin-balance strong { font-size: 20px; }
+.admin-deposit-send { display: grid; gap: 8px; justify-items: start; }
+.admin-sent { margin: 0 !important; color: var(--admin-ok); font-weight: 700; }
+.admin-amounts { font-weight: 700; }
+
 /* Calendario y bloqueo de fechas */
 .admin-section-intro { margin: 0 0 16px; color: var(--muted); }
 .admin-calendar { display: grid; gap: 16px; padding: 22px; border: 2px solid var(--line); border-radius: 16px; background: #fbf8f1; }
@@ -155,7 +166,9 @@
   .admin-page { padding-block: 20px 140px; }
   .admin-page h1 { font-size: 28px; }
   .admin-summary-text { font-size: 24px; }
-  .admin-promotion-editor, .admin-guest-fields { grid-template-columns: 1fr; }
+  .admin-promotion-editor, .admin-guest-fields, .admin-deposit { grid-template-columns: 1fr; }
+  .admin-deposit { padding: 14px; }
+  .admin-deposit-send .admin-button { width: 100%; }
   .admin-promotion-live { position: static; }
   .admin-calendar, .admin-calendar-box { padding: 14px; }
   .admin-card { padding: 18px; }
