@@ -1,16 +1,12 @@
-import { createClient } from "@libsql/client";
-
 /**
- * Base de datos. Dos formas, con las mismas tablas (SQLite) y la misma interfaz:
- * - Cloudflare D1 (binding `DB`), cuando la web corre en Cloudflare Workers y DATABASE_PROVIDER=d1.
- * - Turso (TURSO_DATABASE_URL), en Netlify. En desarrollo, sin esas variables, el archivo local.db (ignorado por git).
- * Sin ninguna, en producción las funciones que la necesitan quedan desactivadas.
+ * Base de datos: Cloudflare D1 (SQLite), binding `DB` (ver wrangler.jsonc).
+ * - En Cloudflare Workers es la base real "cabanas-amanecer".
+ * - En desarrollo (`next dev`), next.config.ts llama a initOpenNextCloudflareForDev() y la web usa una D1 simulada
+ *   que se guarda en la carpeta .wrangler (ignorada por git). Las tablas se crean solas.
  */
-const isDevelopment = process.env.NODE_ENV === "development";
-const useD1 = process.env.DATABASE_PROVIDER === "d1";
-const databaseUrl = process.env.TURSO_DATABASE_URL || (isDevelopment ? "file:local.db" : "");
 
-export const isDatabaseConfigured = useD1 || databaseUrl !== "";
+/** La web siempre tiene base de datos (D1). Se mantiene para que las funciones que la usan lo dejen explícito. */
+export const isDatabaseConfigured = true;
 
 export type DbRow = Record<string, unknown>;
 export type DbResult = { rows: DbRow[]; rowsAffected: number };
@@ -71,24 +67,6 @@ const addedReservationColumns = [
   ["deposit_sent_at", "TEXT NOT NULL DEFAULT ''"],
 ];
 
-/* ---------- Turso ---------- */
-
-let tursoDatabase: Promise<Database> | null = null;
-
-async function connectTurso(): Promise<Database> {
-  const client = createClient({ url: databaseUrl, authToken: process.env.TURSO_AUTH_TOKEN });
-  const database: Database = {
-    async execute(query) {
-      const result = await client.execute(typeof query === "string" ? query : { sql: query.sql, args: (query.args ?? []) as never });
-      return { rows: result.rows as unknown as DbRow[], rowsAffected: result.rowsAffected };
-    },
-  };
-  await prepareSchema(database);
-  return database;
-}
-
-/* ---------- Cloudflare D1 ---------- */
-
 type D1Like = {
   prepare(sql: string): { bind(...values: unknown[]): { all(): Promise<{ results: DbRow[]; meta: { changes?: number } }> } };
 };
@@ -141,13 +119,7 @@ async function prepareSchema(database: Database) {
   }
 }
 
-/** Conexión a la base. Crea las tablas la primera vez y reintenta si falló la conexión anterior. */
+/** Conexión a la base. Crea las tablas la primera vez. */
 export function getDatabase(): Promise<Database> {
-  if (!isDatabaseConfigured) throw new Error("La base de datos no está configurada.");
-  if (useD1) return connectD1();
-  tursoDatabase ??= connectTurso().catch((error) => {
-    tursoDatabase = null;
-    throw error;
-  });
-  return tursoDatabase;
+  return connectD1();
 }

@@ -57,7 +57,7 @@ export async function getPromotionImage(id: number) {
   const database = await getDatabase();
   const { rows } = await database.execute({ sql: "SELECT image_data FROM promotions WHERE id = ?", args: [id] });
   const value = rows[0]?.image_data;
-  // Turso devuelve los BLOB como ArrayBuffer; D1, como lista de números.
+  // D1 devuelve los BLOB como lista de números; se aceptan también ArrayBuffer y Uint8Array.
   if (value instanceof ArrayBuffer) return value;
   if (Array.isArray(value)) return new Uint8Array(value as number[]).buffer;
   if (value instanceof Uint8Array) return value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength) as ArrayBuffer;

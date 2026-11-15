@@ -15,7 +15,7 @@
       "service": "cabanas-amanecer-montana"
     }
   ],
-  // Base de datos Cloudflare D1. DATABASE_PROVIDER=d1 hace que la web la use en lugar de Turso (src/lib/db.ts).
+  // Base de datos Cloudflare D1 (src/lib/db.ts). En desarrollo, wrangler simula una copia local en .wrangler.
   "d1_databases": [
     {
       "binding": "DB",
@@ -23,9 +23,6 @@
       "database_id": "d98ecc51-0923-4c4c-9ddd-644dfb16541b"
     }
   ],
-  "vars": {
-    "DATABASE_PROVIDER": "d1"
-  },
   // Optimización de fotos (next/image) con Cloudflare Images.
   "images": {
     "binding": "IMAGES"

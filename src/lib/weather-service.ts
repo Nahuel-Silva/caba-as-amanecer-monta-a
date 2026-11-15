@@ -9,8 +9,8 @@ const cacheMs = 60 * 60 * 1000;
 
 /**
  * Último pronóstico leído, guardado en memoria del servidor.
- * Se usa esta caché simple (y no "use cache" de Next.js) porque funciona igual en Netlify y en Cloudflare
- * sin necesitar un almacenamiento aparte. Cada instancia del servidor guarda su copia.
+ * Se usa esta caché simple (y no "use cache" de Next.js) porque en Cloudflare Workers no necesita
+ * un almacenamiento aparte. Cada instancia del servidor guarda su copia.
  */
 let cached: { days: DayForecast[]; expires: number } | null = null;
 

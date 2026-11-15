@@ -12,7 +12,6 @@
     "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
-    "@libsql/client": "^0.18.0",
     "@opennextjs/cloudflare": "^1.20.17",
     "next": "^16.4.6",
     "react": "19.3.0",

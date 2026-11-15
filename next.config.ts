@@ -17,3 +17,7 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// En desarrollo (next dev) da acceso a los bindings de Cloudflare, como la base D1 simulada (ver src/lib/db.ts).
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+initOpenNextCloudflareForDev();

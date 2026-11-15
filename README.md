@@ -13,19 +13,34 @@ cp .env.example .env.local   # en Windows PowerShell: Copy-Item .env.example .en
 npm run dev                  # http://localhost:3000
 ```
 
+En desarrollo la base de datos es una copia simulada de Cloudflare D1 que se guarda en la carpeta `.wrangler` (no se sube al repositorio). Empieza vacía y las tablas se crean solas.
+
 Antes de publicar cambios:
 
 ```bash
 npm run build
 npm run lint
+npm run cf:preview   # opcional: la web armada para Cloudflare, en http://localhost:8787
 ```
+
+`cf:preview` usa el mismo motor que Cloudflare. En Windows necesita el **Modo de desarrollador** activado (Configuración → Sistema → Avanzado) y lee las variables secretas de `.dev.vars` (no se sube al repositorio).
+
+## Publicación en Cloudflare
+
+La web está en Cloudflare Workers (plan gratis), conectada a GitHub: cada cambio subido a `main` se compila y se publica solo.
+
+- **Comandos** (Workers & Pages → cabanas-amanecer-montana → Settings → Build): build `npx opennextjs-cloudflare build`, deploy `npx opennextjs-cloudflare deploy`, preview `npx opennextjs-cloudflare upload`. El deploy tiene que ser el del adaptador (no `wrangler deploy`), porque copia la caché de las páginas.
+- **Variables de compilación** (Build): `NEXT_PUBLIC_WHATSAPP_NUMBER` y `NEXT_PUBLIC_PHONE_NUMBERS`, porque se escriben dentro de la web al compilarla. Más adelante, `NEXT_PUBLIC_SITE_URL`.
+- **Variables secretas** (Variables and Secrets, tipo Secret): `ADMIN_PASSWORD`, `RESEND_API_KEY`, `RESERVATIONS_EMAIL_TO` y `RESERVATIONS_EMAIL_FROM`. `keep_vars` en `wrangler.jsonc` evita que cada publicación las borre.
+- **Configuración:** `wrangler.jsonc` (Worker, base D1, fotos) y `open-next.config.ts` (caché de páginas en los archivos estáticos).
+- `cacheComponents` de Next.js está desactivado porque cuelga las páginas en Workers (ver `next.config.ts`).
 
 ## Número de WhatsApp
 
 El número se configura en **un solo lugar**: la variable de entorno `NEXT_PUBLIC_WHATSAPP_NUMBER`.
 
 - En local: editá `.env.local` (formato: código de país, sin `+`, espacios ni guiones).
-- En producción (Vercel): *Project Settings > Environment Variables*, y volvé a desplegar.
+- En producción (Cloudflare): variable de compilación, ver "Publicación en Cloudflare". Al cambiarla hay que volver a publicar.
 
 Mientras la variable esté vacía, el ícono flotante y los botones de consulta no se muestran. Nunca se publica un número inventado.
 
@@ -80,7 +95,7 @@ Hay que cargar `RESEND_API_KEY`, `RESERVATIONS_EMAIL_TO` y `RESERVATIONS_EMAIL_F
 
 ## Base de datos y panel
 
-Las solicitudes de reserva y las reseñas se guardan en [Turso](https://turso.tech). En desarrollo, sin configurar nada, se usa el archivo `local.db`, que no se sube al repositorio. Las tablas se crean solas. Para producción hay que cargar `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN`.
+Las solicitudes de reserva, las reseñas, las promociones y los ajustes del panel se guardan en [Cloudflare D1](https://developers.cloudflare.com/d1/), la base "cabanas-amanecer" (binding `DB` en `wrangler.jsonc`). Las tablas se crean solas. Para consultarla: `npx wrangler d1 execute cabanas-amanecer --remote --command "SELECT ..."` (requiere `npx wrangler login`). En desarrollo se usa una copia simulada local.
 
 En `/admin`, con la contraseña `ADMIN_PASSWORD`, se confirman o rechazan reservas, se bloquean fechas, se aprueban reseñas y se cargan promociones:
 
@@ -121,7 +136,7 @@ La URL pública se configura con `NEXT_PUBLIC_SITE_URL` (ver `.env.example`).
 - Los datos estructurados solo incluyen datos confirmados: nombre, localidad, provincia y país; la calle y el teléfono recién aparecen cuando cargás la dirección y el número de WhatsApp. No hay reseñas, valoraciones ni precios.
 - Open Graph todavía no incluye imagen: se agrega cuando haya una fotografía real del complejo (las de demostración no se usan).
 
-**Cuándo cargarla:** en Vercel, solo en el entorno *Production* y cuando el contenido real esté listo. Después, dar de alta el sitio en Google Search Console y enviar `https://tu-dominio/sitemap.xml`.
+**Cuándo cargarla:** en Cloudflare, como variable de compilación, cuando el contenido real esté listo y la web tenga su dominio propio. Después, dar de alta el sitio en Google Search Console y enviar `https://tu-dominio/sitemap.xml`.
 
 ## Estructura
 
