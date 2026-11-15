@@ -188,6 +188,13 @@ export const attractions: Attraction[] = [
     sourceLabel: "Municipalidad de Malargüe y UNCuyo (PDF)",
   },
   {
+    name: "Parque Turcará",
+    detail:
+      "Parque aéreo en la cuesta del Chihuido, a 35 km de la ciudad de Malargüe. Tiene puentes tibetanos, vía ferrata, la caverna de Turcará, un puente comando y las tirolesas más altas del sur de Mendoza; el circuito de aventura completo dura alrededor de 1 hora y media. También hay senderos paleontológicos autoguiados, senderos adaptados y un área de camping.",
+    sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-40/turcara/",
+    sourceLabel: turismoMalargue,
+  },
+  {
     name: "Cascada Manqui Malal",
     detail:
       "Cascada de unos 30 metros de altura. Su nombre viene del mapuche: «manqui» es cóndor y «malal», barda o pared de piedra. En las rocas de origen marino que la rodean hay fósiles de los períodos Jurásico y Cretácico.",

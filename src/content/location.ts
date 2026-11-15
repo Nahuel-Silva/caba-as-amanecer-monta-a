@@ -15,6 +15,7 @@ export const attractionDistances: Distance[] = [
   { place: "Observatorio Pierre Auger", distance: "En la ciudad" },
   { place: "Castillos de Pincheira", distance: "27 km" },
   { place: "Manqui Malal", distance: "34 km" },
+  { place: "Parque Turcará", distance: "35 km" },
   { place: "Volcán Malacara", distance: "42 km" },
   { place: "Laguna de la Niña Encantada", distance: "55 km" },
   { place: "Valle de Los Molles", distance: "60 km" },
