@@ -31,6 +31,12 @@ Mientras la variable esté vacía, el ícono flotante y los botones de consulta 
 
 Los mensajes precargados se arman en `src/lib/whatsapp.ts` (mensaje general y mensaje por cabaña).
 
+## Teléfonos para reservar por llamada
+
+Se configuran en la variable `NEXT_PUBLIC_PHONE_NUMBERS`, con el formato `Nombre | número` y las entradas separadas por `;` (ver `.env.example`). Después de cargarla o cambiarla hay que volver a desplegar.
+
+El botón aparece al lado del de Instagram y abre una ventana con los números: en el celular cada número llama al tocarlo; en la computadora solo se muestra. Mientras la variable esté vacía, el botón no aparece.
+
 ## Dónde editar el contenido
 
 | Qué | Archivo |

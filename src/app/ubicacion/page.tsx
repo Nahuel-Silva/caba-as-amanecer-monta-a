@@ -37,7 +37,7 @@ export default function LocationPage() {
         <section aria-label="Mapa y dirección" className="wrap section" style={{ paddingTop: 0 }}>
           <LocationSection />
 
-          <section aria-labelledby="distances-title" className="distances">
+          <section aria-labelledby="distances-title" className="distances" id="distancias">
             <p className="eyebrow">Distancias</p>
             <h2 id="distances-title">¿A cuánto queda cada lugar?</h2>
 

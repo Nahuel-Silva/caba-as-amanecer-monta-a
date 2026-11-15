@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { AttractionCard } from "@/components/attraction-card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -27,8 +28,11 @@ export default function MalarguePage() {
           <p className="eyebrow">Alrededores</p>
           <h1>Malargüe, por descubrir.</h1>
           <p className="section-intro">{getAttractionsIntro()}</p>
+          <p className="section-intro attractions-distances-link">
+            ¿A cuánto queda cada lugar desde las cabañas? Mirá la <Link href="/ubicacion#distancias">tabla de distancias</Link>.
+          </p>
         </header>
-        <section aria-label="Atractivos de Malargüe" className="wrap section" style={{ paddingTop: 0 }}>
+        <section aria-label="Atractivos de Malargüe" className="wrap section attractions-section" style={{ paddingTop: 0 }}>
           <div className="attraction-grid">
             {withPhoto.map((attraction, index) => (
               <AttractionCard attraction={attraction} eager={index < 2} key={attraction.name} />

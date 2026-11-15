@@ -1,3 +1,7 @@
+/* Menos aire entre los lugares y el clima: la sección del clima ya arranca sin margen arriba. */
+.attractions-section { padding-bottom: 56px; }
+.page-heading .attractions-distances-link { margin-top: 12px; }
+.attractions-distances-link a { color: var(--olive-dark); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .climate { padding-top: 0; }
 .climate > h2 { margin: 0; font-family: var(--font-display), serif; font-size: 34px; font-weight: 600; }
 .climate-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin: 28px 0 0; padding: 0; list-style: none; }
@@ -14,6 +18,7 @@
 @media (max-width: 1100px) { .climate-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 760px) { .climate-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 600px) {
+  .attractions-section { padding-bottom: 40px; }
   .climate > h2 { font-size: 26px; }
   .climate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .climate-temps { font-size: 18px; }

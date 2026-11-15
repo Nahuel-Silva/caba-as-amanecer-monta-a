@@ -33,7 +33,7 @@ export const faqs: Faq[] = [
   {
     question: "¿Qué servicios incluye la estadía?",
     answer:
-      "WiFi, televisor con DIRECTV, aire acondicionado, calefacción a gas natural y estufa a leña, cocina equipada, cochera individual techada, parrilla y servicio de ropa blanca.",
+      "WiFi, televisor con DIRECTV, aire acondicionado, calefacción a gas natural y estufa a leña, cocina equipada, cochera individual techada, parrilla individual en cada cabaña y servicio de ropa blanca.",
   },
   {
     question: "¿Cómo funciona la limpieza y el cambio de ropa blanca?",
@@ -41,9 +41,14 @@ export const faqs: Faq[] = [
       "La limpieza se hace día por medio de 9 a 12 hs, sin huéspedes en la cabaña, por lo que los objetos personales deben guardarse dentro del placard (el complejo no se hace cargo de su pérdida). Las sábanas y toallas se cambian cada 3 días.",
   },
   {
-    question: "¿Puedo cambiar la fecha o pedir una devolución?",
+    question: "¿Puedo cambiar la fecha de mi reserva?",
     answer:
-      "No se reconocen cambios de fecha ni devoluciones sobre las reservas confirmadas por inconvenientes de transporte aéreo o terrestre ni por condiciones climáticas. La seña del 50 % no es reembolsable.",
+      "Sí. Si necesitás cambiar la fecha, avisanos con anticipación y buscamos juntos una nueva. El cambio queda sujeto a la disponibilidad de las cabañas y no aplica para temporada alta. Escribinos por WhatsApp y lo coordinamos. Tené en cuenta que, si la tarifa para la nueva fecha aumentó, el precio de la estadía se actualiza a esa tarifa.",
+  },
+  {
+    question: "¿Se devuelve la seña si cancelo la reserva?",
+    answer:
+      "No. La seña del 50 % no es reembolsable, aunque la cancelación sea por problemas de transporte aéreo o terrestre o por el clima. Si no podés viajar en la fecha reservada, escribinos: en lugar de cancelar, podemos buscar juntos una nueva fecha.",
   },
   {
     question: "¿Qué actividades se pueden hacer en la zona?",

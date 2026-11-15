@@ -208,6 +208,27 @@ button { font: inherit; }
 .ig-float svg { width: 32px; height: 32px; }
 .ig-float:hover { box-shadow: 0 8px 24px rgb(0 0 0 / 34%); transform: scale(1.07); }
 .ig-float:focus-visible { outline: 3px solid var(--olive-dark); outline-offset: 3px; }
+
+/* Teléfono: a la izquierda de Instagram, mismo tamaño. Abre una ventana con los números. */
+.phone-float { display: grid; width: 60px; height: 60px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: var(--olive-dark); color: #fffdf7; cursor: pointer; box-shadow: 0 6px 20px rgb(0 0 0 / 28%); transition: transform 160ms ease, box-shadow 160ms ease; }
+.phone-float svg { width: 28px; height: 28px; }
+.phone-float:hover { box-shadow: 0 8px 24px rgb(0 0 0 / 34%); transform: scale(1.07); }
+.phone-float:focus-visible { outline: 3px solid var(--clay); outline-offset: 3px; }
+.phone-dialog { position: fixed; inset: 0; width: min(420px, calc(100vw - 32px)); height: fit-content; margin: auto; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; color: var(--ink); box-shadow: 0 18px 50px rgb(0 0 0 / 28%); }
+.phone-dialog::backdrop { background: rgb(17 19 16 / 45%); }
+.phone-dialog-content { display: grid; gap: 14px; padding: 22px; }
+.phone-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.phone-dialog-header h2 { margin: 0; font-family: var(--font-display), serif; font-size: 25px; font-weight: 600; }
+.phone-dialog-close { display: grid; width: 36px; height: 36px; flex: none; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgb(182 111 81 / 12%); color: var(--ink); cursor: pointer; font-size: 22px; line-height: 1; }
+.phone-dialog-close:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 2px; }
+.phone-dialog-intro { margin: 0; color: var(--muted); font-size: 15px; text-align: left; }
+.phone-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.phone-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fffdf7; color: var(--ink); }
+.phone-item strong { grid-column: 1; font-size: clamp(17px, 4.6vw, 20px); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.phone-name { grid-column: 1; color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.phone-action { grid-column: 2; grid-row: 1 / span 2; padding: 8px 16px; border-radius: 999px; background: var(--olive-dark); color: #fffdf7; font-size: 14px; font-weight: 700; }
+.phone-item.is-link { text-decoration: none; }
+.phone-item.is-link:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 2px; }
 .wa-float { display: grid; width: 60px; height: 60px; place-items: center; border-radius: 50%; background: #25d366; color: #fff; box-shadow: 0 6px 20px rgb(0 0 0 / 28%); transition: transform 160ms ease, box-shadow 160ms ease; }
 .wa-float svg { width: 34px; height: 34px; }
 .wa-float:hover { box-shadow: 0 8px 24px rgb(0 0 0 / 34%); transform: scale(1.07); }
