@@ -1,10 +1,9 @@
-import type { Row } from "@libsql/client";
-import { getDatabase, isDatabaseConfigured } from "@/lib/db";
+import { getDatabase, isDatabaseConfigured, type DbRow } from "@/lib/db";
 import { slugify, type Promotion, type PromotionFields } from "@/lib/promotion";
 
 const columns = "id, slug, title, description, discount, validity, details, conditions, code, image_alt, active, updated_at, image_data IS NOT NULL AS has_image";
 
-function toPromotion(row: Row): Promotion {
+function toPromotion(row: DbRow): Promotion {
   const id = Number(row.id);
   const alt = String(row.image_alt);
 
@@ -57,7 +56,12 @@ export async function getActivePromotion(slug: string): Promise<Promotion | unde
 export async function getPromotionImage(id: number) {
   const database = await getDatabase();
   const { rows } = await database.execute({ sql: "SELECT image_data FROM promotions WHERE id = ?", args: [id] });
-  return (rows[0]?.image_data as ArrayBuffer | null | undefined) ?? null;
+  const value = rows[0]?.image_data;
+  // Turso devuelve los BLOB como ArrayBuffer; D1, como lista de números.
+  if (value instanceof ArrayBuffer) return value;
+  if (Array.isArray(value)) return new Uint8Array(value as number[]).buffer;
+  if (value instanceof Uint8Array) return value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength) as ArrayBuffer;
+  return null;
 }
 
 async function uniqueSlug(title: string) {

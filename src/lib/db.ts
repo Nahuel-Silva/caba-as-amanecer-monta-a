@@ -1,13 +1,22 @@
-import { createClient, type Client } from "@libsql/client";
+import { createClient } from "@libsql/client";
 
 /**
- * Base de datos Turso. Sin TURSO_DATABASE_URL, en desarrollo se usa el archivo local.db
- * (ignorado por git) y en producción las funciones que la necesitan quedan desactivadas.
+ * Base de datos. Dos formas, con las mismas tablas (SQLite) y la misma interfaz:
+ * - Cloudflare D1 (binding `DB`), cuando la web corre en Cloudflare Workers y DATABASE_PROVIDER=d1.
+ * - Turso (TURSO_DATABASE_URL), en Netlify. En desarrollo, sin esas variables, el archivo local.db (ignorado por git).
+ * Sin ninguna, en producción las funciones que la necesitan quedan desactivadas.
  */
 const isDevelopment = process.env.NODE_ENV === "development";
+const useD1 = process.env.DATABASE_PROVIDER === "d1";
 const databaseUrl = process.env.TURSO_DATABASE_URL || (isDevelopment ? "file:local.db" : "");
 
-export const isDatabaseConfigured = databaseUrl !== "";
+export const isDatabaseConfigured = useD1 || databaseUrl !== "";
+
+export type DbRow = Record<string, unknown>;
+export type DbResult = { rows: DbRow[]; rowsAffected: number };
+export type DbQuery = string | { sql: string; args?: unknown[] };
+/** Lo único que la web necesita de la base: ejecutar una consulta con parámetros. */
+export type Database = { execute(query: DbQuery): Promise<DbResult> };
 
 const schema = [
   `CREATE TABLE IF NOT EXISTS reservations (
@@ -62,29 +71,83 @@ const addedReservationColumns = [
   ["deposit_sent_at", "TEXT NOT NULL DEFAULT ''"],
 ];
 
-let database: Promise<Client> | null = null;
+/* ---------- Turso ---------- */
 
-async function connect() {
+let tursoDatabase: Promise<Database> | null = null;
+
+async function connectTurso(): Promise<Database> {
   const client = createClient({ url: databaseUrl, authToken: process.env.TURSO_AUTH_TOKEN });
-  await client.batch(schema, "write");
+  const database: Database = {
+    async execute(query) {
+      const result = await client.execute(typeof query === "string" ? query : { sql: query.sql, args: (query.args ?? []) as never });
+      return { rows: result.rows as unknown as DbRow[], rowsAffected: result.rowsAffected };
+    },
+  };
+  await prepareSchema(database);
+  return database;
+}
 
-  const { rows } = await client.execute("SELECT name FROM pragma_table_info('reservations')");
+/* ---------- Cloudflare D1 ---------- */
+
+type D1Like = {
+  prepare(sql: string): { bind(...values: unknown[]): { all(): Promise<{ results: DbRow[]; meta: { changes?: number } }> } };
+};
+
+/** D1 no acepta Buffer ni undefined: los BLOB van como ArrayBuffer y lo vacío como null. */
+function toD1Value(value: unknown) {
+  if (value === undefined) return null;
+  if (typeof value === "boolean") return value ? 1 : 0;
+  if (value instanceof Uint8Array) return value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength);
+  return value;
+}
+
+let d1SchemaReady = false;
+
+/**
+ * En Workers, una visita no puede esperar algo creado por otra visita: la conexión a D1 se arma en cada visita
+ * (es instantánea) y solo se recuerda que las tablas ya existen.
+ */
+async function connectD1(): Promise<Database> {
+  const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+  const d1 = (getCloudflareContext().env as unknown as { DB?: D1Like }).DB;
+  if (!d1) throw new Error("Falta el binding DB de Cloudflare D1.");
+  const database: Database = {
+    async execute(query) {
+      const { sql, args = [] } = typeof query === "string" ? { sql: query } : query;
+      const result = await d1.prepare(sql).bind(...args.map(toD1Value)).all();
+      return { rows: result.results ?? [], rowsAffected: result.meta?.changes ?? 0 };
+    },
+  };
+  if (!d1SchemaReady) {
+    await prepareSchema(database);
+    d1SchemaReady = true;
+  }
+  return database;
+}
+
+/* ---------- Común ---------- */
+
+/** Crea las tablas si no existen y suma las columnas nuevas a las bases que ya existían. */
+async function prepareSchema(database: Database) {
+  for (const statement of schema) await database.execute(statement);
+
+  const { rows } = await database.execute("SELECT name FROM pragma_table_info('reservations')");
   const existing = new Set(rows.map((row) => String(row.name)));
   for (const [column, definition] of addedReservationColumns) {
     if (existing.has(column)) continue;
-    await client.execute(`ALTER TABLE reservations ADD COLUMN ${column} ${definition}`).catch((error: unknown) => {
+    await database.execute(`ALTER TABLE reservations ADD COLUMN ${column} ${definition}`).catch((error: unknown) => {
       if (!String(error).includes("duplicate column")) throw error;
     });
   }
-  return client;
 }
 
-/** Conexión compartida. Crea las tablas la primera vez y reintenta si falló la conexión anterior. */
-export function getDatabase() {
+/** Conexión a la base. Crea las tablas la primera vez y reintenta si falló la conexión anterior. */
+export function getDatabase(): Promise<Database> {
   if (!isDatabaseConfigured) throw new Error("La base de datos no está configurada.");
-  database ??= connect().catch((error) => {
-    database = null;
+  if (useD1) return connectD1();
+  tursoDatabase ??= connectTurso().catch((error) => {
+    tursoDatabase = null;
     throw error;
   });
-  return database;
+  return tursoDatabase;
 }

@@ -13,7 +13,6 @@ const cacheMs = 60 * 60 * 1000;
  * sin necesitar un almacenamiento aparte. Cada instancia del servidor guarda su copia.
  */
 let cached: { days: DayForecast[]; expires: number } | null = null;
-let pending: Promise<DayForecast[]> | null = null;
 
 async function fetchForecast(): Promise<DayForecast[]> {
   const { lat, lng } = site.coordinates ?? fallbackCoordinates;
@@ -36,14 +35,9 @@ async function fetchForecast(): Promise<DayForecast[]> {
  */
 export async function getMalargueForecast(): Promise<DayForecast[]> {
   if (cached && cached.expires > Date.now()) return cached.days;
-  // Si llegan varias visitas a la vez, comparten una sola consulta.
-  pending ??= fetchForecast()
-    .then((days) => {
-      cached = { days, expires: Date.now() + cacheMs };
-      return days;
-    })
-    .finally(() => {
-      pending = null;
-    });
-  return pending;
+  // No se comparte una consulta en curso entre visitas: en Cloudflare Workers una visita no puede esperar
+  // algo que inició otra. Se guarda solo el resultado, que sí se puede compartir.
+  const days = await fetchForecast();
+  cached = { days, expires: Date.now() + cacheMs };
+  return days;
 }
