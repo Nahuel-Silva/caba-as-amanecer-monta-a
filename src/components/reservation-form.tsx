@@ -2,9 +2,12 @@
 
 import { useState, type FormEvent } from "react";
 import { StayWeather } from "@/components/stay-weather";
+import Link from "next/link";
 import { countNights, formatDay } from "@/lib/availability";
 import type { ReservationPrefill } from "@/lib/reservation";
+import { conditionsPath, reservationConsentLabel } from "@/lib/subscribers";
 import "./reservation-form.css";
+import "./promo-subscribe.css";
 
 type ReservationFormProps = {
   /** Datos elegidos en la barra de reserva. */
@@ -39,7 +42,7 @@ export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProp
       const response = await fetch("/api/reservas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, ...prefill }),
+        body: JSON.stringify({ ...fields, wantsPromotions: fields.wantsPromotions === "on", ...prefill }),
       });
       const result: { ok: boolean; error?: string } = await response.json();
 
@@ -94,6 +97,14 @@ export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProp
         Mensaje (opcional)
         <textarea maxLength={1000} name="message" rows={3} />
       </label>
+      {/* Opcional y sin marcar: no hace falta para reservar. */}
+      <label className="reservation-wide reservation-consent">
+        <input name="wantsPromotions" type="checkbox" />
+        <span>
+          {reservationConsentLabel} (Opcional.){" "}
+          <Link href={conditionsPath} target="_blank">Condiciones</Link>
+        </span>
+      </label>
 
       {/* Campo trampa para robots: las personas no lo ven. Sin "sitio web" ni nada que el navegador autocomplete. */}
       <div aria-hidden="true" className="reservation-trap">
@@ -116,7 +127,7 @@ export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProp
         <button className="button button-primary" disabled={isSending} type="submit">
           {isSending ? "Enviando…" : "Solicitar reserva"}
         </button>
-        <small>Usamos tus datos solo para responder esta solicitud. Las fechas se bloquean por 24 horas y se liberan si no se confirma.</small>
+        <small>Usamos tus datos solo para responder esta solicitud (y para las promociones, si marcaste la casilla). Las fechas se bloquean por 24 horas y se liberan si no se confirma.</small>
       </div>
     </form>
   );

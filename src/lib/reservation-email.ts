@@ -35,6 +35,49 @@ async function sendEmail({ to, subject, text, replyTo }: Email) {
   if (!response.ok) throw new Error(`Resend respondió ${response.status}: ${await response.text()}`);
 }
 
+/** Mail con versión en texto y en HTML, y encabezados extra (por ejemplo, el de baja con un clic). */
+export type BulkEmail = { to: string; subject: string; text: string; html: string; headers?: Record<string, string> };
+
+/** Error de Resend con su código, para explicar en el panel qué pasó (por ejemplo, 429: límite diario). */
+export class EmailError extends Error {
+  constructor(public status: number, message: string) {
+    super(message);
+  }
+}
+
+/** Manda hasta 100 mails en una sola llamada a Resend (cada uno cuenta para el límite diario). */
+export async function sendBulkEmails(emails: BulkEmail[]) {
+  if (emails.length === 0) return;
+  const response = await fetch("https://api.resend.com/emails/batch", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify(emails.map(({ to, subject, text, html, headers }) => ({ from: emailFrom, to, subject, text, html, headers, ...(emailTo ? { reply_to: emailTo } : {}) }))),
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!response.ok) throw new EmailError(response.status, `Resend respondió ${response.status}: ${await response.text()}`);
+}
+
+/** Mail para confirmar la suscripción hecha desde la página Promociones. */
+export function sendSubscriptionConfirmation(to: string, confirmUrl: string) {
+  return sendEmail({
+    to,
+    subject: `Confirmá que querés recibir las promociones de ${site.name}`,
+    replyTo: emailTo || undefined,
+    text: [
+      "Hola:",
+      "",
+      `Alguien anotó este mail en la web de ${site.name} para recibir avisos de promociones.`,
+      "Si fuiste vos, confirmalo desde este enlace:",
+      confirmUrl,
+      "",
+      "Si no fuiste vos, no hagas nada: sin confirmar no te vamos a mandar promociones y el mail se borra solo en una semana.",
+      "",
+      site.name,
+      site.location,
+    ].join("\n"),
+  });
+}
+
 /** Mail al huésped desde el panel (seña o confirmación). Las respuestas llegan al mail del propietario. */
 export function sendGuestEmail(to: string, subject: string, text: string) {
   return sendEmail({ to, subject, text: `${text}

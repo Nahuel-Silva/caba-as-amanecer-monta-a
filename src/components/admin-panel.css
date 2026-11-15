@@ -174,3 +174,8 @@
   .admin-card { padding: 18px; }
   .admin-contact .admin-button, .admin-actions .admin-button { width: 100%; }
 }
+
+/* Personas anotadas para recibir promociones */
+.admin-subscribers { margin-top: 48px; padding-top: 32px; border-top: 2px solid var(--line); }
+.admin-whatsapp-list { display: grid; gap: 12px; justify-items: start; margin-bottom: 18px; padding: 18px 20px; border-radius: 14px; background: #e6efdf; }
+.admin-whatsapp-list p { margin: 0; }

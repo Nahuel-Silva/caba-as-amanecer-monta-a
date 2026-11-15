@@ -1,0 +1,30 @@
+/* Recuadro para anotarse a los avisos de promociones (página Promociones) y página de confirmación y baja. */
+.promo-subscribe { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: start; gap: 20px clamp(24px, 5vw, 56px); margin-top: 48px; padding: clamp(22px, 4vw, 34px); border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: var(--shadow-soft); }
+.promo-subscribe h2 { margin: 0 0 8px; font-family: var(--font-display), serif; font-size: clamp(26px, 3vw, 32px); font-weight: 600; line-height: 1.1; }
+.promo-subscribe p { margin: 0; color: var(--muted); }
+.promo-subscribe-form { display: grid; gap: 14px; justify-items: start; }
+.promo-subscribe-email { display: grid; width: 100%; gap: 5px; font-size: 13px; font-weight: 700; }
+.promo-subscribe-email input { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #b9b09f; border-radius: var(--radius-sm); background: #fffdf7; color: var(--ink); font: inherit; font-size: 15px; font-weight: 400; }
+.promo-subscribe-consent { display: flex; align-items: start; gap: 10px; font-size: 14px; line-height: 1.45; cursor: pointer; }
+.promo-subscribe-consent input, .reservation-consent input { width: 18px; height: 18px; flex: none; margin: 1px 0 0; accent-color: var(--olive-dark); }
+.promo-subscribe-consent a, .reservation-consent a, .subscription-page a { text-decoration: underline; text-underline-offset: 2px; }
+.promo-subscribe-email input:focus-visible, .promo-subscribe-consent input:focus-visible, .reservation-consent input:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 2px; }
+.promo-subscribe-form .button:disabled { cursor: wait; opacity: .7; }
+.promo-subscribe-error { color: #9c3d24 !important; font-size: 14px; font-weight: 700; }
+.promo-subscribe-done { padding: 16px; border: 1px solid var(--olive); border-radius: var(--radius-sm); }
+.promo-subscribe-done strong { display: block; margin-bottom: 4px; font-size: 16px; }
+
+/* Casilla del formulario de reserva. */
+.reservation-consent { display: flex !important; align-items: start; gap: 10px !important; font-size: 13px !important; font-weight: 400 !important; line-height: 1.45; cursor: pointer; }
+
+/* Página /suscripcion y condiciones. */
+.subscription-page { max-width: 720px; padding-block: 8px 96px; }
+.subscription-page h2 { margin: 32px 0 8px; font-family: var(--font-display), serif; font-size: 26px; font-weight: 600; }
+.subscription-page p, .subscription-page li { color: var(--muted); }
+.subscription-box { display: grid; gap: 14px; justify-items: start; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; }
+.subscription-box p { margin: 0; }
+.subscription-box .button:disabled { cursor: wait; opacity: .7; }
+
+@media (max-width: 760px) {
+  .promo-subscribe { grid-template-columns: 1fr; }
+}

@@ -15,6 +15,7 @@ export function SiteFooter() {
           <Link href="/malargue">Malargüe</Link>
           <Link href="/ubicacion">Ubicación</Link>
           <Link href="/preguntas">Preguntas</Link>
+          <Link href="/condiciones-promociones">Condiciones de promociones</Link>
         </nav>
       </div>
     </footer>

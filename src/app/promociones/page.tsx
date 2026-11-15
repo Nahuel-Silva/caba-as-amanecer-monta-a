@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { ContactBand } from "@/components/contact-band";
 import { PromotionCard } from "@/components/promotion-card";
+import { PromoSubscribe } from "@/components/promo-subscribe";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { listActivePromotions } from "@/lib/promotions-db";
@@ -51,6 +52,7 @@ export default function PromotionsPage() {
           <Suspense fallback={<p>Cargando promociones…</p>}>
             <PromotionList />
           </Suspense>
+          <PromoSubscribe />
         </section>
         <ContactBand />
       </main>

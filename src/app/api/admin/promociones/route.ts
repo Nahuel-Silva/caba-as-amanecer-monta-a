@@ -2,6 +2,7 @@ import { isAdminSession } from "@/lib/admin-auth";
 import { validatePromotion } from "@/lib/promotion";
 import { createPromotion, deletePromotion, setPromotionActive, updatePromotion } from "@/lib/promotions-db";
 import { isSameOrigin } from "@/lib/request-guard";
+import { deleteNoticesFor } from "@/lib/subscribers-db";
 
 const maxImageBytes = 1_500_000;
 
@@ -30,7 +31,9 @@ export async function POST(request: Request) {
   try {
     if (input.action === "delete") {
       if (!hasId) return respond(400, { error: "Datos inválidos." });
-      return (await deletePromotion(id)) ? respond(200, { ok: true }) : respond(404, { error: "No encontramos esa promoción." });
+      if (!(await deletePromotion(id))) return respond(404, { error: "No encontramos esa promoción." });
+      await deleteNoticesFor(id);
+      return respond(200, { ok: true });
     }
 
     if (input.action === "set-active") {

@@ -56,6 +56,27 @@ const schema = [
   )`,
   // Ajustes del panel, por ejemplo los datos para el pago de la seña.
   "CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)",
+  // Personas que aceptaron recibir promociones. "pending": se anotó en la web y falta que confirme desde su mail.
+  // Al darse de baja, la fila se borra: no se guarda nada de quien ya no quiere recibir avisos.
+  `CREATE TABLE IF NOT EXISTS subscribers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL DEFAULT '',
+    phone TEXT NOT NULL DEFAULT '',
+    source TEXT NOT NULL CHECK (source IN ('reserva', 'web')),
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active')),
+    token TEXT NOT NULL UNIQUE,
+    consent_version TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    confirmed_at TEXT NOT NULL DEFAULT ''
+  )`,
+  // A quién ya se le avisó cada promoción, para no mandarle el mismo mail dos veces.
+  `CREATE TABLE IF NOT EXISTS promotion_notices (
+    promotion_id INTEGER NOT NULL,
+    subscriber_id INTEGER NOT NULL,
+    sent_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (promotion_id, subscriber_id)
+  )`,
 ];
 
 /** Columnas agregadas después de crear la tabla de reservas: se suman solas a las bases existentes. */

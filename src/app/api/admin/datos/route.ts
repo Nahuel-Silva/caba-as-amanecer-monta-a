@@ -2,11 +2,13 @@ import { isAdminSession } from "@/lib/admin-auth";
 import { getCabins } from "@/lib/cabins";
 import { confirmationMessage, depositMessage, type GuestMessageData } from "@/lib/guest-messages";
 import { listPromotions } from "@/lib/promotions-db";
-import { canEmailGuests, sendGuestEmail } from "@/lib/reservation-email";
+import { publicBaseUrl, promotionNoticeEmail } from "@/lib/promotion-notice";
+import { canEmailGuests, EmailError, sendBulkEmails, sendGuestEmail } from "@/lib/reservation-email";
 import { blockDates, confirmReservation, getReservation, listReservations, rejectReservation, saveDepositInfo, type ReservationRecord } from "@/lib/reservations-db";
 import { isSameOrigin } from "@/lib/request-guard";
 import { listReviews, setReviewStatus } from "@/lib/reviews-db";
 import { getSettings, saveSetting } from "@/lib/settings-db";
+import { countPendingNotices, getNoticeSummary, listSubscribers, recordNotices, removeSubscriber, subscribersToNotify } from "@/lib/subscribers-db";
 import { site } from "@/content/site";
 
 const respond = (status: number, body: Record<string, unknown>) =>
@@ -18,8 +20,15 @@ export async function GET() {
   if (!(await isAdminSession())) return respond(401, { error: "Sesión vencida." });
 
   try {
-    const [reservations, reviews, promotions, settings] = await Promise.all([listReservations(), listReviews(), listPromotions(), getSettings()]);
-    return respond(200, { reservations, reviews, promotions, settings, canEmailGuests });
+    const [reservations, reviews, promotions, settings, subscribers, noticeSummary] = await Promise.all([
+      listReservations(),
+      listReviews(),
+      listPromotions(),
+      getSettings(),
+      listSubscribers(),
+      getNoticeSummary(),
+    ]);
+    return respond(200, { reservations, reviews, promotions, settings, subscribers, noticeSummary, canEmailGuests });
   } catch (error) {
     console.error("No se pudieron leer los datos del panel", error);
     return respond(502, { error: "No pudimos leer la base de datos." });
@@ -27,7 +36,10 @@ export async function GET() {
 }
 
 type AdminAction =
-  | { action: "confirm-reservation" | "reject-reservation" | "approve-review" | "reject-review" | "send-confirmation"; id: number }
+  | {
+      action: "confirm-reservation" | "reject-reservation" | "approve-review" | "reject-review" | "send-confirmation" | "notify-promotion" | "remove-subscriber";
+      id: number;
+    }
   | { action: "send-deposit"; id: number; total?: unknown; deposit?: unknown; paymentDetails?: unknown }
   | { action: "block-dates"; cabinSlug: string; arrival: string; departure: string; name?: unknown; phone?: unknown; guests?: unknown };
 
@@ -73,6 +85,34 @@ async function emailGuest(item: ReservationRecord, subject: string, text: string
   }
 }
 
+/**
+ * Manda el aviso de una promoción visible a las personas confirmadas que todavía no lo recibieron.
+ * Manda como mucho una tanda (el límite diario del plan gratis de Resend) y avisa cuántas faltan.
+ */
+async function notifyPromotion(id: number, request: Request) {
+  const promotion = (await listPromotions()).find((item) => item.id === id);
+  if (!promotion) return respond(404, { error: "No encontramos esa promoción." });
+  if (!promotion.active) return respond(400, { error: "Primero mostrá la promoción en la web: el mail lleva el enlace para verla." });
+  if (!canEmailGuests) return respond(503, { error: "Falta configurar el envío de mails." });
+
+  const recipients = await subscribersToNotify(id);
+  if (recipients.length === 0) return respond(200, { ok: true, sent: 0, remaining: 0 });
+
+  const baseUrl = publicBaseUrl(request);
+  try {
+    await sendBulkEmails(recipients.map((person) => promotionNoticeEmail(promotion, baseUrl, person.email, person.token)));
+  } catch (error) {
+    console.error("No se pudo enviar el aviso de la promoción", error);
+    const reason =
+      error instanceof EmailError && error.status === 429
+        ? "Se llegó al límite de mails de hoy. Probá de nuevo mañana."
+        : "No se pudo mandar el aviso. Hasta que el dominio propio esté verificado en Resend, los mails solo llegan a tu propio correo.";
+    return respond(502, { error: reason });
+  }
+  await recordNotices(id, recipients.map((person) => person.id));
+  return respond(200, { ok: true, sent: recipients.length, remaining: await countPendingNotices(id) });
+}
+
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) return respond(403, { error: "Solicitud no permitida." });
   if (!(await isAdminSession())) return respond(401, { error: "Sesión vencida." });
@@ -96,6 +136,12 @@ export async function POST(request: Request) {
     }
 
     if (!Number.isInteger(input.id)) return respond(400, { error: "Datos inválidos." });
+
+    if (input.action === "notify-promotion") return notifyPromotion(input.id, request);
+
+    if (input.action === "remove-subscriber") {
+      return (await removeSubscriber(input.id)) ? respond(200, { ok: true }) : respond(404, { error: "Esa persona ya no está en la lista." });
+    }
 
     if (input.action === "send-deposit") {
       const total = amount(input.total);

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { formatSubscriptionDay } from "@/components/admin-subscribers";
 import type { ConfirmRequest, Notice } from "@/components/admin-ui";
 import { PromotionCard } from "@/components/promotion-card";
 import type { Promotion } from "@/lib/promotion";
+import type { PromotionNoticeSummary } from "@/lib/subscribers";
 
 const maxImageWidth = 1400;
 
@@ -191,14 +193,74 @@ function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | 
 
 type AdminPromotionsProps = {
   promotions: Promotion[];
+  /** Cuántas personas recibieron el aviso de cada promoción. */
+  noticeSummary: PromotionNoticeSummary;
+  /** Personas confirmadas para recibir promociones. */
+  subscriberCount: number;
+  canEmailGuests: boolean;
   onChange: () => Promise<void>;
   ask: (request: ConfirmRequest) => void;
   onNotice: (notice: Notice) => void;
 };
 
+/** Pide al servidor que mande el aviso por mail de una promoción. */
+async function notifyPromotion(id: number): Promise<{ error: string; sent?: number; remaining?: number }> {
+  try {
+    const response = await fetch("/api/admin/datos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "notify-promotion", id }),
+    });
+    const result = (await response.json()) as { error?: string; sent?: number; remaining?: number };
+    return response.ok ? { error: "", sent: result.sent, remaining: result.remaining } : { error: result.error ?? "No se pudo mandar el aviso." };
+  } catch {
+    return { error: "No hay conexión a internet. Revisá la conexión y probá de nuevo." };
+  }
+}
+
+const people = (count: number) => `${count} ${count === 1 ? "persona" : "personas"}`;
+
 /** Sección de promociones del panel. */
-export function AdminPromotions({ promotions, onChange, ask, onNotice }: AdminPromotionsProps) {
+export function AdminPromotions({ promotions, noticeSummary, subscriberCount, canEmailGuests, onChange, ask, onNotice }: AdminPromotionsProps) {
   const [editing, setEditing] = useState<Promotion | "new" | null>(null);
+
+  function announce(promotion: Promotion) {
+    const alreadySent = noticeSummary[promotion.id]?.sent ?? 0;
+    const missing = Math.max(0, subscriberCount - alreadySent);
+    ask({
+      title: "¿Avisar esta promoción por mail?",
+      text: (
+        <p>
+          <strong>{promotion.title}</strong>
+          <br />
+          {alreadySent > 0
+            ? `Ya se les avisó a ${people(alreadySent)}. Ahora se manda solo a las que faltan (${people(missing)}), nadie lo recibe dos veces.`
+            : `Se manda un mail con la promoción a ${people(subscriberCount)}.`}{" "}
+          No se puede deshacer.
+        </p>
+      ),
+      confirmLabel: "Sí, mandar el aviso",
+      onConfirm: async () => {
+        const result = await notifyPromotion(promotion.id);
+        if (result.error) onNotice({ kind: "error", text: result.error });
+        else if (!result.sent) onNotice({ kind: "success", text: "Todas las personas anotadas ya habían recibido esta promoción." });
+        else
+          onNotice({
+            kind: "success",
+            text: result.remaining
+              ? `Listo, se mandó a ${people(result.sent)}. Faltan ${people(result.remaining)}: por el límite diario de mails, tocá "Avisar por mail" de nuevo mañana.`
+              : `Listo, se mandó el aviso a ${people(result.sent)}.`,
+          });
+        await onChange();
+      },
+    });
+  }
+
+  function noticeStatus(promotion: Promotion) {
+    const summary = noticeSummary[promotion.id];
+    if (!summary) return "Todavía no se avisó por mail.";
+    return `Avisada por mail a ${people(summary.sent)} (última vez: ${formatSubscriptionDay(summary.lastSentAt)}).`;
+  }
 
   async function run(body: Record<string, unknown>, successText: string) {
     const error = await sendPromotion(body);
@@ -266,8 +328,12 @@ export function AdminPromotions({ promotions, onChange, ask, onNotice }: AdminPr
             </div>
             <p className="admin-message">{promotion.description}</p>
             {(promotion.discount || promotion.validity) && <p>{[promotion.discount, promotion.validity].filter(Boolean).join(" · ")}</p>}
+            {promotion.active && <p className="admin-meta">{noticeStatus(promotion)}</p>}
             <div className="admin-actions">
               <button className="admin-button is-primary" onClick={() => setEditing(promotion)} type="button">Cambiar</button>
+              {promotion.active && canEmailGuests && subscriberCount > 0 && (
+                <button className="admin-button is-secondary" onClick={() => announce(promotion)} type="button">Avisar por mail</button>
+              )}
               <button className="admin-button is-secondary" onClick={() => toggle(promotion)} type="button">
                 {promotion.active ? "Ocultar" : "Mostrar en la web"}
               </button>

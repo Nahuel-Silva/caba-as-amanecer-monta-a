@@ -111,6 +111,12 @@ El calendario solo recibe fechas: los datos de los huéspedes se ven únicamente
 
 Las promociones se guardan en la base de datos y se cargan desde la pestaña Promociones de `/admin`: se pueden crear, editar, ocultar y borrar, y cada una puede tener foto. La foto se achica en el navegador y se guarda en la base. Cada promoción tiene su página en `/promociones/<slug>`, con un formulario que arma la consulta por WhatsApp; no reserva ni confirma disponibilidad. La vigencia es solo un texto: la promoción no se oculta sola al vencer.
 
+### Avisos de promociones por mail
+
+Quien quiera recibir promociones lo acepta con una casilla sin marcar: en el formulario de reserva (queda anotado enseguida, con nombre, mail y teléfono) o en la página Promociones (solo el mail; queda pendiente hasta que confirme desde el mail que le llega, y si no confirma en una semana se borra). Las condiciones están en `/condiciones-promociones` (`src/app/condiciones-promociones/page.tsx`); si se cambian de fondo, subir `consentVersion` en `src/lib/subscribers.ts`.
+
+En el panel, cada promoción visible tiene el botón "Avisar por mail": manda el aviso a las personas confirmadas que todavía no lo recibieron, como mucho 100 por vez (límite diario del plan gratis de Resend). Cada mail lleva su enlace de baja (`/suscripcion?baja=...`) y la baja con un clic para Gmail (`/api/suscripcion/baja`). Al darse de baja se borran los datos de la persona. Debajo de las promociones está la lista de anotados, con un botón para copiar los teléfonos para una lista de difusión de WhatsApp Business. Los mails a huéspedes solo salen con el dominio propio verificado en Resend.
+
 ## Opiniones
 
 Las reseñas del inicio se cargan en `src/content/reviews.ts`. Usá solo opiniones reales, copiadas tal cual y con el enlace a su fuente, y actualizá `ratingsCheckedAt` cuando revises los puntajes. Las reseñas del formulario se publican solas, también las negativas. Las que tienen insultos o enlaces esperan revisión en `/admin`, y desde ahí se puede quitar cualquiera. No se agregan reseñas a los datos estructurados de Google.

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { AdminCalendar, type ManualGuestInput } from "@/components/admin-calendar";
 import { AdminPromotions } from "@/components/admin-promotions";
+import { AdminSubscribers } from "@/components/admin-subscribers";
 import { ConfirmDialog, HelpBox, NoticeBar, type ConfirmRequest, type Notice } from "@/components/admin-ui";
 import { countNights, todayInMendoza, type StaySelection } from "@/lib/availability";
 import {
@@ -19,6 +20,7 @@ import type { Promotion } from "@/lib/promotion";
 import { manualBlockName } from "@/lib/reservation";
 import type { ReservationRecord } from "@/lib/reservations-db";
 import type { ReviewRecord } from "@/lib/reviews-db";
+import type { PromotionNoticeSummary, SubscriberRecord } from "@/lib/subscribers";
 import "./admin-panel.css";
 
 /*
@@ -34,6 +36,9 @@ type AdminData = {
   reviews: ReviewRecord[];
   promotions: Promotion[];
   settings: { paymentDetails: string };
+  /** Personas anotadas para recibir promociones. */
+  subscribers: SubscriberRecord[];
+  noticeSummary: PromotionNoticeSummary;
   /** Si el servidor tiene configurado el envío de mails a huéspedes. */
   canEmailGuests: boolean;
 };
@@ -371,6 +376,7 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
   const publishedReviews = data.reviews.filter((item) => item.status === "approved");
   const hiddenReviews = data.reviews.filter((item) => item.status === "rejected");
   const visiblePromotions = data.promotions.filter((item) => item.active).length;
+  const subscriberCount = data.subscribers.filter((item) => item.status === "active").length;
 
   /* ---------- Inicio ---------- */
 
@@ -389,7 +395,7 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
     const tiles: { view: View; title: string; text: string; count: number; isUrgent: boolean }[] = [
       { view: "reservas", title: "Pedidos de reserva", text: "Responder pedidos, ver las próximas estadías y bloquear fechas.", count: toAnswer.length, isUrgent: toAnswer.length > 0 },
       { view: "resenas", title: "Opiniones", text: "Revisar las opiniones que dejan los huéspedes en la web.", count: reviewsToCheck.length, isUrgent: reviewsToCheck.length > 0 },
-      { view: "promociones", title: "Promociones", text: `Crear, cambiar u ocultar promociones. Hay ${visiblePromotions} ${visiblePromotions === 1 ? "visible" : "visibles"} en la web.`, count: 0, isUrgent: false },
+      { view: "promociones", title: "Promociones", text: `Crear, cambiar u ocultar promociones y avisarlas por mail. Hay ${visiblePromotions} ${visiblePromotions === 1 ? "visible" : "visibles"} en la web y ${subscriberCount} ${subscriberCount === 1 ? "persona anotada" : "personas anotadas"} para recibirlas.`, count: 0, isUrgent: false },
     ];
 
     return (
@@ -786,8 +792,19 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
       <h1 className="admin-title">Promociones</h1>
       <HelpBox>
         <p>Las promociones aparecen en la página Promociones de la web. Podés crear una nueva, cambiar una que ya existe u ocultarla sin borrarla.</p>
+        <p>Con &quot;Avisar por mail&quot; le mandás la promoción a las personas anotadas (la lista está más abajo). Cada persona la recibe una sola vez.</p>
+        {!canEmailGuests && <p>El aviso por mail va a funcionar cuando esté configurado el envío de mails.</p>}
       </HelpBox>
-      <AdminPromotions ask={ask} onChange={loadData} onNotice={setNotice} promotions={data.promotions} />
+      <AdminPromotions
+        ask={ask}
+        canEmailGuests={canEmailGuests}
+        noticeSummary={data.noticeSummary}
+        onChange={loadData}
+        onNotice={setNotice}
+        promotions={data.promotions}
+        subscriberCount={subscriberCount}
+      />
+      <AdminSubscribers ask={ask} onChange={loadData} onNotice={setNotice} subscribers={data.subscribers} />
     </>
   );
 }

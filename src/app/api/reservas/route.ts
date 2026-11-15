@@ -9,6 +9,7 @@ import {
   sendOwnerNotification,
 } from "@/lib/reservation-email";
 import { createReservation } from "@/lib/reservations-db";
+import { subscribeFromReservation } from "@/lib/subscribers-db";
 
 const respond = (status: number, body: { ok: boolean; error?: string }) => Response.json(body, { status });
 
@@ -46,6 +47,13 @@ export async function POST(request: Request) {
       isSaved = true;
     } catch (saveError) {
       console.error("No se pudo guardar la solicitud", saveError);
+    }
+
+    // Marcó la casilla de promociones. Si falla, la solicitud sigue adelante igual.
+    if (isSaved && !looksLikeSpam && fields.wantsPromotions === true) {
+      await subscribeFromReservation(data.email.toLowerCase(), data.name, data.phone).catch((subscribeError: unknown) => {
+        console.error("No se pudo anotar a la persona en los avisos de promociones", subscribeError);
+      });
     }
   }
 
