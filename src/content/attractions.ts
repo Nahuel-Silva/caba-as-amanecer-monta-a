@@ -136,6 +136,35 @@ export const attractions: Attraction[] = [
       creditUrl: "https://commons.wikimedia.org/wiki/File:Observatorio_Pierre_Auger_Tanque_Rayos_C%C3%B3smicos.jpg",
     },
   },
+  {
+    name: "Valle de Los Molles",
+    detail:
+      "Valle a 60 km de la ciudad de Malargüe, a unos 45 minutos por la ruta 222, con todo el camino asfaltado. Combina río, montaña y gastronomía: tiene restaurantes, casas de té y baños termales, y su actividad hotelera empezó hace unos 90 años con el hotel Termas Lahuen-Co. Se puede hacer trekking, cabalgatas, mountain bike y escalada.",
+    sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-222/valle-de-los-molles/",
+    sourceLabel: turismoMalargue,
+    image: {
+      src: "/images/malargue/valle-de-los-molles.jpg",
+      alt: "Valle de Los Molles en otoño: álamos sin hojas, pastizales dorados y cerros nevados al fondo.",
+      credit: "ANDY ABIR ALAN",
+      license: "CC BY-SA 3.0",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Los_Molles,_Mendoza,_Argentina_-_panoramio_(26).jpg",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/",
+    },
+  },
+  {
+    name: "Paso Pehuenche",
+    detail:
+      "Paso internacional a Chile por la Ruta Nacional 145, la principal alternativa al Cristo Redentor. Quedó completamente pavimentado en 2016 y su punto más alto ronda los 2.450 metros sobre el nivel del mar, según el Gobierno de Mendoza. Los complejos fronterizos tienen horario y el paso puede cerrarse por nieve: antes de viajar, consultá su estado.",
+    sourceUrl: "https://www.mendoza.gov.ar/prensa/inauguraron-formalmente-el-paso-pehuenche/",
+    image: {
+      src: "/images/malargue/paso-pehuenche.jpg",
+      alt: "Arroyo de montaña en la zona del Paso Pehuenche, entre laderas con pastos y cerros rocosos bajo un cielo azul.",
+      credit: "Claudio Elias",
+      license: "CC BY-SA 4.0",
+      creditUrl: "https://commons.wikimedia.org/wiki/File:Paso_Pehuenche.jpg",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+    },
+  },
   // Sin foto: no hay imágenes con licencia libre en Wikimedia Commons. Se muestran como tarjetas de texto.
   {
     name: "Planetario Malargüe",
@@ -150,6 +179,13 @@ export const attractions: Attraction[] = [
       "Volcán de poco más de 1.800 metros sobre el nivel del mar, a 42 km al sureste de la ciudad, camino a la Laguna de Llancanelo. Se recorre con un trekking guiado de dificultad media, de unas 3 horas, que entra por sus cárcavas y sube a un mirador con vista al norte de la Payunia y a la laguna. Hay que reservar turno antes. No es apto para embarazadas ni para personas con movilidad reducida o problemas cardíacos.",
     sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-186/volcan-malacara/",
     sourceLabel: turismoMalargue,
+  },
+  {
+    name: "Geoparque Llano Blanco",
+    detail:
+      "Emprendimiento turístico de 70 hectáreas en Llano Blanco, sobre la Ruta 40, a 73,5 km al sur de la ciudad de Malargüe, entre Bardas Blancas y El Manzano. Se recorre por senderos guiados que cuentan la geología, la paleontología, la historia, la flora y la fauna del lugar, y su principal atractivo es un bosque petrificado. También ofrece comidas típicas, alojamiento y camping.",
+    sourceUrl: "https://turismo.malargue.gov.ar/newstart/wp-content/uploads/2021/06/Sitio-de-interes-Geologico-LLANO-BLANCO-0507.pdf",
+    sourceLabel: "Municipalidad de Malargüe y UNCuyo (PDF)",
   },
   {
     name: "Cascada Manqui Malal",

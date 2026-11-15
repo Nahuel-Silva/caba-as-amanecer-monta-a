@@ -11,6 +11,8 @@ export type SiteInfo = {
   directions: string;
   intro: string;
   contactNote: string;
+  /** Perfil de Instagram de las cabañas. */
+  instagramUrl: string;
 };
 
 export const site: SiteInfo = {
@@ -22,6 +24,7 @@ export const site: SiteInfo = {
   intro:
     "Dos cabañas totalmente equipadas y atendidas por sus dueños, para descansar en familia o con amigos y descubrir los paisajes del sur mendocino.",
   contactNote: "Los datos de contacto se publicarán cuando estén confirmados.",
+  instagramUrl: "https://instagram.com/amanecerdemontana",
 };
 
 export const amenities = [
