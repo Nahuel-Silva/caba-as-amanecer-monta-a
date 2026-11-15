@@ -19,6 +19,8 @@
   "images": {
     "binding": "IMAGES"
   },
+  // Las variables se cargan en el panel de Cloudflare: que cada publicación no las borre.
+  "keep_vars": true,
   "observability": {
     "enabled": true
   }
