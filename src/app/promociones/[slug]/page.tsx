@@ -4,10 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { PromotionInquiry } from "@/components/promotion-inquiry";
 import { ShareButton } from "@/components/share-button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { formatPesos } from "@/lib/guest-messages";
 import { getActivePromotion } from "@/lib/promotions-db";
 import { pageMetadata } from "@/lib/seo";
 import "@/components/promotion-card.css";
@@ -38,7 +38,7 @@ async function PromotionDetail({ params }: PromotionPageProps) {
 
   if (!promotion) notFound();
 
-  const { image, discount, details, conditions, code, validity } = promotion;
+  const { image, discount, details, conditions, code, validity, price } = promotion;
 
   return (
     <main className="wrap promotion-detail">
@@ -54,6 +54,11 @@ async function PromotionDetail({ params }: PromotionPageProps) {
         {validity && <p className="promotion-validity">{validity}</p>}
         <h1>{promotion.title}</h1>
         <p className="promotion-lead">{promotion.description}</p>
+        {price !== undefined && (
+          <p className="promotion-price promotion-price-large">
+            <span>Precio total</span> <strong>{formatPesos(price)}</strong>
+          </p>
+        )}
         {details.length > 0 && (
           <ul className="promotion-details">
             {details.map((detail) => <li key={detail}>{detail}</li>)}
@@ -63,9 +68,6 @@ async function PromotionDetail({ params }: PromotionPageProps) {
         {conditions && <p className="promotion-conditions">{conditions}</p>}
         <ShareButton title={promotion.title} />
       </article>
-      <aside>
-        <PromotionInquiry code={code} title={promotion.title} />
-      </aside>
     </main>
   );
 }

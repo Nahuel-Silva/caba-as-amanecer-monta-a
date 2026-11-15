@@ -1,4 +1,5 @@
 import { site } from "@/content/site";
+import { formatPesos } from "@/lib/guest-messages";
 import type { Promotion } from "@/lib/promotion";
 import type { BulkEmail } from "@/lib/reservation-email";
 import { siteUrl } from "@/lib/seo";
@@ -21,6 +22,7 @@ export function promotionNoticeEmail(promotion: Promotion, baseUrl: string, to: 
   const conditions = new URL(conditionsPath, baseUrl).toString();
   const unsubscribe = unsubscribeUrls(baseUrl, token);
   const highlights = [promotion.discount, promotion.validity].filter(Boolean).join(" · ");
+  const price = promotion.price !== undefined ? `Precio total: ${formatPesos(promotion.price)}` : "";
   const subject = `Nueva promoción en ${site.name}: ${promotion.title}`;
 
   const text = [
@@ -28,6 +30,7 @@ export function promotionNoticeEmail(promotion: Promotion, baseUrl: string, to: 
     highlights,
     "",
     promotion.description,
+    price,
     ...promotion.details.map((detail) => `- ${detail}`),
     promotion.conditions ? `\nCondiciones: ${promotion.conditions}` : "",
     promotion.code ? `Código: ${promotion.code}` : "",
@@ -54,6 +57,7 @@ ${image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(promotion.image!.al
 <h1 style="margin:0 0 8px;font-family:Georgia,serif;font-size:28px;font-weight:normal">${escapeHtml(promotion.title)}</h1>
 ${highlights ? `<p style="margin:0 0 14px;font-size:16px;font-weight:bold">${escapeHtml(highlights)}</p>` : ""}
 <p style="margin:0 0 14px;font-size:16px;line-height:1.5">${escapeHtml(promotion.description)}</p>
+${price ? `<p style="margin:0 0 14px;font-size:18px"><strong>${escapeHtml(price)}</strong></p>` : ""}
 ${promotion.details.length ? `<ul style="margin:0 0 14px;padding-left:20px;font-size:15px;line-height:1.5">${promotion.details.map((detail) => `<li>${escapeHtml(detail)}</li>`).join("")}</ul>` : ""}
 ${promotion.conditions ? `<p style="margin:0 0 8px;font-size:14px;color:#5d5f55">Condiciones: ${escapeHtml(promotion.conditions)}</p>` : ""}
 ${promotion.code ? `<p style="margin:0 0 14px;font-size:15px">Código: <strong>${escapeHtml(promotion.code)}</strong></p>` : ""}

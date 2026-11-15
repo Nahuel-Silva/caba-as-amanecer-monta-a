@@ -9,6 +9,8 @@ export type Promotion = {
   discount?: string;
   /** Vigencia tal como se muestra, por ejemplo "Hasta el 30 de noviembre". */
   validity?: string;
+  /** Precio total de la promoción en pesos. Es opcional: hay promociones sin precio. */
+  price?: number;
   /** Qué incluye o puntos clave. */
   details: string[];
   /** Condiciones, por ejemplo "Mínimo 3 noches. No acumulable con otras promociones." */
@@ -25,6 +27,8 @@ export type PromotionFields = {
   description: string;
   discount: string;
   validity: string;
+  /** null: la promoción no muestra precio. */
+  price: number | null;
   details: string[];
   conditions: string;
   code: string;
@@ -49,6 +53,13 @@ export function validatePromotion(input: Record<string, unknown>): { data: Promo
   if (title.length < 3 || !slugify(title)) return { error: "Ingresá un título." };
   if (description.length < 10) return { error: "Escribí una descripción de al menos 10 caracteres." };
 
+  // Precio opcional: vacío o un número entero de pesos.
+  const hasPrice = input.price !== undefined && input.price !== null && input.price !== "";
+  const price = hasPrice ? input.price : null;
+  if (price !== null && !(typeof price === "number" && Number.isInteger(price) && price > 0 && price < 1_000_000_000)) {
+    return { error: "Revisá el precio: escribí solo números, o dejalo vacío si la promoción no tiene precio." };
+  }
+
   return {
     data: {
       title,
@@ -56,6 +67,7 @@ export function validatePromotion(input: Record<string, unknown>): { data: Promo
       details,
       discount: text(input.discount, 24),
       validity: text(input.validity, 80),
+      price: price as number | null,
       conditions: text(input.conditions, 400),
       code: text(input.code, 30),
       imageAlt: text(input.imageAlt, 160),

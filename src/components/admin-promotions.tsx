@@ -4,6 +4,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { formatSubscriptionDay } from "@/components/admin-subscribers";
 import type { ConfirmRequest, Notice } from "@/components/admin-ui";
 import { PromotionCard } from "@/components/promotion-card";
+import { formatPesos } from "@/lib/guest-messages";
 import type { Promotion } from "@/lib/promotion";
 import type { PromotionNoticeSummary } from "@/lib/subscribers";
 
@@ -35,7 +36,13 @@ async function sendPromotion(body: Record<string, unknown>) {
   }
 }
 
-type Draft = { title: string; description: string; discount: string; validity: string; imageAlt: string };
+type Draft = { title: string; description: string; discount: string; validity: string; price: string; imageAlt: string };
+
+/** Lo que se escribió en el precio, solo con números: "180.000" o "$ 180000" -> 180000. Vacío -> null. */
+function readPrice(value: string) {
+  const digits = value.replace(/\D/g, "");
+  return digits ? Number(digits) : null;
+}
 
 /** Arma una promoción de muestra con lo escrito hasta ahora, para la vista previa. */
 function previewPromotion(draft: Draft, image: string): Promotion {
@@ -46,6 +53,7 @@ function previewPromotion(draft: Draft, image: string): Promotion {
     description: draft.description.trim() || "Acá va la descripción.",
     discount: draft.discount.trim() || undefined,
     validity: draft.validity.trim() || undefined,
+    price: readPrice(draft.price) ?? undefined,
     details: [],
     image: image ? { src: image, alt: draft.imageAlt } : undefined,
     active: true,
@@ -68,13 +76,21 @@ function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | 
     description: promotion?.description ?? "",
     discount: promotion?.discount ?? "",
     validity: promotion?.validity ?? "",
+    price: promotion?.price ? String(promotion.price) : "",
     imageAlt: promotion?.image?.alt ?? "",
   });
 
   function updateDraft(event: FormEvent<HTMLFormElement>) {
     const fields = new FormData(event.currentTarget);
     const read = (name: keyof Draft) => String(fields.get(name) ?? "");
-    setDraft({ title: read("title"), description: read("description"), discount: read("discount"), validity: read("validity"), imageAlt: read("imageAlt") });
+    setDraft({
+      title: read("title"),
+      description: read("description"),
+      discount: read("discount"),
+      validity: read("validity"),
+      price: read("price"),
+      imageAlt: read("imageAlt"),
+    });
   }
 
   async function chooseImage(event: ChangeEvent<HTMLInputElement>) {
@@ -106,6 +122,7 @@ function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | 
       action: "save",
       id: promotion?.id,
       details: String(fields.details).split("\n"),
+      price: readPrice(String(fields.price ?? "")),
       imageBase64: newImage.split(",")[1] ?? "",
       removeImage: isRemoved,
     });
@@ -138,6 +155,18 @@ function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | 
           Hasta cuándo vale
           <input defaultValue={promotion?.validity} maxLength={80} name="validity" placeholder="Hasta el 30 de mayo" type="text" />
           <Hint>Por ejemplo: Hasta el 30 de mayo.</Hint>
+        </label>
+        <label className="admin-wide">
+          Precio total (opcional)
+          <span className="admin-money">
+            <span aria-hidden="true">$</span>
+            <input defaultValue={promotion?.price ? String(promotion.price) : ""} inputMode="numeric" maxLength={14} name="price" placeholder="Por ejemplo: 180000" type="text" />
+          </span>
+          <Hint>
+            {readPrice(draft.price)
+              ? `Se va a ver así: ${formatPesos(readPrice(draft.price)!)}. Aclará en la descripción qué incluye ese precio (noches, personas).`
+              : "Lo que cuesta la promoción completa, solo con números. Si la promoción no tiene precio, dejalo vacío."}
+          </Hint>
         </label>
         <label className="admin-wide">
           Qué incluye
@@ -327,7 +356,9 @@ export function AdminPromotions({ promotions, noticeSummary, subscriberCount, ca
               <span className="admin-status">{promotion.active ? "Se ve en la web" : "Oculta"}</span>
             </div>
             <p className="admin-message">{promotion.description}</p>
-            {(promotion.discount || promotion.validity) && <p>{[promotion.discount, promotion.validity].filter(Boolean).join(" · ")}</p>}
+            {(promotion.discount || promotion.validity || promotion.price) && (
+              <p>{[promotion.discount, promotion.validity, promotion.price && `Precio total: ${formatPesos(promotion.price)}`].filter(Boolean).join(" · ")}</p>
+            )}
             {promotion.active && <p className="admin-meta">{noticeStatus(promotion)}</p>}
             <div className="admin-actions">
               <button className="admin-button is-primary" onClick={() => setEditing(promotion)} type="button">Cambiar</button>

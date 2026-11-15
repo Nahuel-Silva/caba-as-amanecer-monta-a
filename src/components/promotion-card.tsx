@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { formatPesos } from "@/lib/guest-messages";
 import type { Promotion } from "@/lib/promotion";
 import "./promotion-card.css";
 
@@ -25,6 +26,11 @@ export function PromotionCard({ promotion }: { promotion: Promotion }) {
         {promotion.validity && <p className="promotion-validity">{promotion.validity}</p>}
         <h2>{promotion.title}</h2>
         <p>{promotion.description}</p>
+        {promotion.price !== undefined && (
+          <p className="promotion-price">
+            <span>Precio total</span> <strong>{formatPesos(promotion.price)}</strong>
+          </p>
+        )}
         <Link
           aria-label={`Ver la promoción ${promotion.title}`}
           className="button button-primary"

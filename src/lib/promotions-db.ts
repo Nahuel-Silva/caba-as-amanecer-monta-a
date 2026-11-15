@@ -1,7 +1,7 @@
 import { getDatabase, isDatabaseConfigured, type DbRow } from "@/lib/db";
 import { slugify, type Promotion, type PromotionFields } from "@/lib/promotion";
 
-const columns = "id, slug, title, description, discount, validity, details, conditions, code, image_alt, active, updated_at, image_data IS NOT NULL AS has_image";
+const columns = "id, slug, title, description, discount, validity, price, details, conditions, code, image_alt, active, updated_at, image_data IS NOT NULL AS has_image";
 
 function toPromotion(row: DbRow): Promotion {
   const id = Number(row.id);
@@ -14,6 +14,7 @@ function toPromotion(row: DbRow): Promotion {
     description: String(row.description),
     discount: String(row.discount) || undefined,
     validity: String(row.validity) || undefined,
+    price: row.price === null || row.price === undefined ? undefined : Number(row.price),
     details: JSON.parse(String(row.details)) as string[],
     conditions: String(row.conditions) || undefined,
     code: String(row.code) || undefined,
@@ -78,14 +79,15 @@ async function uniqueSlug(title: string) {
 export async function createPromotion(fields: PromotionFields, image: Buffer | null) {
   const database = await getDatabase();
   await database.execute({
-    sql: `INSERT INTO promotions (slug, title, description, discount, validity, details, conditions, code, image_data, image_alt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO promotions (slug, title, description, discount, validity, price, details, conditions, code, image_data, image_alt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     args: [
       await uniqueSlug(fields.title),
       fields.title,
       fields.description,
       fields.discount,
       fields.validity,
+      fields.price,
       JSON.stringify(fields.details),
       fields.conditions,
       fields.code,
@@ -99,7 +101,7 @@ export async function createPromotion(fields: PromotionFields, image: Buffer | n
 export async function updatePromotion(id: number, fields: PromotionFields, image: Buffer | null, removeImage: boolean) {
   const database = await getDatabase();
   const { rowsAffected } = await database.execute({
-    sql: `UPDATE promotions SET title = ?, description = ?, discount = ?, validity = ?, details = ?, conditions = ?, code = ?, image_alt = ?,
+    sql: `UPDATE promotions SET title = ?, description = ?, discount = ?, validity = ?, price = ?, details = ?, conditions = ?, code = ?, image_alt = ?,
         image_data = CASE WHEN ? = 1 THEN NULL WHEN ? IS NOT NULL THEN ? ELSE image_data END,
         updated_at = datetime('now')
       WHERE id = ?`,
@@ -108,6 +110,7 @@ export async function updatePromotion(id: number, fields: PromotionFields, image
       fields.description,
       fields.discount,
       fields.validity,
+      fields.price,
       JSON.stringify(fields.details),
       fields.conditions,
       fields.code,

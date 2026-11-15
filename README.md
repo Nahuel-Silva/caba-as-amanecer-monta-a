@@ -109,7 +109,7 @@ El calendario solo recibe fechas: los datos de los huéspedes se ven únicamente
 
 ## Promociones
 
-Las promociones se guardan en la base de datos y se cargan desde la pestaña Promociones de `/admin`: se pueden crear, editar, ocultar y borrar, y cada una puede tener foto. La foto se achica en el navegador y se guarda en la base. Cada promoción tiene su página en `/promociones/<slug>`, con un formulario que arma la consulta por WhatsApp; no reserva ni confirma disponibilidad. La vigencia es solo un texto: la promoción no se oculta sola al vencer.
+Las promociones se guardan en la base de datos y se cargan desde la pestaña Promociones de `/admin`: se pueden crear, editar, ocultar y borrar, y cada una puede tener foto y un precio total (opcional, en pesos; las promociones sin precio no lo muestran). La foto se achica en el navegador y se guarda en la base. Cada promoción tiene su página en `/promociones/<slug>`. La vigencia es solo un texto: la promoción no se oculta sola al vencer.
 
 ### Avisos de promociones por mail
 

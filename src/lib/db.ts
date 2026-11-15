@@ -79,13 +79,23 @@ const schema = [
   )`,
 ];
 
-/** Columnas agregadas después de crear la tabla de reservas: se suman solas a las bases existentes. */
+/** Columnas agregadas después de crear cada tabla: se suman solas a las bases existentes. */
 const addedReservationColumns = [
   ["has_baby", "INTEGER NOT NULL DEFAULT 0"],
   // Montos en pesos de la tarifa y la seña, y cuándo se le mandó el mensaje de la seña al huésped.
   ["price_total", "INTEGER"],
   ["deposit", "INTEGER"],
   ["deposit_sent_at", "TEXT NOT NULL DEFAULT ''"],
+];
+
+const addedPromotionColumns = [
+  // Precio total de la promoción en pesos (opcional).
+  ["price", "INTEGER"],
+];
+
+const addedColumns: [table: string, columns: string[][]][] = [
+  ["reservations", addedReservationColumns],
+  ["promotions", addedPromotionColumns],
 ];
 
 type D1Like = {
@@ -130,13 +140,15 @@ async function connectD1(): Promise<Database> {
 async function prepareSchema(database: Database) {
   for (const statement of schema) await database.execute(statement);
 
-  const { rows } = await database.execute("SELECT name FROM pragma_table_info('reservations')");
-  const existing = new Set(rows.map((row) => String(row.name)));
-  for (const [column, definition] of addedReservationColumns) {
-    if (existing.has(column)) continue;
-    await database.execute(`ALTER TABLE reservations ADD COLUMN ${column} ${definition}`).catch((error: unknown) => {
-      if (!String(error).includes("duplicate column")) throw error;
-    });
+  for (const [table, columns] of addedColumns) {
+    const { rows } = await database.execute(`SELECT name FROM pragma_table_info('${table}')`);
+    const existing = new Set(rows.map((row) => String(row.name)));
+    for (const [column, definition] of columns) {
+      if (existing.has(column)) continue;
+      await database.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`).catch((error: unknown) => {
+        if (!String(error).includes("duplicate column")) throw error;
+      });
+    }
   }
 }
 
