@@ -2,17 +2,23 @@
 .season-layer { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .season-canvas { width: 100%; height: 100%; }
 
-/* Verano: resplandor cálido de amanecer detrás de la parte de arriba, que se intensifica y se apaga muy lento. */
-.season-glow {
-  position: absolute; inset: 0 0 auto; height: 75vh;
-  background:
-    radial-gradient(70% 55% at 50% 0%, rgb(248 196 112 / 42%), transparent 70%),
-    radial-gradient(120% 80% at 50% -10%, rgb(236 150 110 / 26%), rgb(236 150 110 / 10%) 45%, transparent 75%);
-  animation: season-glow 14s ease-in-out infinite alternate;
+/* Verano, haces de luz: franjas paralelas y separadas que caen despacio en diagonal, apareciendo y desvaneciéndose. */
+.season-beams { position: absolute; inset: 0; }
+.season-beam {
+  position: absolute; transform-origin: 50% 0; transform: rotate(-36deg);
+  border-radius: 999px;
+  background: linear-gradient(to bottom, rgb(255 214 130 / 0%), rgb(255 214 130 / 34%) 20%, rgb(255 214 130 / 20%) 60%, rgb(255 214 130 / 0%));
+  filter: blur(13px);
+  opacity: 0;
+  animation: season-beam-fall ease-in-out infinite;
 }
-
-@keyframes season-glow { from { opacity: .7; } to { opacity: 1; } }
-
+/* Cada franja baja a lo largo de su propia diagonal: aparece arriba, cae y se desvanece abajo. */
+@keyframes season-beam-fall {
+  0% { opacity: 0; transform: rotate(-36deg) translateY(-35%); }
+  30% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(-36deg) translateY(35%); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .season-glow { animation: none; }
+  .season-beam { animation: none; opacity: .8; }
 }

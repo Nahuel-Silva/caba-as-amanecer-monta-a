@@ -6,7 +6,7 @@ import "./seasonal-effects.css";
 
 /*
  * Decoración de fondo según la estación del año (hemisferio sur):
- * primavera, pétalos; verano, un resplandor de amanecer; otoño, hojas de álamo; invierno, copos de nieve.
+ * primavera, pétalos; verano, haces de luz de sol; otoño, hojas de álamo; invierno, copos de nieve.
  * Cambia sola con la fecha de Mendoza. Para verla en otra estación: ?estacion=invierno (o verano, otono, primavera).
  * No intercepta clics, se pausa con la pestaña oculta y respeta "reducir movimiento".
  */
@@ -168,10 +168,49 @@ export function SeasonalEffects() {
   return (
     <div aria-hidden="true" className={`season-layer season-${state.season}`}>
       {state.season === "verano" ? (
-        <div className="season-glow" />
+        <SunBeams />
       ) : (
         !state.reducedMotion && <FallingParticles season={state.season} />
       )}
+    </div>
+  );
+}
+
+/**
+ * Haces de luz, repartidos a lo ancho de la pantalla: dónde empiezan (left y top, en % de la pantalla),
+ * cuánto bajan (length, en % del alto), su ancho y su ritmo. Fijos, para que se vean igual en cada visita.
+ */
+const beams = [
+  { left: 2, top: -8, length: 70, width: 58, delay: 0, duration: 16 },
+  { left: 36, top: -8, length: 78, width: 64, delay: -6, duration: 19 },
+  { left: 46, top: 32, length: 22, width: 26, delay: -11, duration: 14 },
+  { left: 68, top: 8, length: 45, width: 44, delay: -3, duration: 17 },
+  { left: 76, top: -8, length: 10, width: 18, delay: -8, duration: 15 },
+  { left: 79, top: 2, length: 66, width: 72, delay: -13, duration: 21 },
+  { left: 93, top: 70, length: 22, width: 46, delay: -5, duration: 18 },
+];
+
+/**
+ * Haces de luz de sol: franjas paralelas y separadas que bajan en diagonal, como el sol entrando entre los álamos.
+ * Cada una cae despacio a lo largo de su diagonal, aparece y se desvanece, a su propio ritmo (solo con CSS).
+ */
+function SunBeams() {
+  return (
+    <div className="season-beams">
+      {beams.map((beam) => (
+        <span
+          className="season-beam"
+          key={`${beam.left}-${beam.top}`}
+          style={{
+            left: `${beam.left}%`,
+            top: `${beam.top}%`,
+            height: `${beam.length * 1.25}vh`,
+            width: `${beam.width * 1.4}px`,
+            animationDelay: `${beam.delay}s`,
+            animationDuration: `${beam.duration}s`,
+          }}
+        />
+      ))}
     </div>
   );
 }
