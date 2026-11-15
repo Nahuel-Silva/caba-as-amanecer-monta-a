@@ -179,3 +179,8 @@
 .admin-subscribers { margin-top: 48px; padding-top: 32px; border-top: 2px solid var(--line); }
 .admin-whatsapp-list { display: grid; gap: 12px; justify-items: start; margin-bottom: 18px; padding: 18px 20px; border-radius: 14px; background: #e6efdf; }
 .admin-whatsapp-list p { margin: 0; }
+.admin-search { display: grid; gap: 8px; margin-bottom: 18px; }
+.admin-search > label { font-weight: 700; }
+.admin-search-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.admin-search-row input { flex: 1 1 260px; }
+.admin-search-result { margin: 0; color: var(--muted); font-weight: 700; }

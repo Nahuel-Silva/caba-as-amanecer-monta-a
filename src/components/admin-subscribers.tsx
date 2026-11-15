@@ -13,6 +13,16 @@ export function formatSubscriptionDay(value: string) {
 
 const hasPhone = (person: SubscriberRecord) => person.phone.replace(/\D/g, "").length >= 8;
 
+/** Minúsculas y sin tildes: "Martín" se encuentra escribiendo "martin". */
+const simplify = (value: string) => value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+
+/** Busca en el nombre y el mail; si se escriben números, también en el teléfono (sin espacios ni guiones). */
+function matchesSearch(person: SubscriberRecord, query: string) {
+  if (simplify(`${person.name} ${person.email}`).includes(query)) return true;
+  const digits = query.replace(/\D/g, "");
+  return digits.length >= 3 && person.phone.replace(/\D/g, "").includes(digits);
+}
+
 type AdminSubscribersProps = {
   subscribers: SubscriberRecord[];
   onChange: () => Promise<void>;
@@ -23,9 +33,15 @@ type AdminSubscribersProps = {
 /** Lista de personas que aceptaron recibir promociones, con los teléfonos listos para la difusión de WhatsApp. */
 export function AdminSubscribers({ subscribers, onChange, ask, onNotice }: AdminSubscribersProps) {
   const [isCopied, setIsCopied] = useState(false);
+  const [search, setSearch] = useState("");
   const active = subscribers.filter((person) => person.status === "active");
   const pending = subscribers.filter((person) => person.status === "pending");
   const withPhone = active.filter(hasPhone);
+
+  const query = simplify(search);
+  const matches = (person: SubscriberRecord) => !query || matchesSearch(person, query);
+  const shownActive = active.filter(matches);
+  const shownPending = pending.filter(matches);
 
   async function copyPhones() {
     const list = withPhone.map((person) => `${person.name || person.email}: ${person.phone}`).join("\n");
@@ -111,12 +127,45 @@ export function AdminSubscribers({ subscribers, onChange, ask, onNotice }: Admin
         </div>
       )}
 
-      {active.length === 0 ? <p className="admin-empty">Todavía no se anotó nadie.</p> : <div className="admin-list">{active.map(personCard)}</div>}
+      {subscribers.length > 0 && (
+        <div className="admin-search">
+          <label htmlFor="admin-subscriber-search">Buscar una persona</label>
+          <div className="admin-search-row">
+            <input
+              autoComplete="off"
+              id="admin-subscriber-search"
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Escribí el nombre, el mail o el teléfono"
+              type="search"
+              value={search}
+            />
+            {search && (
+              <button className="admin-button is-secondary" onClick={() => setSearch("")} type="button">
+                Borrar búsqueda
+              </button>
+            )}
+          </div>
+          {query && (
+            <p className="admin-search-result" role="status">
+              {shownActive.length + shownPending.length === 0
+                ? `No hay nadie anotado que coincida con "${search.trim()}".`
+                : `${shownActive.length + shownPending.length} ${shownActive.length + shownPending.length === 1 ? "persona coincide" : "personas coinciden"} con "${search.trim()}".`}
+            </p>
+          )}
+        </div>
+      )}
 
-      {pending.length > 0 && (
-        <details className="admin-group admin-past" style={{ marginTop: 24 }}>
-          <summary>Sin confirmar ({pending.length})</summary>
-          <div className="admin-list">{pending.map(personCard)}</div>
+      {active.length === 0 ? (
+        <p className="admin-empty">Todavía no se anotó nadie.</p>
+      ) : (
+        shownActive.length > 0 && <div className="admin-list">{shownActive.map(personCard)}</div>
+      )}
+
+      {shownPending.length > 0 && (
+        // Al buscar, la sección se abre sola para que se vea a quien coincide.
+        <details className="admin-group admin-past" key={query ? "buscando" : "normal"} open={Boolean(query)} style={{ marginTop: 24 }}>
+          <summary>Sin confirmar ({shownPending.length})</summary>
+          <div className="admin-list">{shownPending.map(personCard)}</div>
         </details>
       )}
     </section>
