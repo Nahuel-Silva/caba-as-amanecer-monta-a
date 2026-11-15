@@ -47,7 +47,7 @@ function WeatherIcon({ condition }: { condition: WeatherCondition }) {
   );
 }
 
-/** Pronóstico de los días de la estadía si ya existe; si no, el clima habitual de esos meses. */
+/** Pronóstico real de los días que ya lo tienen (~10 días) y clima típico de los demás. Se actualiza solo cada hora. */
 export function StayWeather({ arrival, departure }: { arrival: string; departure: string }) {
   const [days, setDays] = useState<DayForecast[] | null>(null);
 
@@ -63,8 +63,8 @@ export function StayWeather({ arrival, departure }: { arrival: string; departure
 
   if (days === null || !arrival || !departure) return null;
 
-  const { forecast, hasDaysWithoutForecast, months } = getStayWeather(arrival, departure, days);
-  const showClimate = forecast.length === 0 || hasDaysWithoutForecast;
+  const { forecast, typical, months } = getStayWeather(arrival, departure, days);
+  const coldest = months.reduce((first, other) => (other.min < first.min ? other : first));
 
   return (
     <div className="stay-weather">
@@ -86,21 +86,29 @@ export function StayWeather({ arrival, departure }: { arrival: string; departure
         </>
       )}
 
-      {showClimate && (
-        <div className="stay-weather-climate">
-          {forecast.length === 0 && <p className="stay-weather-title">Clima habitual en Malargüe</p>}
-          {months.map((month) => (
-            <p key={month.month}>
-              <strong>{forecast.length > 0 ? `Para los demás días (${month.month.toLowerCase()})` : month.month}:</strong>{" "}
-              máximas de {formatDegrees(month.max)} y mínimas de {formatDegrees(month.min)} en promedio.
-            </p>
-          ))}
-          {/* Un solo consejo, el del mes más frío de la estadía. */}
-          {forecast.length === 0 && <p>{climateTip(months.reduce((a, b) => (b.min < a.min ? b : a)))}</p>}
-        </div>
+      {typical.length > 0 && (
+        <>
+          <p className="stay-weather-title">{forecast.length > 0 ? "Clima típico para los demás días" : "Clima típico para tus fechas"}</p>
+          <ul className="stay-weather-days is-typical">
+            {typical.map((day) => (
+              <li key={day.date}>
+                <span className="stay-weather-day">{formatWeekday(day.date)}</span>
+                <span className="stay-weather-temp">
+                  <strong>{formatDegrees(day.max)}</strong> / {formatDegrees(day.min)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="stay-weather-note">
+            {forecast.length > 0
+              ? "Promedio de años anteriores, no es un pronóstico. El pronóstico real de estos días aparece solo a medida que se acercan."
+              : "Promedio de años anteriores, no es un pronóstico. Unos 10 días antes de tu llegada, acá vas a ver el pronóstico real."}
+          </p>
+          {forecast.length === 0 && <p>{climateTip(coldest)}</p>}
+        </>
       )}
 
-      {/* MET Norway pide citarlo junto a su pronóstico (CC BY 4.0). Los promedios del SMN se citan en la página de Malargüe. */}
+      {/* MET Norway pide citarlo junto a su pronóstico (CC BY 4.0). Los promedios (NASA POWER y SMN) se citan en src/content/daily-climate.ts. */}
       {forecast.length > 0 && (
         <p className="stay-weather-source">
           Pronóstico: <a href={forecastSource.url} rel="noopener noreferrer" target="_blank">{forecastSource.label}<span className="sr-only"> (se abre en una pestaña nueva)</span></a>.

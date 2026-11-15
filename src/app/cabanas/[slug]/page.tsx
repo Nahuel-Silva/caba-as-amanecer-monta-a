@@ -14,8 +14,6 @@ import "./cabin-page.css";
 
 type CabinPageProps = { params: Promise<{ slug: string }> };
 
-export const instant = false;
-
 export function generateStaticParams() {
   return getCabins().map((cabin) => ({ slug: cabin.slug }));
 }

@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // cacheComponents y partialPrefetching quedan desactivados: en Cloudflare Workers hacen que las páginas se cuelguen
+  // (vercel/next.js#94880, opennextjs-cloudflare#1115). Volver a probarlos cuando se resuelva.
   images: {
     qualities: [75, 90],
   },

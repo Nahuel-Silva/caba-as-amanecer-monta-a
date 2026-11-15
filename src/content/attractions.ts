@@ -214,6 +214,32 @@ export const attractions: Attraction[] = [
       licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
     },
   },
+  {
+    name: "Volcán Malacara",
+    detail:
+      "Volcán de poco más de 1.800 metros sobre el nivel del mar, camino a la Laguna de Llancanelo. Se recorre con un trekking guiado de dificultad media, de unas 3 horas, que entra por sus cárcavas y sube a un mirador con vista al norte de la Payunia y a la laguna. Hay que reservar turno antes. No es apto para embarazadas ni para personas con movilidad reducida o problemas cardíacos.",
+    sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-186/volcan-malacara/",
+    sourceLabel: turismoMalargue,
+    image: {
+      src: "/images/malargue/volcan-malacara.jpg",
+      alt: "Interior de una cárcava del Volcán Malacara: paredes de roca curvadas y la luz del sol entrando por una grieta arriba.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
+    },
+  },
+  {
+    name: "Cascada Manqui Malal",
+    detail:
+      "Cascada de unos 30 metros de altura. Su nombre viene del mapuche: «manqui» es cóndor y «malal», barda o pared de piedra. En las rocas de origen marino que la rodean hay fósiles de los períodos Jurásico y Cretácico.",
+    sourceUrl: "https://www.malargue.tur.ar/en/route-40-circuit/manqui-malal-waterfall/",
+    sourceLabel: "Turismo Malargüe (en inglés)",
+    image: {
+      src: "/images/malargue/cascada-manqui-malal.jpg",
+      alt: "Cascada Manqui Malal: un hilo de agua cae por una pared de roca anaranjada bajo el cielo azul.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
+    },
+  },
   // Sin foto: no hay imágenes con licencia libre en Wikimedia Commons. Se muestran como tarjetas de texto.
   {
     name: "Planetario Malargüe",
@@ -241,20 +267,6 @@ export const attractions: Attraction[] = [
     detail:
       "Parque aéreo en la cuesta del Chihuido. Tiene puentes tibetanos, vía ferrata, la caverna de Turcará, un puente comando y las tirolesas más altas del sur de Mendoza; el circuito de aventura completo dura alrededor de 1 hora y media. También hay senderos paleontológicos autoguiados, senderos adaptados y un área de camping.",
     sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-40/turcara/",
-    sourceLabel: turismoMalargue,
-  },
-  {
-    name: "Cascada Manqui Malal",
-    detail:
-      "Cascada de unos 30 metros de altura. Su nombre viene del mapuche: «manqui» es cóndor y «malal», barda o pared de piedra. En las rocas de origen marino que la rodean hay fósiles de los períodos Jurásico y Cretácico.",
-    sourceUrl: "https://www.malargue.tur.ar/en/route-40-circuit/manqui-malal-waterfall/",
-    sourceLabel: "Turismo Malargüe (en inglés)",
-  },
-  {
-    name: "Volcán Malacara",
-    detail:
-      "Volcán de poco más de 1.800 metros sobre el nivel del mar, camino a la Laguna de Llancanelo. Se recorre con un trekking guiado de dificultad media, de unas 3 horas, que entra por sus cárcavas y sube a un mirador con vista al norte de la Payunia y a la laguna. Hay que reservar turno antes. No es apto para embarazadas ni para personas con movilidad reducida o problemas cardíacos.",
-    sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-186/volcan-malacara/",
     sourceLabel: turismoMalargue,
   },
   {

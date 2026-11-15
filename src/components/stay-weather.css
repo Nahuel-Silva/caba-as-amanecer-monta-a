@@ -11,3 +11,6 @@
 .stay-weather-source { color: var(--muted); font-size: 11px; }
 .stay-weather-source a { text-decoration: underline; text-underline-offset: 2px; }
 .booking-bar .stay-weather { grid-column: 1 / -1; }
+/* Clima típico: tarjetas más livianas y con borde punteado, para que no se confundan con el pronóstico. */
+.stay-weather-days.is-typical li { min-width: 86px; grid-template-columns: auto; border-style: dashed; background: transparent; }
+.stay-weather-note { color: var(--muted); font-size: 12px; }

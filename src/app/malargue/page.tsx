@@ -48,7 +48,7 @@ export default function MalarguePage() {
               </div>
             </>
           )}
-          <p className="attraction-credits-note">Fotos de Wikimedia Commons, redimensionadas para la web. Las licencias se indican en cada una.</p>
+          <p className="attraction-credits-note">Fotos de Wikimedia Commons, redimensionadas para la web, y fotos propias. El autor y la licencia se indican en cada una.</p>
         </section>
 
         <section aria-labelledby="climate-title" className="wrap section climate">

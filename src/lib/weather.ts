@@ -1,4 +1,5 @@
 import { climateSource, monthlyClimate, type MonthlyClimate } from "@/content/climate";
+import { typicalClimate } from "@/content/daily-climate";
 
 export type WeatherCondition = "clear" | "partly" | "cloudy" | "rain" | "sleet" | "snow";
 
@@ -81,25 +82,41 @@ export function parseMetForecast(response: MetResponse): DayForecast[] {
 
 /* ---------- Clima de una estadía (se usa en el navegador) ---------- */
 
+/** Clima típico de un día sin pronóstico todavía (promedio de años anteriores). */
+export type DayTypical = { date: string; max: number; min: number };
+
 export type StayWeather = {
-  /** Días de la estadía (de la llegada a la salida) que ya tienen pronóstico. */
+  /** Días de la estadía (de la llegada a la salida) que ya tienen pronóstico real. */
   forecast: DayForecast[];
-  /** Si hay días de la estadía todavía sin pronóstico. */
-  hasDaysWithoutForecast: boolean;
-  /** Clima habitual de los meses de la estadía (uno o dos). */
+  /** Los demás días de la estadía, con su clima típico. Cuando entran en el pronóstico, pasan solos a `forecast`. */
+  typical: DayTypical[];
+  /** Clima habitual de los meses de la estadía (uno o dos), para el consejo de qué traer. */
   months: MonthlyClimate[];
 };
 
+/** Días de la estadía, de la llegada a la salida inclusive. */
+function stayDays(arrival: string, departure: string) {
+  const result: string[] = [];
+  const day = new Date(`${arrival}T12:00:00Z`);
+  while (day.toISOString().slice(0, 10) <= departure && result.length < 60) {
+    result.push(day.toISOString().slice(0, 10));
+    day.setUTCDate(day.getUTCDate() + 1);
+  }
+  return result;
+}
+
 export function getStayWeather(arrival: string, departure: string, days: DayForecast[]): StayWeather {
-  const forecast = days.filter((day) => arrival <= day.date && day.date <= departure);
-  const lastForecast = days.at(-1)?.date ?? "";
+  const byDate = new Map(days.map((day) => [day.date, day]));
+  const forecast: DayForecast[] = [];
+  const typical: DayTypical[] = [];
+  for (const date of stayDays(arrival, departure)) {
+    const day = byDate.get(date);
+    if (day) forecast.push(day);
+    else typical.push({ date, ...typicalClimate(date) });
+  }
   const monthIndexes = [...new Set([arrival, departure].map((date) => Number(date.slice(5, 7)) - 1))];
 
-  return {
-    forecast,
-    hasDaysWithoutForecast: departure > lastForecast,
-    months: monthIndexes.map((index) => monthlyClimate[index]),
-  };
+  return { forecast, typical, months: monthIndexes.map((index) => monthlyClimate[index]) };
 }
 
 /** "2026-11-12" -> "jue 12" */

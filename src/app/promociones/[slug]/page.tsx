@@ -14,12 +14,7 @@ import "@/components/promotion-card.css";
 
 type PromotionPageProps = { params: Promise<{ slug: string }> };
 
-export const instant = false;
-
-// Las promociones se leen en cada visita. Cache Components exige igual un parámetro de referencia.
-export function generateStaticParams() {
-  return [{ slug: "sin-promociones" }];
-}
+// Las promociones se leen en cada visita (connection() las vuelve dinámicas).
 
 export async function generateMetadata({ params }: PromotionPageProps): Promise<Metadata> {
   const { slug } = await params;
