@@ -244,11 +244,11 @@ button { font: inherit; }
 .phone-action { grid-column: 2; grid-row: 1 / span 2; padding: 8px 16px; border-radius: 999px; background: var(--olive-dark); color: #fffdf7; font-size: 14px; font-weight: 700; }
 .phone-item.is-link { text-decoration: none; }
 /* En la computadora: clic para copiar el número. */
-.phone-item.is-copy { width: 100%; cursor: pointer; font: inherit; text-align: left; transition: border-color 160ms ease, background-color 160ms ease; }
-.phone-item.is-copy:hover { border-color: var(--olive); background: #f6f1e6; }
+.phone-list .phone-item.is-copy { width: 100%; justify-items: start; cursor: pointer; font: inherit; text-align: left; transition: border-color 160ms ease, background-color 160ms ease; }
+.phone-list .phone-item.is-copy:hover { border-color: var(--olive); background: #f6f1e6; }
+.phone-list .phone-item.is-copy:hover strong { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 .phone-item.is-copy:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 2px; }
-.phone-action.is-copy { background: transparent; color: var(--olive-dark); box-shadow: inset 0 0 0 1px var(--olive); }
-.phone-action.is-done { background: var(--olive); color: #fffdf7; }
+.phone-copied { grid-column: 2; grid-row: 1 / span 2; color: var(--olive); font-size: 14px; font-weight: 800; white-space: nowrap; }
 .phone-item.is-link:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 2px; }
 .site-footer { padding-bottom: 96px; }
 

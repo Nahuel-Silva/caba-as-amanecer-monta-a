@@ -78,12 +78,11 @@ export function PhoneFloat() {
                     <span className="phone-action">Llamar</span>
                   </a>
                 ) : (
-                  <button className="phone-item is-copy" onClick={(event) => copy(phone.display, event.currentTarget)} type="button">
+                  <button aria-label={`Copiar el número de ${phone.name || "teléfono"}: ${phone.display}`} className="phone-item is-copy" onClick={(event) => copy(phone.display, event.currentTarget)} title="Clic para copiar" type="button">
                     {phone.name && <span className="phone-name">{phone.name}</span>}
                     <strong>{phone.display}</strong>
-                    <span aria-live="polite" className={`phone-action ${copied === phone.display ? "is-done" : "is-copy"}`}>
-                      {copied === phone.display ? "¡Copiado!" : "Copiar"}
-                    </span>
+                    {/* Aviso que aparece solo después de copiar; no es un botón. */}
+                    <span aria-live="polite" className="phone-copied">{copied === phone.display ? "✓ ¡Copiado!" : ""}</span>
                   </button>
                 )}
               </li>
