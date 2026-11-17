@@ -5,12 +5,30 @@ import { phoneContacts } from "@/lib/phones";
 
 /**
  * Opción de llamada del menú de contacto. Abre una ventana con los teléfonos.
- * En el celular cada número llama al tocarlo; en la computadora queda solo como texto,
- * porque desde ahí no se puede llamar.
+ * En el celular cada número llama al tocarlo; en la computadora, como desde ahí no se puede llamar,
+ * hacer clic en un número lo copia y avisa "¡Copiado!".
  */
 export function PhoneFloat() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [canCall, setCanCall] = useState(false);
+  const [copied, setCopied] = useState("");
+  const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  async function copy(number: string, item: HTMLElement) {
+    try {
+      await navigator.clipboard.writeText(number);
+    } catch {
+      // Sin permiso para copiar: se deja el número seleccionado para copiarlo con Ctrl+C.
+      const range = document.createRange();
+      range.selectNodeContents(item.querySelector("strong") ?? item);
+      window.getSelection()?.removeAllRanges();
+      window.getSelection()?.addRange(range);
+      return;
+    }
+    setCopied(number);
+    if (copiedTimer.current) clearTimeout(copiedTimer.current);
+    copiedTimer.current = setTimeout(() => setCopied(""), 2500);
+  }
 
   useEffect(() => {
     // Celulares y tablets: pantalla táctil sin mouse.
@@ -49,7 +67,7 @@ export function PhoneFloat() {
             <h2 id="phone-dialog-title">Reservá por teléfono</h2>
             <button aria-label="Cerrar" className="phone-dialog-close" onClick={close} type="button">×</button>
           </div>
-          <p className="phone-dialog-intro">{canCall ? "Tocá un número para llamar." : "Llamanos desde tu celular a cualquiera de estos números."}</p>
+          <p className="phone-dialog-intro">{canCall ? "Tocá un número para llamar." : "Llamanos desde tu celular a cualquiera de estos números. Hacé clic en uno para copiarlo."}</p>
           <ul className="phone-list">
             {phoneContacts.map((phone) => (
               <li key={phone.href}>
@@ -60,10 +78,13 @@ export function PhoneFloat() {
                     <span className="phone-action">Llamar</span>
                   </a>
                 ) : (
-                  <div className="phone-item">
+                  <button className="phone-item is-copy" onClick={(event) => copy(phone.display, event.currentTarget)} type="button">
                     {phone.name && <span className="phone-name">{phone.name}</span>}
                     <strong>{phone.display}</strong>
-                  </div>
+                    <span aria-live="polite" className={`phone-action ${copied === phone.display ? "is-done" : "is-copy"}`}>
+                      {copied === phone.display ? "¡Copiado!" : "Copiar"}
+                    </span>
+                  </button>
                 )}
               </li>
             ))}
