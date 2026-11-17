@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { phoneContacts } from "@/lib/phones";
 
 /**
- * Botón fijo de llamada, al lado del de Instagram. Abre una ventana con los teléfonos.
+ * Opción de llamada del menú de contacto. Abre una ventana con los teléfonos.
  * En el celular cada número llama al tocarlo; en la computadora queda solo como texto,
  * porque desde ahí no se puede llamar.
  */
@@ -27,10 +27,13 @@ export function PhoneFloat() {
 
   return (
     <>
-      <button aria-haspopup="dialog" aria-label="Reservar por teléfono" className="phone-float" onClick={() => dialogRef.current?.showModal()} type="button">
+      <button aria-haspopup="dialog" aria-label="Reservar por teléfono" className="contact-option is-phone" onClick={() => dialogRef.current?.showModal()} type="button">
+        <span aria-hidden="true" className="contact-option-label">Llamar</span>
+        <span className="contact-option-icon">
         <svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2Z" />
         </svg>
+        </span>
       </button>
 
       <dialog

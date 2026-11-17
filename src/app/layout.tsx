@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito, Fraunces } from "next/font/google";
+import { ContactMenu } from "@/components/contact-menu";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import { SeasonalEffects } from "@/components/seasonal-effects";
 import { InstagramFloat } from "@/components/instagram-float";
@@ -51,9 +52,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SeasonalEffects />
         <div className="contact-floats">
           {showReservationForm && <ReservationDialog />}
-          <PhoneFloat />
-          <InstagramFloat />
-          <WhatsAppFloat />
+          <ContactMenu>
+            <WhatsAppFloat />
+            <InstagramFloat />
+            <PhoneFloat />
+          </ContactMenu>
         </div>
       </body>
     </html>
