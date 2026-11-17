@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useUi } from "@/i18n/locale-context";
 
 /**
  * Menú flotante de contacto, abajo a la derecha en todas las páginas: un solo botón que, al tocarlo,
@@ -8,6 +9,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
  * Se cierra con la X, tocando fuera del menú o con la tecla Escape.
  */
 export function ContactMenu({ children }: { children: ReactNode }) {
+  const t = useUi().contact;
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -43,7 +45,7 @@ export function ContactMenu({ children }: { children: ReactNode }) {
       <button
         aria-controls="contact-menu-list"
         aria-expanded={isOpen}
-        aria-label={isOpen ? "Cerrar el menú de contacto" : "Contactanos: WhatsApp, Instagram o teléfono"}
+        aria-label={isOpen ? t.close : t.open}
         className="contact-menu-toggle"
         onClick={() => setIsOpen((open) => !open)}
         ref={toggleRef}

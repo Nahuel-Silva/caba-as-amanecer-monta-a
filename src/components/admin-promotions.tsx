@@ -22,19 +22,29 @@ async function compressImage(file: File) {
   return canvas.toDataURL("image/jpeg", 0.82);
 }
 
-async function sendPromotion(body: Record<string, unknown>) {
+/** Guarda o cambia una promoción. Devuelve el error ("" si salió bien) y si quedó traducida. */
+async function postPromotion(body: Record<string, unknown>): Promise<{ error: string; translated?: boolean }> {
   try {
     const response = await fetch("/api/admin/promociones", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    const result = (await response.json()) as { error?: string };
-    return response.ok ? "" : (result.error ?? "No pudimos guardar el cambio. Probá de nuevo.");
+    const result = (await response.json()) as { error?: string; translated?: boolean };
+    return response.ok ? { error: "", translated: result.translated } : { error: result.error ?? "No pudimos guardar el cambio. Probá de nuevo." };
   } catch {
-    return "No hay conexión a internet. Revisá la conexión y probá de nuevo.";
+    return { error: "No hay conexión a internet. Revisá la conexión y probá de nuevo." };
   }
 }
+
+async function sendPromotion(body: Record<string, unknown>) {
+  return (await postPromotion(body)).error;
+}
+
+const translationNames = { pt: "Portugués", en: "Inglés" } as const;
+
+/** Campos en español que, si cambian, hacen que la traducción se rehaga sola al guardar. */
+const spanishFields = ["title", "description", "discount", "validity", "details", "conditions", "imageAlt"] as const;
 
 type Draft = { title: string; description: string; discount: string; validity: string; price: string; imageAlt: string };
 
@@ -65,7 +75,7 @@ function Hint({ children }: { children: string }) {
   return <small className="admin-hint">{children}</small>;
 }
 
-function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | null; onDone: () => void; onSaved: () => void }) {
+function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | null; onDone: () => void; onSaved: (translated: boolean) => void }) {
   const [preview, setPreview] = useState(promotion?.image?.src ?? "");
   const [newImage, setNewImage] = useState("");
   const [isRemoved, setIsRemoved] = useState(false);
@@ -116,8 +126,26 @@ function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const fields = Object.fromEntries(new FormData(event.currentTarget));
+    const read = (name: string) => String(fields[name] ?? "").trim();
+    // ¿Cambió algo del texto en español? Entonces las traducciones se rehacen solas.
+    const original: Record<(typeof spanishFields)[number], string> = {
+      title: promotion?.title ?? "",
+      description: promotion?.description ?? "",
+      discount: promotion?.discount ?? "",
+      validity: promotion?.validity ?? "",
+      details: promotion?.details.join("\n") ?? "",
+      conditions: promotion?.conditions ?? "",
+      imageAlt: promotion?.image?.alt ?? "",
+    };
+    const retranslate = spanishFields.some((name) => read(name).replace(/\s+/g, " ") !== original[name].trim().replace(/\s+/g, " "));
+    const translations = Object.fromEntries(
+      (["pt", "en"] as const).map((locale) => [
+        locale,
+        { title: read(`tr-${locale}-title`), description: read(`tr-${locale}-description`), details: read(`tr-${locale}-details`).split("\n") },
+      ]),
+    );
     setIsSaving(true);
-    const message = await sendPromotion({
+    const result = await postPromotion({
       ...fields,
       action: "save",
       id: promotion?.id,
@@ -125,10 +153,12 @@ function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | 
       price: readPrice(String(fields.price ?? "")),
       imageBase64: newImage.split(",")[1] ?? "",
       removeImage: isRemoved,
+      retranslate,
+      translations,
     });
     setIsSaving(false);
-    if (message) setError(message);
-    else onSaved();
+    if (result.error) setError(result.error);
+    else onSaved(Boolean(result.translated));
   }
 
   return (
@@ -200,10 +230,47 @@ function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | 
             <button className="admin-button is-secondary" onClick={removeImage} type="button">Quitar foto</button>
           </div>
         )}
+        <details className="admin-wide admin-translations">
+          <summary>Cómo se ve en portugués e inglés</summary>
+          {!promotion ? (
+            <p className="admin-hint">Al guardar, la promoción se traduce sola al portugués y al inglés. Después podés volver acá a ver cómo quedó.</p>
+          ) : (
+            <>
+              <p className="admin-hint">
+                Se traduce sola al guardar. Si cambiás el texto en español, la traducción se rehace sola. Si querés corregir una palabra de la
+                traducción, cambiala acá sin tocar el español.
+              </p>
+              {(["pt", "en"] as const).map((locale) => {
+                const texts = promotion.translations?.[locale];
+                return texts ? (
+                  <fieldset className="admin-translation" key={locale}>
+                    <legend>{translationNames[locale]}</legend>
+                    <label>
+                      Título
+                      <input defaultValue={texts.title} maxLength={90} name={`tr-${locale}-title`} type="text" />
+                    </label>
+                    <label>
+                      Descripción
+                      <textarea defaultValue={texts.description} maxLength={500} name={`tr-${locale}-description`} rows={3} />
+                    </label>
+                    <label>
+                      Qué incluye
+                      <textarea defaultValue={texts.details.join("\n")} name={`tr-${locale}-details`} rows={3} />
+                    </label>
+                  </fieldset>
+                ) : (
+                  <p className="admin-hint" key={locale}>
+                    Todavía no está traducida al {translationNames[locale].toLowerCase()}: en esa versión de la web se ve en español. Se traduce al guardar.
+                  </p>
+                );
+              })}
+            </>
+          )}
+        </details>
         {error && <p className="admin-error admin-wide" role="alert">{error}</p>}
         <div className="admin-actions admin-wide">
           <button className="admin-button is-primary" disabled={isSaving} type="submit">
-            {isSaving ? "Guardando…" : "Guardar promoción"}
+            {isSaving ? "Guardando y traduciendo…" : "Guardar promoción"}
           </button>
           <button className="admin-button is-secondary" onClick={onDone} type="button">Volver sin guardar</button>
         </div>
@@ -334,9 +401,13 @@ export function AdminPromotions({ promotions, noticeSummary, subscriberCount, ca
       <PromotionForm
         key={editing === "new" ? "new" : editing.id}
         onDone={() => setEditing(null)}
-        onSaved={() => {
+        onSaved={(translated) => {
           setEditing(null);
-          onNotice({ kind: "success", text: "Listo, la promoción quedó guardada." });
+          onNotice(
+            translated
+              ? { kind: "success", text: "Listo, la promoción quedó guardada y traducida al portugués y al inglés." }
+              : { kind: "success", text: "Listo, la promoción quedó guardada. No se pudo traducir: en portugués e inglés se ve en español hasta que la vuelvas a guardar." },
+          );
           void onChange();
         }}
         promotion={editing === "new" ? null : editing}
@@ -360,6 +431,11 @@ export function AdminPromotions({ promotions, noticeSummary, subscriberCount, ca
               <p>{[promotion.discount, promotion.validity, promotion.price && `Precio total: ${formatPesos(promotion.price)}`].filter(Boolean).join(" · ")}</p>
             )}
             {promotion.active && <p className="admin-meta">{noticeStatus(promotion)}</p>}
+            <p className="admin-meta">
+              {promotion.translations?.pt && promotion.translations.en
+                ? "Traducida al portugués y al inglés."
+                : "Sin traducir: en portugués e inglés se ve en español. Tocá Cambiar y Guardar para traducirla."}
+            </p>
             <div className="admin-actions">
               <button className="admin-button is-primary" onClick={() => setEditing(promotion)} type="button">Cambiar</button>
               {promotion.active && canEmailGuests && subscriberCount > 0 && (

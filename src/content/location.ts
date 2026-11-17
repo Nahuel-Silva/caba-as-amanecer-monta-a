@@ -44,3 +44,19 @@ export const attractionDistances: Distance[] = [
   { place: "Ranquil Norte", distance: "188 km" },
   { place: "Reserva La Payunia", distance: "210 km" },
 ];
+
+/** Nombres de la tabla que se traducen (los nombres propios de los lugares quedan igual). */
+export const distanceTranslations: Record<"pt" | "en", Record<string, string>> = {
+  pt: {
+    "Centro de Malargüe": "Centro de Malargüe",
+    "En la ciudad": "Na cidade",
+    "Paso Pehuenche (límite con Chile)": "Paso Pehuenche (fronteira com o Chile)",
+    "Grabados Rupestres": "Gravuras rupestres",
+  },
+  en: {
+    "Centro de Malargüe": "Malargüe town center",
+    "En la ciudad": "In town",
+    "Paso Pehuenche (límite con Chile)": "Paso Pehuenche (Chile border)",
+    "Grabados Rupestres": "Rock carvings (Agua Botada)",
+  },
+};

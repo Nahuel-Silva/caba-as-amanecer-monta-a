@@ -5,6 +5,7 @@ import { BabyToggle } from "@/components/baby-toggle";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { StayWeather } from "@/components/stay-weather";
 import { useAvailability } from "@/components/use-availability";
+import { useUi } from "@/i18n/locale-context";
 import { isStayAvailable, keepAvailableStay, type StaySelection } from "@/lib/availability";
 import { guestOptions, openReservationEvent, reservationSentEvent, type ReservationPrefill } from "@/lib/reservation";
 import "./booking-bar.css";
@@ -13,6 +14,7 @@ type CabinOption = { slug: string; name: string };
 
 /** Barra para elegir cabaña, fechas y personas. Abre el formulario de reserva con esos datos. */
 export function BookingBar({ cabins }: { cabins: CabinOption[] }) {
+  const t = useUi().booking;
   const availability = useAvailability();
   const [slug, setSlug] = useState(cabins[0].slug);
   const [stay, setStay] = useState<StaySelection>({ arrival: "", departure: "" });
@@ -48,11 +50,11 @@ export function BookingBar({ cabins }: { cabins: CabinOption[] }) {
 
   function openForm() {
     if (!stay.departure) {
-      setError("Elegí la fecha de llegada y la de salida.");
+      setError(t.errorDates);
       return;
     }
     if (!isStayAvailable(stay.arrival, stay.departure, bookings)) {
-      setError("Esas fechas ya no están disponibles. Elegí otras.");
+      setError(t.errorUnavailable);
       return;
     }
     const detail: ReservationPrefill = { cabin: cabin.name, ...stay, guests, hasBaby };
@@ -62,7 +64,7 @@ export function BookingBar({ cabins }: { cabins: CabinOption[] }) {
   return (
     <div className="booking-bar">
       <label className="booking-field">
-        Cabaña
+        {t.cabin}
         <select data-cabin onChange={(event) => changeCabin(event.target.value)} value={slug}>
           {cabins.map((option) => (
             <option key={option.slug} value={option.slug}>{option.name}</option>
@@ -71,25 +73,25 @@ export function BookingBar({ cabins }: { cabins: CabinOption[] }) {
       </label>
 
       <div className="booking-field booking-dates">
-        Fechas
+        {t.dates}
         {availability ? (
           <DateRangePicker
             bookings={bookings}
-            notice={availability.notice}
+            notice={availability.notice ? t.availabilityNotice : undefined}
             onChange={changeStay}
             today={availability.today}
             value={stay}
           />
         ) : (
-          <div className="booking-loading">Cargando…</div>
+          <div className="booking-loading">{t.loading}</div>
         )}
       </div>
 
       <label className="booking-field">
-        Personas
+        {t.guests}
         <select onChange={(event) => setGuests(event.target.value)} value={guests}>
           {guestOptions.map((option) => (
-            <option key={option} value={option}>{option === "5" ? "5 (con cama extra)" : option}</option>
+            <option key={option} value={option}>{t.guestOption(option)}</option>
           ))}
         </select>
       </label>
@@ -97,7 +99,7 @@ export function BookingBar({ cabins }: { cabins: CabinOption[] }) {
       <BabyToggle checked={hasBaby} onChange={setHasBaby} />
 
       <button className="button button-primary booking-submit" onClick={openForm} type="button">
-        Solicitar reserva
+        {t.submit}
       </button>
 
       {error && <p className="booking-error" role="alert">{error}</p>}

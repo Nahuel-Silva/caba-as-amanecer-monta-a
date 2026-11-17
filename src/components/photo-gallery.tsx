@@ -3,11 +3,14 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { usePanOnHover } from "@/components/use-pan-on-hover";
+import { useUi } from "@/i18n/locale-context";
 
 type GalleryImage = { src: string; alt: string; isDemo: boolean };
 
 /** Con panOnHover, la tira de fotos se desliza siguiendo el mouse. */
 export function PhotoGallery({ images, panOnHover = false }: { images: GalleryImage[]; panOnHover?: boolean }) {
+  const ui = useUi();
+  const t = ui.gallery;
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -69,7 +72,7 @@ export function PhotoGallery({ images, panOnHover = false }: { images: GalleryIm
       <div className="gallery-grid" onMouseMove={panOnHover ? followMouse : undefined}>
         {images.map((image, index) => (
           <button
-            aria-label={`Ampliar foto${image.isDemo ? " de demostración" : ""} ${index + 1}`}
+            aria-label={t.enlarge(index + 1, image.isDemo)}
             className="gallery-item"
             key={image.src}
             onClick={(event) => {
@@ -88,7 +91,7 @@ export function PhotoGallery({ images, panOnHover = false }: { images: GalleryIm
               />
               {image.isDemo && (
                 <span aria-hidden="true" className="demo-image-label">
-                  Foto de demostración
+                  {ui.demoPhoto}
                 </span>
               )}
             </span>
@@ -97,7 +100,7 @@ export function PhotoGallery({ images, panOnHover = false }: { images: GalleryIm
       </div>
       {activeIndex !== null && (
         <dialog
-          aria-label={`Galería${images[activeIndex].isDemo ? " de fotos de demostración" : " de fotos"}`}
+          aria-label={t.dialog(images[activeIndex].isDemo)}
           aria-modal="true"
           className="gallery-dialog"
           onClose={() => setActiveIndex(null)}
@@ -108,12 +111,12 @@ export function PhotoGallery({ images, panOnHover = false }: { images: GalleryIm
         >
           <div className="gallery-dialog-content">
             <button
-              aria-label="Cerrar galería"
+              aria-label={t.closeLabel}
               className="gallery-controls gallery-close"
               onClick={() => setActiveIndex(null)}
               type="button"
             >
-              Cerrar
+              {t.close}
             </button>
             <div className="gallery-dialog-image">
               <Image
@@ -126,13 +129,13 @@ export function PhotoGallery({ images, panOnHover = false }: { images: GalleryIm
             </div>
             <div className="gallery-controls">
               <button onClick={() => move(-1)} type="button">
-                Anterior
+                {t.previous}
               </button>
               <span>
-                Foto{images[activeIndex].isDemo ? " de demostración" : ""} {activeIndex + 1} de {images.length}
+                {t.counter(activeIndex + 1, images.length, images[activeIndex].isDemo)}
               </span>
               <button onClick={() => move(1)} type="button">
-                Siguiente
+                {t.next}
               </button>
             </div>
           </div>

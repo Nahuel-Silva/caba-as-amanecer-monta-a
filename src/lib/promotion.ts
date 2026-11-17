@@ -1,3 +1,17 @@
+/** Textos de una promoción que se traducen (el código y el precio no se traducen). */
+export type PromotionTexts = {
+  title: string;
+  description: string;
+  discount: string;
+  validity: string;
+  details: string[];
+  conditions: string;
+  imageAlt: string;
+};
+
+/** Traducciones de una promoción, hechas solas con DeepL al guardar (y corregibles desde el panel). */
+export type PromotionTranslations = Partial<Record<"pt" | "en", PromotionTexts>>;
+
 export type Promotion = {
   id: number;
   /** Parte final de la dirección, creada a partir del título. No cambia al editar. */
@@ -20,6 +34,8 @@ export type Promotion = {
   image?: { src: string; alt: string };
   /** Con false, la promoción deja de mostrarse sin borrarla. */
   active: boolean;
+  /** Solo en el panel: las traducciones guardadas. */
+  translations?: PromotionTranslations;
 };
 
 export type PromotionFields = {
@@ -42,6 +58,35 @@ export function slugify(title: string) {
 
 function text(value: unknown, limit: number) {
   return typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, limit) : "";
+}
+
+/** Textos en español de una promoción, en el formato de las traducciones. */
+export function spanishTexts(fields: PromotionFields): PromotionTexts {
+  return {
+    title: fields.title,
+    description: fields.description,
+    discount: fields.discount,
+    validity: fields.validity,
+    details: fields.details,
+    conditions: fields.conditions,
+    imageAlt: fields.imageAlt,
+  };
+}
+
+/** Lee las traducciones enviadas desde el panel (solo título, descripción y qué incluye se editan a mano). */
+export function readTranslationEdits(value: unknown): Partial<Record<"pt" | "en", Pick<PromotionTexts, "title" | "description" | "details">>> {
+  const result: Partial<Record<"pt" | "en", Pick<PromotionTexts, "title" | "description" | "details">>> = {};
+  if (typeof value !== "object" || value === null) return result;
+  for (const locale of ["pt", "en"] as const) {
+    const entry = (value as Record<string, unknown>)[locale];
+    if (typeof entry !== "object" || entry === null) continue;
+    const fields = entry as Record<string, unknown>;
+    const details = Array.isArray(fields.details) ? fields.details.map((item) => text(item, 120)).filter(Boolean).slice(0, 10) : [];
+    const title = text(fields.title, 90);
+    const description = text(fields.description, 500);
+    if (title && description) result[locale] = { title, description, details };
+  }
+  return result;
 }
 
 /** Valida los datos del panel. */

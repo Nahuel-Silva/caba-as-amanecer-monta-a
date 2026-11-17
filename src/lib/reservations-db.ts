@@ -1,4 +1,5 @@
 import type { Booking } from "@/lib/availability";
+import { isLocale, type Locale } from "@/i18n/config";
 import { getDatabase } from "@/lib/db";
 import { manualBlockName, type ReservationRequest } from "@/lib/reservation";
 
@@ -33,6 +34,10 @@ export type ReservationRecord = {
   deposit: number | null;
   /** Cuándo se le mandó al huésped el mensaje de la seña (vacío si todavía no). */
   depositSentAt: string;
+  /** Idioma de la página desde la que pidió la reserva: los mensajes para el huésped se mandan en ese idioma. */
+  locale: Locale;
+  /** Su mensaje traducido al español (vacío si escribió en español o no se pudo traducir). */
+  messageEs: string;
 };
 
 /** Solo devuelve fechas: el calendario público nunca recibe datos de los huéspedes. */
@@ -56,22 +61,27 @@ export async function getOccupiedStays(today: string) {
  * no tomen las mismas noches a la vez. Devuelve false si ya están ocupadas.
  * Lo que parece spam queda como rechazado: no ocupa fechas, pero se puede rescatar desde el panel.
  */
-export async function createReservation(cabinSlug: string, reservation: ReservationRequest, looksLikeSpam = false) {
+export async function createReservation(
+  cabinSlug: string,
+  reservation: ReservationRequest,
+  looksLikeSpam = false,
+  extra: { locale: Locale; messageEs: string } = { locale: "es", messageEs: "" },
+) {
   const { name, email, phone, arrival, departure, guests, hasBaby, message } = reservation;
-  const values = [cabinSlug, name, email, phone, arrival, departure, guests, hasBaby ? 1 : 0, message];
+  const values = [cabinSlug, name, email, phone, arrival, departure, guests, hasBaby ? 1 : 0, message, extra.locale, extra.messageEs];
   const database = await getDatabase();
 
   if (looksLikeSpam) {
     await database.execute({
-      sql: "INSERT INTO reservations (cabin_slug, name, email, phone, arrival, departure, guests, has_baby, message, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'rejected')",
+      sql: "INSERT INTO reservations (cabin_slug, name, email, phone, arrival, departure, guests, has_baby, message, locale, message_es, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'rejected')",
       args: values,
     });
     return true;
   }
 
   const { rowsAffected } = await database.execute({
-    sql: `INSERT INTO reservations (cabin_slug, name, email, phone, arrival, departure, guests, has_baby, message)
-      SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
+    sql: `INSERT INTO reservations (cabin_slug, name, email, phone, arrival, departure, guests, has_baby, message, locale, message_es)
+      SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
       WHERE NOT EXISTS (
         SELECT 1 FROM reservations
         WHERE ${occupiesDates("reservations")} AND cabin_slug = ? AND arrival < ? AND ? < departure
@@ -106,6 +116,8 @@ export async function listReservations(): Promise<ReservationRecord[]> {
     priceTotal: row.price_total === null || row.price_total === undefined ? null : Number(row.price_total),
     deposit: row.deposit === null || row.deposit === undefined ? null : Number(row.deposit),
     depositSentAt: String(row.deposit_sent_at ?? ""),
+    locale: isLocale(row.locale) ? row.locale : "es",
+    messageEs: String(row.message_es ?? ""),
   }));
 }
 

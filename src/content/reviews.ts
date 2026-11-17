@@ -4,6 +4,7 @@ export type Review = {
   quote: string;
   /** Nombre abreviado del huésped, para no publicar su apellido completo. */
   author: string;
+  /** Mes de la opinión, AAAA-MM. Se muestra como "enero de 2026" en el idioma de la página. */
   date: string;
   /** Puntaje sobre 5. */
   rating: number;
@@ -24,8 +25,8 @@ const bookingUrl = "https://www.booking.com/hotel/ar/cabanas-amanecer-de-montana
 /** Ficha de las cabañas en Google (identificador fijo de Google, no cambia aunque cambie el nombre). */
 const googleUrl = "https://www.google.com/search?kgmid=/g/11t26z4ps_";
 
-/** Fecha en la que se consultaron los puntajes. Actualizala cuando los revises. */
-export const ratingsCheckedAt = "noviembre de 2026";
+/** Mes en que se consultaron los puntajes (AAAA-MM). Actualizalo cuando los revises. */
+export const ratingsCheckedAt = "2026-11";
 
 // Cargar solo opiniones reales, copiadas tal cual y con su fuente. Nunca inventar ni modificar reseñas.
 export const ratingSummaries: RatingSummary[] = [
@@ -39,7 +40,7 @@ export const reviews: Review[] = [
     title: "La ubicación es excelente",
     quote: "El lugar es increíble, una paz que no se puede describir!",
     author: "Walter D.",
-    date: "enero de 2026",
+    date: "2026-01",
     rating: 5,
     sourceName: "Welcome Argentina",
     sourceUrl: welcomeArgentinaUrl,
@@ -48,7 +49,7 @@ export const reviews: Review[] = [
     title: "Excelente alojamiento!",
     quote: "Las cabañas son espaciosas y están muy bien equipadas.",
     author: "Diego D.",
-    date: "enero de 2026",
+    date: "2026-01",
     rating: 5,
     sourceName: "Welcome Argentina",
     sourceUrl: welcomeArgentinaUrl,
@@ -57,7 +58,7 @@ export const reviews: Review[] = [
     title: "Excelente lugar para descansar",
     quote: "Las cabañas muy bien equipadas y amplias.",
     author: "Heraldo B.",
-    date: "marzo de 2025",
+    date: "2025-03",
     rating: 5,
     sourceName: "Welcome Argentina",
     sourceUrl: welcomeArgentinaUrl,

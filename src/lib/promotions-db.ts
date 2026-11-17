@@ -1,53 +1,80 @@
 import { getDatabase, isDatabaseConfigured, type DbRow } from "@/lib/db";
-import { slugify, type Promotion, type PromotionFields } from "@/lib/promotion";
+import type { Locale } from "@/i18n/config";
+import { slugify, type Promotion, type PromotionFields, type PromotionTranslations } from "@/lib/promotion";
 
-const columns = "id, slug, title, description, discount, validity, price, details, conditions, code, image_alt, active, updated_at, image_data IS NOT NULL AS has_image";
+const columns =
+  "id, slug, title, description, discount, validity, price, details, conditions, code, image_alt, active, updated_at, translations, image_data IS NOT NULL AS has_image";
 
-function toPromotion(row: DbRow): Promotion {
+function readTranslations(value: unknown): PromotionTranslations {
+  try {
+    return JSON.parse(String(value ?? "{}")) as PromotionTranslations;
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Arma la promoción en el idioma pedido. Si todavía no está traducida (por ejemplo, porque DeepL no respondió),
+ * se muestra en español. En el panel (withTranslations) se devuelve en español con sus traducciones aparte.
+ */
+function toPromotion(row: DbRow, locale: Locale = "es", withTranslations = false): Promotion {
   const id = Number(row.id);
-  const alt = String(row.image_alt);
+  const translations = readTranslations(row.translations);
+  const translated = locale === "es" ? undefined : translations[locale];
+  const pick = (spanish: string, other: string | undefined) => (translated && other !== undefined ? other : spanish);
 
   return {
     id,
     slug: String(row.slug),
-    title: String(row.title),
-    description: String(row.description),
-    discount: String(row.discount) || undefined,
-    validity: String(row.validity) || undefined,
+    title: pick(String(row.title), translated?.title),
+    description: pick(String(row.description), translated?.description),
+    discount: pick(String(row.discount), translated?.discount) || undefined,
+    validity: pick(String(row.validity), translated?.validity) || undefined,
     price: row.price === null || row.price === undefined ? undefined : Number(row.price),
-    details: JSON.parse(String(row.details)) as string[],
-    conditions: String(row.conditions) || undefined,
+    details: translated?.details ?? (JSON.parse(String(row.details)) as string[]),
+    conditions: pick(String(row.conditions), translated?.conditions) || undefined,
     code: String(row.code) || undefined,
-    image: row.has_image ? { src: `/api/promociones/${id}/imagen?v=${encodeURIComponent(String(row.updated_at))}`, alt } : undefined,
+    image: row.has_image
+      ? { src: `/api/promociones/${id}/imagen?v=${encodeURIComponent(String(row.updated_at))}`, alt: pick(String(row.image_alt), translated?.imageAlt) }
+      : undefined,
     active: Number(row.active) === 1,
+    ...(withTranslations ? { translations } : {}),
   };
 }
 
+/** Todas las promociones, para el panel: en español y con sus traducciones. */
 export async function listPromotions(): Promise<Promotion[]> {
   const database = await getDatabase();
   const { rows } = await database.execute(`SELECT ${columns} FROM promotions ORDER BY active DESC, id DESC`);
-  return rows.map(toPromotion);
+  return rows.map((row) => toPromotion(row, "es", true));
 }
 
-/** Promociones visibles en la web. Si la base falla, la página muestra que no hay promociones activas. */
-export async function listActivePromotions(): Promise<Promotion[]> {
+/** Una promoción en un idioma, para el aviso por mail a quienes se anotaron en ese idioma. */
+export async function getPromotionIn(id: number, locale: Locale) {
+  const database = await getDatabase();
+  const { rows } = await database.execute({ sql: `SELECT ${columns} FROM promotions WHERE id = ?`, args: [id] });
+  return rows[0] ? toPromotion(rows[0], locale) : undefined;
+}
+
+/** Promociones visibles en la web, en el idioma pedido. Si la base falla, la página muestra que no hay promociones activas. */
+export async function listActivePromotions(locale: Locale = "es"): Promise<Promotion[]> {
   if (!isDatabaseConfigured) return [];
   try {
     const database = await getDatabase();
     const { rows } = await database.execute(`SELECT ${columns} FROM promotions WHERE active = 1 ORDER BY id DESC`);
-    return rows.map(toPromotion);
+    return rows.map((row) => toPromotion(row, locale));
   } catch (error) {
     console.error("No se pudieron leer las promociones", error);
     return [];
   }
 }
 
-export async function getActivePromotion(slug: string): Promise<Promotion | undefined> {
+export async function getActivePromotion(slug: string, locale: Locale = "es"): Promise<Promotion | undefined> {
   if (!isDatabaseConfigured) return undefined;
   try {
     const database = await getDatabase();
     const { rows } = await database.execute({ sql: `SELECT ${columns} FROM promotions WHERE slug = ? AND active = 1`, args: [slug] });
-    return rows[0] ? toPromotion(rows[0]) : undefined;
+    return rows[0] ? toPromotion(rows[0], locale) : undefined;
   } catch (error) {
     console.error("No se pudo leer la promoción", error);
     return undefined;
@@ -76,11 +103,11 @@ async function uniqueSlug(title: string) {
   return `${base}-${suffix}`;
 }
 
-export async function createPromotion(fields: PromotionFields, image: Buffer | null) {
+export async function createPromotion(fields: PromotionFields, image: Buffer | null, translations: PromotionTranslations = {}) {
   const database = await getDatabase();
   await database.execute({
-    sql: `INSERT INTO promotions (slug, title, description, discount, validity, price, details, conditions, code, image_data, image_alt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO promotions (slug, title, description, discount, validity, price, details, conditions, code, image_data, image_alt, translations)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     args: [
       await uniqueSlug(fields.title),
       fields.title,
@@ -93,15 +120,16 @@ export async function createPromotion(fields: PromotionFields, image: Buffer | n
       fields.code,
       image,
       fields.imageAlt,
+      JSON.stringify(translations),
     ],
   });
 }
 
 /** Actualiza los textos. La foto solo cambia si llega una nueva o si se pide quitarla. */
-export async function updatePromotion(id: number, fields: PromotionFields, image: Buffer | null, removeImage: boolean) {
+export async function updatePromotion(id: number, fields: PromotionFields, image: Buffer | null, removeImage: boolean, translations: PromotionTranslations = {}) {
   const database = await getDatabase();
   const { rowsAffected } = await database.execute({
-    sql: `UPDATE promotions SET title = ?, description = ?, discount = ?, validity = ?, price = ?, details = ?, conditions = ?, code = ?, image_alt = ?,
+    sql: `UPDATE promotions SET title = ?, description = ?, discount = ?, validity = ?, price = ?, details = ?, conditions = ?, code = ?, image_alt = ?, translations = ?,
         image_data = CASE WHEN ? = 1 THEN NULL WHEN ? IS NOT NULL THEN ? ELSE image_data END,
         updated_at = datetime('now')
       WHERE id = ?`,
@@ -115,6 +143,7 @@ export async function updatePromotion(id: number, fields: PromotionFields, image
       fields.conditions,
       fields.code,
       fields.imageAlt,
+      JSON.stringify(translations),
       removeImage ? 1 : 0,
       image,
       image,

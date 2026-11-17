@@ -38,14 +38,14 @@ export async function createReview({ author, rating, title, quote }: NewReview, 
 export async function listApprovedReviews(): Promise<Review[]> {
   const database = await getDatabase();
   const { rows } = await database.execute("SELECT * FROM reviews WHERE status = 'approved' ORDER BY created_at DESC LIMIT 30");
-  const format = new Intl.DateTimeFormat("es-AR", { month: "long", year: "numeric", timeZone: "UTC" });
 
   return rows.map((row) => ({
     author: String(row.author),
     title: String(row.title),
     quote: String(row.quote),
     rating: Number(row.rating),
-    date: format.format(new Date(`${String(row.created_at).replace(" ", "T")}Z`)),
+    // Mes AAAA-MM: la web lo muestra en el idioma de la página.
+    date: String(row.created_at).slice(0, 7),
     sourceName: "Reseña de esta web",
   }));
 }

@@ -3,9 +3,12 @@
 import { useState, type FormEvent } from "react";
 import { StayWeather } from "@/components/stay-weather";
 import Link from "next/link";
-import { countNights, formatDay } from "@/lib/availability";
+import { localizePath } from "@/i18n/config";
+import { formatDay } from "@/i18n/format";
+import { useLocale, useUi } from "@/i18n/locale-context";
+import { countNights } from "@/lib/availability";
 import type { ReservationPrefill } from "@/lib/reservation";
-import { conditionsPath, reservationConsentLabel } from "@/lib/subscribers";
+import { conditionsPath } from "@/lib/subscribers";
 import "./reservation-form.css";
 import "./promo-subscribe.css";
 
@@ -17,13 +20,11 @@ type ReservationFormProps = {
   onSent: () => void;
 };
 
-function guestsLabel(guests: string) {
-  if (guests === "5") return "5 personas (con cama extra)";
-  return `${guests} ${guests === "1" ? "persona" : "personas"}`;
-}
-
 /** Pide los datos de contacto para la estadía elegida en la barra. El servidor bloquea las fechas por 24 horas. */
 export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProps) {
+  const locale = useLocale();
+  const ui = useUi();
+  const t = ui.reservation;
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [failure, setFailure] = useState<{ message: string; prefill: ReservationPrefill } | null>(null);
@@ -42,7 +43,7 @@ export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProp
       const response = await fetch("/api/reservas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, wantsPromotions: fields.wantsPromotions === "on", ...prefill }),
+        body: JSON.stringify({ ...fields, wantsPromotions: fields.wantsPromotions === "on", ...prefill, locale }),
       });
       const result: { ok: boolean; error?: string } = await response.json();
 
@@ -50,10 +51,10 @@ export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProp
         setIsSent(true);
         onSent();
       } else {
-        setFailure({ message: result.error ?? "No pudimos enviar tu solicitud.", prefill });
+        setFailure({ message: result.error ?? t.errorFallback, prefill });
       }
     } catch {
-      setFailure({ message: "No pudimos enviar tu solicitud. Revisá tu conexión o escribinos por WhatsApp.", prefill });
+      setFailure({ message: t.errorConnection, prefill });
     } finally {
       setIsSending(false);
     }
@@ -62,8 +63,8 @@ export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProp
   if (isSent) {
     return (
       <div className="reservation-sent" role="status">
-        <h3>¡Recibimos tu solicitud!</h3>
-        <p>Bloqueamos tus fechas por 24 horas. Te vamos a responder con la tarifa, y la reserva queda confirmada con el pago de la seña.</p>
+        <h3>{t.sentTitle}</h3>
+        <p>{t.sentText}</p>
       </div>
     );
   }
@@ -73,36 +74,36 @@ export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProp
       <div className="reservation-summary reservation-wide">
         <div>
           <strong>{prefill.cabin}</strong>
-          <p>{formatDay(prefill.arrival)} → {formatDay(prefill.departure)} · {nights} {nights === 1 ? "noche" : "noches"}</p>
-          <p>{guestsLabel(prefill.guests)}{prefill.hasBaby && " · Con bebé"}</p>
+          <p>{formatDay(prefill.arrival, locale)} → {formatDay(prefill.departure, locale)} · {ui.calendar.nights(nights)}</p>
+          <p>{t.guests(prefill.guests)}{prefill.hasBaby && t.withBaby}</p>
         </div>
-        <button className="reservation-summary-edit" onClick={onEdit} type="button">Cambiar</button>
+        <button className="reservation-summary-edit" onClick={onEdit} type="button">{t.change}</button>
       </div>
       <div className="reservation-wide">
         <StayWeather arrival={prefill.arrival} departure={prefill.departure} />
       </div>
       <label className="reservation-wide">
-        Nombre y apellido
+        {t.name}
         <input autoComplete="name" maxLength={80} name="name" required type="text" />
       </label>
       <label>
-        Email
+        {t.email}
         <input autoComplete="email" maxLength={120} name="email" required type="email" />
       </label>
       <label>
-        Teléfono
+        {t.phone}
         <input autoComplete="tel" maxLength={30} name="phone" required type="tel" />
       </label>
       <label className="reservation-wide">
-        Mensaje (opcional)
+        {t.message}
         <textarea maxLength={1000} name="message" rows={3} />
       </label>
       {/* Opcional y sin marcar: no hace falta para reservar. */}
       <label className="reservation-wide reservation-consent">
         <input name="wantsPromotions" type="checkbox" />
         <span>
-          {reservationConsentLabel} (Opcional.){" "}
-          <Link href={conditionsPath} target="_blank">Condiciones</Link>
+          {t.consent} {t.optional}{" "}
+          <Link href={localizePath(locale, conditionsPath)} target="_blank">{t.conditions}</Link>
         </span>
       </label>
 
@@ -125,9 +126,9 @@ export function ReservationForm({ prefill, onEdit, onSent }: ReservationFormProp
 
       <div className="reservation-actions reservation-wide">
         <button className="button button-primary" disabled={isSending} type="submit">
-          {isSending ? "Enviando…" : "Solicitar reserva"}
+          {isSending ? t.sending : t.submit}
         </button>
-        <small>Usamos tus datos solo para responder esta solicitud (y para las promociones, si marcaste la casilla). Las fechas se bloquean por 24 horas y se liberan si no se confirma.</small>
+        <small>{t.note}</small>
       </div>
     </form>
   );

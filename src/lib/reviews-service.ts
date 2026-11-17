@@ -1,6 +1,6 @@
 import type { Review } from "@/content/reviews";
 
-export type ReviewForm = { author: string; rating: number; title: string; quote: string; consent: boolean; hp_token: string };
+export type ReviewForm = { author: string; rating: number; title: string; quote: string; consent: boolean; hp_token: string; locale: string };
 
 /** Envía una reseña. Se publica sola, salvo que tenga insultos o enlaces. */
 export async function submitReview(review: ReviewForm): Promise<{ ok: boolean; published?: boolean; error?: string }> {
@@ -12,7 +12,7 @@ export async function submitReview(review: ReviewForm): Promise<{ ok: boolean; p
     });
     return (await response.json()) as { ok: boolean; published?: boolean; error?: string };
   } catch {
-    return { ok: false, error: "No pudimos enviar tu reseña. Revisá tu conexión y probá de nuevo." };
+    return { ok: false };
   }
 }
 

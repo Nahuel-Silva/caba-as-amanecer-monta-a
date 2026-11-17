@@ -1,0 +1,23 @@
+/* Selector de idioma, a la derecha del menú. En el celular queda junto al logo y el menú pasa a la segunda fila. */
+.header-end { display: flex; align-items: center; gap: 28px; }
+.language-switcher { display: flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+.language-switcher a { display: inline-flex; min-height: 30px; align-items: center; gap: 6px; padding: 0 10px 0 7px; border-radius: 999px; color: var(--muted); }
+.flag-icon { width: 18px; height: 12px; flex: none; border-radius: 2px; box-shadow: 0 0 0 1px rgb(0 0 0 / 12%); }
+.language-switcher a:hover { color: var(--ink); }
+.language-switcher a[aria-current="true"] { background: var(--olive-dark); color: #fffdf7; }
+.language-switcher a:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+
+/* Sugerencia de idioma según el navegador: una tarjeta chica abajo a la izquierda, lejos del menú de contacto. */
+.language-suggestion { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: max(20px, env(safe-area-inset-left)); z-index: 16; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; max-width: min(420px, calc(100vw - 120px)); padding: 14px 44px 14px 18px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbf8f1; box-shadow: 0 10px 30px rgb(0 0 0 / 18%); }
+.language-suggestion p { margin: 0; font-size: 14px; font-weight: 700; }
+.language-suggestion .button { min-height: 40px; padding-inline: 16px; }
+.language-suggestion-close { position: absolute; top: 8px; right: 8px; display: grid; width: 30px; height: 30px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgb(182 111 81 / 12%); color: var(--ink); cursor: pointer; font-size: 20px; line-height: 1; }
+.language-suggestion-close:focus-visible { outline: 2px solid var(--olive-dark); outline-offset: 2px; }
+
+@media (max-width: 760px) {
+  .language-switcher a { gap: 4px; padding: 0 7px 0 5px; }
+  .flag-icon { width: 16px; height: 11px; }
+  .site-header .header-end { display: contents; }
+  .site-header .language-switcher { order: 2; }
+  .language-suggestion { right: 96px; max-width: none; }
+}

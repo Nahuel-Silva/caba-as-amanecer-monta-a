@@ -1,7 +1,11 @@
 import { isAdminSession } from "@/lib/admin-auth";
 import { getCabins } from "@/lib/cabins";
-import { confirmationMessage, depositMessage, type GuestMessageData } from "@/lib/guest-messages";
-import { listPromotions } from "@/lib/promotions-db";
+import { isLocale } from "@/i18n/config";
+import { confirmationMessage, depositMessage, guestEmailSubject, type GuestMessageData } from "@/lib/guest-messages";
+import { isTranslationConfigured, translateText } from "@/lib/translate";
+import type { Locale } from "@/i18n/config";
+import type { Promotion } from "@/lib/promotion";
+import { getPromotionIn, listPromotions } from "@/lib/promotions-db";
 import { publicBaseUrl, promotionNoticeEmail } from "@/lib/promotion-notice";
 import { canEmailGuests, EmailError, sendBulkEmails, sendGuestEmail } from "@/lib/reservation-email";
 import { blockDates, confirmReservation, getReservation, listReservations, rejectReservation, saveDepositInfo, type ReservationRecord } from "@/lib/reservations-db";
@@ -9,7 +13,6 @@ import { isSameOrigin } from "@/lib/request-guard";
 import { listReviews, setReviewStatus } from "@/lib/reviews-db";
 import { getSettings, saveSetting } from "@/lib/settings-db";
 import { countPendingNotices, getNoticeSummary, listSubscribers, recordNotices, removeSubscriber, subscribersToNotify } from "@/lib/subscribers-db";
-import { site } from "@/content/site";
 
 const respond = (status: number, body: Record<string, unknown>) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
@@ -39,9 +42,15 @@ type AdminAction =
   | {
       action: "confirm-reservation" | "reject-reservation" | "approve-review" | "reject-review" | "send-confirmation" | "notify-promotion" | "remove-subscriber";
       id: number;
+      /** Texto final del mensaje al huésped (confirmación), revisado en el panel. */
+      message?: unknown;
     }
-  | { action: "send-deposit"; id: number; total?: unknown; deposit?: unknown; paymentDetails?: unknown }
+  | { action: "send-deposit"; id: number; total?: unknown; deposit?: unknown; paymentDetails?: unknown; message?: unknown }
+  | { action: "translate"; text?: unknown; to?: unknown }
   | { action: "block-dates"; cabinSlug: string; arrival: string; departure: string; name?: unknown; phone?: unknown; guests?: unknown };
+
+/** Mensaje escrito o corregido en el panel (hasta 4.000 caracteres). null si no se mandó. */
+const customMessage = (value: unknown) => (typeof value === "string" && value.trim() ? value.trim().slice(0, 4000) : null);
 
 /** Texto opcional, limpio y recortado. */
 const optionalText = (value: unknown, limit: number) => (typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, limit) : "");
@@ -99,8 +108,13 @@ async function notifyPromotion(id: number, request: Request) {
   if (recipients.length === 0) return respond(200, { ok: true, sent: 0, remaining: 0 });
 
   const baseUrl = publicBaseUrl(request);
+  // Cada persona recibe la promoción en el idioma en que se anotó (si no está traducida, va en español).
+  const byLocale = new Map<Locale, Promotion>();
+  for (const locale of new Set(recipients.map((person) => person.locale))) {
+    byLocale.set(locale, locale === "es" ? promotion : ((await getPromotionIn(id, locale)) ?? promotion));
+  }
   try {
-    await sendBulkEmails(recipients.map((person) => promotionNoticeEmail(promotion, baseUrl, person.email, person.token)));
+    await sendBulkEmails(recipients.map((person) => promotionNoticeEmail(byLocale.get(person.locale) ?? promotion, baseUrl, person.email, person.token, person.locale)));
   } catch (error) {
     console.error("No se pudo enviar el aviso de la promoción", error);
     const reason =
@@ -121,6 +135,15 @@ export async function POST(request: Request) {
   if (!input) return respond(400, { error: "Datos inválidos." });
 
   try {
+    // Traducción del mensaje que el propietario está escribiendo, para ver cómo lo va a recibir el huésped.
+    if (input.action === "translate") {
+      const text = typeof input.text === "string" ? input.text.slice(0, 4000) : "";
+      if (!text.trim() || !isLocale(input.to) || input.to === "es") return respond(400, { error: "Datos inválidos." });
+      if (!isTranslationConfigured) return respond(503, { error: "Falta configurar la traducción automática (DeepL)." });
+      const translated = await translateText(text, input.to);
+      return translated === null ? respond(502, { error: "No se pudo traducir. Probá de nuevo." }) : respond(200, { ok: true, text: translated });
+    }
+
     if (input.action === "block-dates") {
       const { cabinSlug, arrival, departure } = input;
       const isValidDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
@@ -154,14 +177,17 @@ export async function POST(request: Request) {
       if (!(await saveDepositInfo(input.id, total, deposit))) return respond(404, { error: "No encontramos ese pedido." });
       await saveSetting("paymentDetails", paymentDetails);
       const item = (await getReservation(input.id))!;
-      const result = await emailGuest(item, `Tarifa y seña para tu reserva en ${site.name}`, depositMessage(messageData(item, paymentDetails)));
+      // El panel manda el texto final (revisado o corregido); si no llega, se arma en el idioma del huésped.
+      const text = customMessage(input.message) ?? depositMessage(messageData(item, paymentDetails), item.locale);
+      const result = await emailGuest(item, guestEmailSubject("deposit", item.locale), text);
       return respond(200, { ok: true, ...result });
     }
 
     if (input.action === "send-confirmation") {
       const item = await getReservation(input.id);
       if (!item || item.status !== "confirmed") return respond(404, { error: "No encontramos esa reserva confirmada." });
-      const result = await emailGuest(item, `Tu reserva en ${site.name} está confirmada`, confirmationMessage(messageData(item)));
+      const text = customMessage(input.message) ?? confirmationMessage(messageData(item), item.locale);
+      const result = await emailGuest(item, guestEmailSubject("confirmation", item.locale), text);
       return respond(200, { ok: true, ...result });
     }
 

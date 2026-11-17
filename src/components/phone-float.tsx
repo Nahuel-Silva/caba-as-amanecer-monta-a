@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useUi } from "@/i18n/locale-context";
 import { phoneContacts } from "@/lib/phones";
 
 /**
@@ -10,6 +11,7 @@ import { phoneContacts } from "@/lib/phones";
  */
 export function PhoneFloat() {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const t = useUi().contact;
   const [canCall, setCanCall] = useState(false);
   const [copied, setCopied] = useState("");
   const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -45,8 +47,8 @@ export function PhoneFloat() {
 
   return (
     <>
-      <button aria-haspopup="dialog" aria-label="Reservar por teléfono" className="contact-option is-phone" onClick={() => dialogRef.current?.showModal()} type="button">
-        <span aria-hidden="true" className="contact-option-label">Llamar</span>
+      <button aria-haspopup="dialog" aria-label={t.callLabel} className="contact-option is-phone" onClick={() => dialogRef.current?.showModal()} type="button">
+        <span aria-hidden="true" className="contact-option-label">{t.call}</span>
         <span className="contact-option-icon">
         <svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2Z" />
@@ -64,10 +66,10 @@ export function PhoneFloat() {
       >
         <div className="phone-dialog-content">
           <div className="phone-dialog-header">
-            <h2 id="phone-dialog-title">Reservá por teléfono</h2>
-            <button aria-label="Cerrar" className="phone-dialog-close" onClick={close} type="button">×</button>
+            <h2 id="phone-dialog-title">{t.phoneTitle}</h2>
+            <button aria-label={t.phoneClose} className="phone-dialog-close" onClick={close} type="button">×</button>
           </div>
-          <p className="phone-dialog-intro">{canCall ? "Tocá un número para llamar." : "Llamanos desde tu celular a cualquiera de estos números. Hacé clic en uno para copiarlo."}</p>
+          <p className="phone-dialog-intro">{canCall ? t.phoneIntroCall : t.phoneIntroCopy}</p>
           <ul className="phone-list">
             {phoneContacts.map((phone) => (
               <li key={phone.href}>
@@ -75,14 +77,14 @@ export function PhoneFloat() {
                   <a className="phone-item is-link" href={phone.href}>
                     {phone.name && <span className="phone-name">{phone.name}</span>}
                     <strong>{phone.display}</strong>
-                    <span className="phone-action">Llamar</span>
+                    <span className="phone-action">{t.call}</span>
                   </a>
                 ) : (
-                  <button aria-label={`Copiar el número de ${phone.name || "teléfono"}: ${phone.display}`} className="phone-item is-copy" onClick={(event) => copy(phone.display, event.currentTarget)} title="Clic para copiar" type="button">
+                  <button aria-label={t.phoneCopyLabel(phone.name, phone.display)} className="phone-item is-copy" onClick={(event) => copy(phone.display, event.currentTarget)} title={t.phoneCopyHint} type="button">
                     {phone.name && <span className="phone-name">{phone.name}</span>}
                     <strong>{phone.display}</strong>
                     {/* Aviso que aparece solo después de copiar; no es un botón. */}
-                    <span aria-live="polite" className="phone-copied">{copied === phone.display ? "✓ ¡Copiado!" : ""}</span>
+                    <span aria-live="polite" className="phone-copied">{copied === phone.display ? t.phoneCopied : ""}</span>
                   </button>
                 )}
               </li>

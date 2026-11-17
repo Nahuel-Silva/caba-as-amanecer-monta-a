@@ -184,3 +184,25 @@
 .admin-search-row { display: flex; flex-wrap: wrap; gap: 10px; }
 .admin-search-row input { flex: 1 1 260px; }
 .admin-search-result { margin: 0; color: var(--muted); font-weight: 700; }
+
+/* Traducciones de las promociones */
+.admin-translations { padding: 14px 18px; border: 2px solid var(--line); border-radius: 14px; background: #fffdf7; }
+.admin-translations > summary { cursor: pointer; font-weight: 800; }
+.admin-translations[open] > summary { margin-bottom: 10px; }
+.admin-translation { display: grid; gap: 10px; margin: 14px 0 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+.admin-translation legend { padding: 0 6px; font-weight: 800; }
+.admin-translation label { display: grid; gap: 6px; font-weight: 700; }
+.admin-language { display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: 999px; background: #e9eef3; color: #26323d; font-size: 15px; font-weight: 800; vertical-align: middle; }
+.admin-translated-message { padding: 12px 16px; border-left: 4px solid #3d5568; border-radius: 0 12px 12px 0; background: #e9eef3; color: #26323d; }
+
+/* Mensaje al huésped que se puede cambiar antes de mandarlo (y su traducción, si habla otro idioma). */
+.admin-confirm:has(.admin-message-editor) { width: min(720px, calc(100vw - 32px)); }
+.admin-confirm:has(.admin-message-editor.has-translation) { width: min(1040px, calc(100vw - 32px)); }
+.admin-message-editor { display: grid; gap: 14px; margin-top: 16px; }
+.admin-message-editor.has-translation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.admin-message-editor label { display: grid; align-content: start; gap: 6px; font-weight: 700; }
+.admin-message-editor textarea { font-size: 16px; line-height: 1.45; }
+.admin-hint.is-error { color: var(--admin-danger); font-weight: 700; }
+@media (max-width: 760px) {
+  .admin-message-editor.has-translation { grid-template-columns: 1fr; }
+}

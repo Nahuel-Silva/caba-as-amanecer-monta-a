@@ -117,6 +117,15 @@ Quien quiera recibir promociones lo acepta con una casilla sin marcar: en el for
 
 En el panel, cada promoción visible tiene el botón "Avisar por mail": manda el aviso a las personas confirmadas que todavía no lo recibieron, como mucho 100 por vez (límite diario del plan gratis de Resend). Cada mail lleva su enlace de baja (`/suscripcion?baja=...`) y la baja con un clic para Gmail (`/api/suscripcion/baja`). Al darse de baja se borran los datos de la persona. Debajo de las promociones está la lista de anotados, con un botón para copiar los teléfonos para una lista de difusión de WhatsApp Business. Los mails a huéspedes solo salen con el dominio propio verificado en Resend.
 
+## Idiomas (español, portugués e inglés)
+
+La web está en español sin prefijo (`/cabanas`) y traducida al portugués (`/pt/cabanas`) y al inglés (`/en/cabanas`), con un selector de idioma con banderas en el encabezado. Si el navegador del visitante está en portugués o inglés, la versión en español le sugiere una vez la suya.
+
+- **Estructura:** las páginas en español están en `src/app/(es)` y las traducidas en `src/app/[lang]`; las dos usan las mismas vistas de `src/views`. Cada idioma tiene su diseño raíz (`src/components/root-shell.tsx`).
+- **Textos:** la interfaz está en `src/i18n/ui.ts` y `src/i18n/pages.ts`; el contenido traducido, en `src/content/*-translations.ts` y al final de `site.ts` y `location.ts`. El español es siempre la referencia: **si se cambia un texto en español, hay que cambiarlo también en portugués e inglés.** Los avisos del servidor se traducen en `src/i18n/server-messages.ts`.
+- **Huéspedes de otros idiomas:** la reserva guarda el idioma de la página. El acuse por mail le llega en su idioma; en el panel se ve "Habla portugués/inglés" y su mensaje traducido al español, y los mensajes que se le mandan (seña, confirmación) se ven en español y se envían en su idioma (se pueden cambiar antes de mandarlos). El WhatsApp precargado desde las versiones traducidas va en el idioma del visitante y debajo en español.
+- **Traducción automática (DeepL):** con el secreto `DEEPL_API_KEY` (plan gratis de DeepL API), las promociones se traducen solas al guardarlas, se traduce el mensaje libre del formulario de reserva y los mensajes que se cambian en el panel. Sin la clave, todo funciona igual pero esos textos quedan en español.
+
 ## Opiniones
 
 Las reseñas del inicio se cargan en `src/content/reviews.ts`. Usá solo opiniones reales, copiadas tal cual y con el enlace a su fuente, y actualizá `ratingsCheckedAt` cuando revises los puntajes. Las reseñas del formulario se publican solas, también las negativas. Las que tienen insultos o enlaces esperan revisión en `/admin`, y desde ahí se puede quitar cualquiera. No se agregan reseñas a los datos estructurados de Google.

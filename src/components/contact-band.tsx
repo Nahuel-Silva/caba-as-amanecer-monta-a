@@ -1,12 +1,16 @@
 import Image from "next/image";
 import { ArrowUpRightIcon } from "@/components/arrow-icon";
 import { WhatsAppButton } from "@/components/whatsapp-button";
-import { site } from "@/content/site";
+import type { Locale } from "@/i18n/config";
+import { ui } from "@/i18n/ui";
+import { getSiteTexts } from "@/lib/content";
 import { isWhatsAppConfigured } from "@/lib/whatsapp";
 import "./contact-band.css";
 
 /** Bloque de contacto que se repite al final de las páginas principales. */
-export function ContactBand() {
+export function ContactBand({ locale = "es" }: { locale?: Locale }) {
+  const t = ui[locale].contactBand;
+
   return (
     <section className="wrap cta-band contact-panel">
       <div className="contact-panel-photo">
@@ -14,20 +18,16 @@ export function ContactBand() {
       </div>
       <div aria-hidden="true" className="contact-panel-shade" />
       <div>
-        <p className="eyebrow">Contacto</p>
-        <h2>¿Planeando una visita a Malargüe?</h2>
-        <p>
-          {isWhatsAppConfigured
-            ? "Escribinos por WhatsApp para consultar disponibilidad, tarifas y servicios."
-            : site.contactNote}
-        </p>
+        <p className="eyebrow">{t.eyebrow}</p>
+        <h2>{t.title}</h2>
+        <p>{isWhatsAppConfigured ? t.text : getSiteTexts(locale).contactNote}</p>
       </div>
       {isWhatsAppConfigured ? (
-        <WhatsAppButton className="button button-light">
-          Escribir por WhatsApp <ArrowUpRightIcon />
+        <WhatsAppButton className="button button-light" locale={locale}>
+          {t.button} <ArrowUpRightIcon />
         </WhatsAppButton>
       ) : (
-        <span className="pending-note">WhatsApp: pendiente de configurar</span>
+        <span className="pending-note">{t.pending}</span>
       )}
     </section>
   );

@@ -86,16 +86,27 @@ const addedReservationColumns = [
   ["price_total", "INTEGER"],
   ["deposit", "INTEGER"],
   ["deposit_sent_at", "TEXT NOT NULL DEFAULT ''"],
+  // Idioma de la página desde la que pidió la reserva (es, pt o en), y su mensaje traducido al español.
+  ["locale", "TEXT NOT NULL DEFAULT 'es'"],
+  ["message_es", "TEXT NOT NULL DEFAULT ''"],
 ];
 
 const addedPromotionColumns = [
   // Precio total de la promoción en pesos (opcional).
   ["price", "INTEGER"],
+  // Textos traducidos automáticamente (JSON: { pt: {...}, en: {...} }).
+  ["translations", "TEXT NOT NULL DEFAULT '{}'"],
+];
+
+const addedSubscriberColumns = [
+  // Idioma en el que se anotó, para mandarle los avisos en ese idioma.
+  ["locale", "TEXT NOT NULL DEFAULT 'es'"],
 ];
 
 const addedColumns: [table: string, columns: string[][]][] = [
   ["reservations", addedReservationColumns],
   ["promotions", addedPromotionColumns],
+  ["subscribers", addedSubscriberColumns],
 ];
 
 type D1Like = {

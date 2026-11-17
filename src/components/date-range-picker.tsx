@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
-import { countNights, formatDay, selectDay, type Booking, type StaySelection } from "@/lib/availability";
+import { formatDay } from "@/i18n/format";
+import { useLocale, useUi } from "@/i18n/locale-context";
+import { countNights, selectDay, type Booking, type StaySelection } from "@/lib/availability";
 import "./availability-calendar.css";
 
 type DateRangePickerProps = {
@@ -16,6 +18,8 @@ type DateRangePickerProps = {
 
 /** Selector de fechas: dos campos que despliegan el calendario para marcar llegada y salida. */
 export function DateRangePicker({ bookings, today, value, onChange, notice }: DateRangePickerProps) {
+  const locale = useLocale();
+  const t = useUi().calendar;
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -47,20 +51,20 @@ export function DateRangePicker({ bookings, today, value, onChange, notice }: Da
     <div className="date-range" ref={rootRef}>
       <button
         aria-expanded={isOpen}
-        aria-label="Elegir fechas de llegada y salida"
+        aria-label={t.choose}
         className={`date-range-trigger ${isOpen ? "is-open" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
         ref={triggerRef}
         type="button"
       >
         <span className={!departure && isOpen ? "is-active" : undefined}>
-          <small>Llegada</small>
-          <strong>{arrival ? formatDay(arrival) : "Elegir fecha"}</strong>
+          <small>{t.arrival}</small>
+          <strong>{arrival ? formatDay(arrival, locale) : t.chooseDate}</strong>
         </span>
         <span aria-hidden="true" className="date-range-arrow">→</span>
         <span>
-          <small>Salida</small>
-          <strong>{departure ? formatDay(departure) : "Elegir fecha"}</strong>
+          <small>{t.departure}</small>
+          <strong>{departure ? formatDay(departure, locale) : t.chooseDate}</strong>
         </span>
       </button>
 
@@ -75,17 +79,17 @@ export function DateRangePicker({ bookings, today, value, onChange, notice }: Da
           />
           <div className="date-range-footer">
             <div className="date-range-legend">
-              <span><i className="date-range-swatch is-free" /> Disponible</span>
-              <span><i className="date-range-swatch is-booked" /> No disponible</span>
+              <span><i className="date-range-swatch is-free" /> {t.available}</span>
+              <span><i className="date-range-swatch is-booked" /> {t.unavailable}</span>
               {notice && <em>{notice}</em>}
             </div>
             <div className="date-range-actions">
-              {nights > 0 && <strong>{nights} {nights === 1 ? "noche" : "noches"}</strong>}
+              {nights > 0 && <strong>{t.nights(nights)}</strong>}
               <button className="date-range-clear" disabled={!arrival} onClick={() => onChange({ arrival: "", departure: "" })} type="button">
-                Limpiar
+                {t.clear}
               </button>
               <button className="button button-primary date-range-done" onClick={() => setIsOpen(false)} type="button">
-                Listo
+                {t.done}
               </button>
             </div>
           </div>

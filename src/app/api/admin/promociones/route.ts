@@ -1,6 +1,7 @@
 import { isAdminSession } from "@/lib/admin-auth";
-import { validatePromotion } from "@/lib/promotion";
-import { createPromotion, deletePromotion, setPromotionActive, updatePromotion } from "@/lib/promotions-db";
+import { readTranslationEdits, validatePromotion, type PromotionTranslations } from "@/lib/promotion";
+import { translatePromotion } from "@/lib/promotion-translate";
+import { createPromotion, deletePromotion, listPromotions, setPromotionActive, updatePromotion } from "@/lib/promotions-db";
 import { isSameOrigin } from "@/lib/request-guard";
 import { deleteNoticesFor } from "@/lib/subscribers-db";
 
@@ -53,14 +54,31 @@ export async function POST(request: Request) {
     const image = decoded.image ?? null;
     if (image && !data.imageAlt) return respond(400, { error: "Describí qué se ve en la foto." });
 
-    if (input.id === undefined || input.id === null) {
-      await createPromotion(data, image);
-      return respond(200, { ok: true });
-    }
-    if (!hasId) return respond(400, { error: "Datos inválidos." });
+    const isNew = input.id === undefined || input.id === null;
+    if (!isNew && !hasId) return respond(400, { error: "Datos inválidos." });
 
-    return (await updatePromotion(id, data, image, input.removeImage === true))
-      ? respond(200, { ok: true })
+    // Traducciones: si es nueva o cambió el texto en español, se rehacen solas con DeepL.
+    // Si no cambió, se guardan las correcciones hechas a mano en el panel.
+    const previous = isNew ? undefined : (await listPromotions()).find((promotion) => promotion.id === id);
+    if (!isNew && !previous) return respond(404, { error: "No encontramos esa promoción." });
+    let translations: PromotionTranslations;
+    if (isNew || input.retranslate === true || !previous?.translations || Object.keys(previous.translations).length === 0) {
+      translations = await translatePromotion(data);
+    } else {
+      translations = { ...previous.translations };
+      for (const [locale, edited] of Object.entries(readTranslationEdits(input.translations)) as ["pt" | "en", { title: string; description: string; details: string[] }][]) {
+        const current = translations[locale];
+        if (current) translations[locale] = { ...current, ...edited };
+      }
+    }
+    const translated = Object.keys(translations).length > 0;
+
+    if (isNew) {
+      await createPromotion(data, image, translations);
+      return respond(200, { ok: true, translated });
+    }
+    return (await updatePromotion(id, data, image, input.removeImage === true, translations))
+      ? respond(200, { ok: true, translated })
       : respond(404, { error: "No encontramos esa promoción." });
   } catch (saveError) {
     console.error("No se pudo guardar la promoción", saveError);

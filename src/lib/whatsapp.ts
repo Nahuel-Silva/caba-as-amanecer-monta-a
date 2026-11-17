@@ -1,4 +1,6 @@
 import { site } from "@/content/site";
+import type { Locale } from "@/i18n/config";
+import { ui } from "@/i18n/ui";
 
 /**
  * Única fuente del número de WhatsApp: la variable de entorno
@@ -21,13 +23,22 @@ export type Inquiry = {
   cabinName?: string;
 };
 
-export function buildWhatsAppMessage({ cabinName }: Inquiry = {}): string {
-  const subject = cabinName ? `${cabinName} de ${site.name}` : site.name;
-  return `Hola, quisiera recibir información sobre ${subject} en Malargüe. ¿Podrían indicarme disponibilidad, tarifas y servicios?`;
+/**
+ * Mensaje precargado. Desde la versión en portugués o inglés va en ese idioma y, debajo, en español:
+ * así el visitante entiende lo que manda y el propietario lo lee sin traductor.
+ */
+export function buildWhatsAppMessage({ cabinName }: Inquiry = {}, locale: Locale = "es"): string {
+  const message = (code: Locale) => {
+    const t = ui[code].contact;
+    return t.whatsappMessage(cabinName ? t.whatsappSubject(cabinName, site.name) : site.name);
+  };
+  return locale === "es" ? message("es") : `${message(locale)}
+
+(ES) ${message("es")}`;
 }
 
 /** Enlace oficial wa.me con el mensaje precargado. Devuelve null si el número no está configurado. */
-export function buildWhatsAppUrl(inquiry: Inquiry = {}, number: string | null = whatsappNumber): string | null {
+export function buildWhatsAppUrl(inquiry: Inquiry = {}, locale: Locale = "es", number: string | null = whatsappNumber): string | null {
   if (!number) return null;
-  return `https://wa.me/${number}?text=${encodeURIComponent(buildWhatsAppMessage(inquiry))}`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(buildWhatsAppMessage(inquiry, locale))}`;
 }

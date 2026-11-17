@@ -1,23 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
+import { localizePath, type Locale } from "@/i18n/config";
+import { pages } from "@/i18n/pages";
 import { formatPesos } from "@/lib/guest-messages";
 import type { Promotion } from "@/lib/promotion";
 import "./promotion-card.css";
 
-export function PromotionCard({ promotion }: { promotion: Promotion }) {
+export function PromotionCard({ promotion, locale = "es" }: { promotion: Promotion; locale?: Locale }) {
   const { image, discount } = promotion;
+  const t = pages[locale].promotions;
 
   return (
     <article className="promotion-card">
       {image && (
         <div className="promotion-photo">
-          <Image
-            alt={image.alt}
-            fill
-            sizes="(max-width: 760px) 100vw, 360px"
-            src={image.src}
-            unoptimized
-          />
+          <Image alt={image.alt} fill sizes="(max-width: 760px) 100vw, 360px" src={image.src} unoptimized />
           {discount && <span className="promotion-badge">{discount}</span>}
         </div>
       )}
@@ -28,15 +25,11 @@ export function PromotionCard({ promotion }: { promotion: Promotion }) {
         <p>{promotion.description}</p>
         {promotion.price !== undefined && (
           <p className="promotion-price">
-            <span>Precio total</span> <strong>{formatPesos(promotion.price)}</strong>
+            <span>{t.price}</span> <strong>{formatPesos(promotion.price)}</strong>
           </p>
         )}
-        <Link
-          aria-label={`Ver la promoción ${promotion.title}`}
-          className="button button-primary"
-          href={`/promociones/${promotion.slug}`}
-        >
-          Ver promoción <span aria-hidden="true">→</span>
+        <Link aria-label={t.viewLabel(promotion.title)} className="button button-primary" href={localizePath(locale, `/promociones/${promotion.slug}`)}>
+          {t.view} <span aria-hidden="true">→</span>
         </Link>
       </div>
     </article>

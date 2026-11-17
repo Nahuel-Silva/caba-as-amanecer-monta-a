@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { AdminCalendar, type ManualGuestInput } from "@/components/admin-calendar";
+import { MessageEditor, type MessageDraft } from "@/components/admin-message-editor";
 import { AdminPromotions } from "@/components/admin-promotions";
 import { AdminSubscribers } from "@/components/admin-subscribers";
 import { ConfirmDialog, HelpBox, NoticeBar, type ConfirmRequest, type Notice } from "@/components/admin-ui";
@@ -16,6 +17,7 @@ import {
   noRoomMessage,
   type GuestMessageData,
 } from "@/lib/guest-messages";
+import type { Locale } from "@/i18n/config";
 import type { Promotion } from "@/lib/promotion";
 import { manualBlockName } from "@/lib/reservation";
 import type { ReservationRecord } from "@/lib/reservations-db";
@@ -89,10 +91,24 @@ function messageData(item: ReservationRecord, cabin: string, extra: Partial<Gues
   };
 }
 
-function whatsappLink(kind: MessageKind, data: GuestMessageData, phone: string) {
-  const text =
-    kind === "sena" ? depositMessage(data) : kind === "confirmada" ? confirmationMessage(data) : kind === "sin-lugar" ? noRoomMessage(data) : helloMessage(data);
+/** Mensaje armado en el idioma pedido (el del huésped, o español para mostrarlo al propietario). */
+function buildMessage(kind: MessageKind, data: GuestMessageData, locale: Locale) {
+  return kind === "sena"
+    ? depositMessage(data, locale)
+    : kind === "confirmada"
+      ? confirmationMessage(data, locale)
+      : kind === "sin-lugar"
+        ? noRoomMessage(data, locale)
+        : helloMessage(data, locale);
+}
+
+function whatsappTextLink(text: string, phone: string) {
   return `https://wa.me/${whatsappNumberFor(phone)}?text=${encodeURIComponent(text)}`;
+}
+
+/** Enlace de WhatsApp con el mensaje ya escrito en el idioma del huésped. */
+function whatsappLink(kind: MessageKind, data: GuestMessageData, phone: string, locale: Locale = "es") {
+  return whatsappTextLink(buildMessage(kind, data, locale), phone);
 }
 
 /** Lee lo que escribió la persona en un campo de monto: "120.000" o "$ 120000" -> 120000. */
@@ -511,6 +527,7 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
       const data = messageData(item, cabin, { total: values.total, deposit: values.deposit, paymentDetails: values.paymentDetails });
       const balance = balanceOf(data);
       const canWhatsApp = hasPhone(item);
+      const draft: MessageDraft = { current: buildMessage("sena", data, item.locale) };
       ask({
         title: "¿Mandar el mensaje de la seña?",
         text: (
@@ -522,12 +539,13 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
             <br />
             {item.email.includes("@") && canEmailGuests ? `Se envía un mail a ${item.email}` : "No se envía mail"}
             {canWhatsApp ? " y se abre WhatsApp con el mensaje listo: tocá Enviar." : ". Este pedido no tiene un teléfono válido para WhatsApp."}
+            <MessageEditor draftRef={draft} locale={item.locale} spanish={buildMessage("sena", data, "es")} translated={buildMessage("sena", data, item.locale)} />
           </p>
         ),
         confirmLabel: "Sí, mandar mensaje",
         onConfirm: async () => {
-          openWhatsApp(canWhatsApp ? whatsappLink("sena", data, item.phone) : null);
-          const result = await postAction({ action: "send-deposit", id: item.id, ...values });
+          openWhatsApp(canWhatsApp ? whatsappTextLink(draft.current, item.phone) : null);
+          const result = await postAction({ action: "send-deposit", id: item.id, ...values, message: draft.current });
           setNotice(
             result.error
               ? { kind: "error", text: result.error }
@@ -541,6 +559,7 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
     function sendConfirmation(item: ReservationRecord, cabin: string) {
       const data = messageData(item, cabin);
       const canWhatsApp = hasPhone(item);
+      const draft: MessageDraft = { current: buildMessage("confirmada", data, item.locale) };
       ask({
         title: "¿Mandar la confirmación?",
         text: (
@@ -551,12 +570,18 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
             <br />
             {item.email.includes("@") && canEmailGuests ? `Se envía un mail a ${item.email}` : "No se envía mail"}
             {canWhatsApp ? " y se abre WhatsApp con el mensaje listo: tocá Enviar." : "."}
+            <MessageEditor
+              draftRef={draft}
+              locale={item.locale}
+              spanish={buildMessage("confirmada", data, "es")}
+              translated={buildMessage("confirmada", data, item.locale)}
+            />
           </p>
         ),
         confirmLabel: "Sí, mandar confirmación",
         onConfirm: async () => {
-          openWhatsApp(canWhatsApp ? whatsappLink("confirmada", data, item.phone) : null);
-          const result = await postAction({ action: "send-confirmation", id: item.id });
+          openWhatsApp(canWhatsApp ? whatsappTextLink(draft.current, item.phone) : null);
+          const result = await postAction({ action: "send-confirmation", id: item.id, message: draft.current });
           setNotice(
             result.error
               ? { kind: "error", text: result.error }
@@ -594,7 +619,10 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
       return (
         <article className={`admin-card is-${item.status}`} key={item.id}>
           <div className="admin-card-head">
-            <h3>{item.name}</h3>
+            <h3>
+              {item.name}
+              {item.locale !== "es" && <span className="admin-language">Habla {item.locale === "pt" ? "portugués" : "inglés"}</span>}
+            </h3>
             <span className="admin-status">
               {item.status === "pending" ? "Para responder" : item.status === "confirmed" ? (isManualEntry ? "Anotada a mano" : "Confirmada") : "Rechazada o cancelada"}
             </span>
@@ -607,6 +635,10 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
             Se va el {formatLongDay(item.departure)} · {nights} {nights === 1 ? "noche" : "noches"}
           </p>
           {item.message && <p className="admin-message">“{item.message}”</p>}
+          {item.messageEs && <p className="admin-translated-message">Traducido al español: “{item.messageEs}”</p>}
+          {item.locale !== "es" && (
+            <p className="admin-hint">Reservó desde la web en {item.locale === "pt" ? "portugués" : "inglés"}: los mensajes que le mandes desde acá le llegan en ese idioma.</p>
+          )}
           {item.priceTotal !== null && item.deposit !== null && (
             <p className="admin-amounts">
               Total {formatPesos(item.priceTotal)} · Seña {formatPesos(item.deposit)}
@@ -651,7 +683,7 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
                 <p>¿No hay lugar o no va a venir?</p>
                 <div className="admin-actions">
                   {canMessage && (
-                    <a className="admin-button is-secondary" href={whatsappLink("sin-lugar", messageData(item, cabin), item.phone)} rel="noopener noreferrer" target="_blank">Avisarle que no hay lugar</a>
+                    <a className="admin-button is-secondary" href={whatsappLink("sin-lugar", messageData(item, cabin), item.phone, item.locale)} rel="noopener noreferrer" target="_blank">Avisarle que no hay lugar</a>
                   )}
                   <button className="admin-link is-danger" onClick={() => cancelReservation(item)} type="button">Rechazar pedido</button>
                 </div>
@@ -666,7 +698,7 @@ export function AdminPanel({ cabins }: { cabins: CabinOption[] }) {
               )}
               {canMessage && (
                 <>
-                  <a className="admin-button is-secondary" href={whatsappLink("hola", messageData(item, cabin), item.phone)} rel="noopener noreferrer" target="_blank">Escribir otro mensaje</a>
+                  <a className="admin-button is-secondary" href={whatsappLink("hola", messageData(item, cabin), item.phone, item.locale)} rel="noopener noreferrer" target="_blank">Escribir otro mensaje</a>
                 </>
               )}
               <button className="admin-link is-danger" onClick={() => cancelReservation(item)} type="button">Cancelar reserva</button>

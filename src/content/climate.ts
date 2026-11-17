@@ -38,10 +38,10 @@ export const monthlyClimate: MonthlyClimate[] = [
   { month: "Diciembre", max: 27.5, min: 10.0, rainMm: 21.9, rainDays: 2.8 },
 ];
 
-/** Consejo para preparar el viaje según las temperaturas habituales del mes. */
-export function climateTip({ max, min }: MonthlyClimate): string {
-  if (min < 0) return "Las noches suelen bajar de 0°: traé abrigo de invierno y, si venís en auto, consultá el estado de las rutas.";
-  if (min < 6) return "Los días son templados y las noches frías: traé abrigo para la tarde y la noche.";
-  if (max >= 27) return "Los días son calurosos y secos, pero refresca de noche: traé protector solar y un abrigo liviano.";
-  return "Días agradables y noches frescas: traé ropa en capas.";
+/** Qué consejo dar para preparar el viaje según las temperaturas habituales del mes (el texto está en src/i18n/ui.ts). */
+export function climateTipKey({ max, min }: MonthlyClimate): "freezing" | "coldNights" | "hot" | "mild" {
+  if (min < 0) return "freezing";
+  if (min < 6) return "coldNights";
+  if (max >= 27) return "hot";
+  return "mild";
 }

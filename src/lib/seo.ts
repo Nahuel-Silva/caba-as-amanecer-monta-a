@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PENDING, site } from "@/content/site";
+import { htmlLang, localizePath, locales, ogLocale, type Locale } from "@/i18n/config";
 import { isValidCoordinates } from "@/lib/location";
 import { whatsappNumber } from "@/lib/whatsapp";
 
@@ -36,27 +37,42 @@ export function absoluteUrl(path: string, base: string | null = siteUrl): string
 
 export const defaultDescription = `${site.name}: cabañas turísticas en Malargüe, Mendoza. Consultá disponibilidad, tarifas y servicios.`;
 
+/** Descripción general de la web en cada idioma. */
+export const defaultDescriptions: Record<Locale, string> = {
+  es: defaultDescription,
+  pt: `${site.name}: cabanas para turismo em Malargüe, Mendoza, Argentina. Consulte disponibilidade, tarifas e serviços.`,
+  en: `${site.name}: holiday cabins in Malargüe, Mendoza, Argentina. Check availability, rates and services.`,
+};
+
 type PageSeo = {
   /** Título de la página; el layout le agrega " | Cabañas Amanecer de Montaña". */
   title: string;
   description: string;
-  /** Ruta de la página, por ejemplo "/cabanas" o "/cabanas/payunia". */
+  /** Ruta de la página sin idioma, por ejemplo "/cabanas" o "/cabanas/payunia". */
   path: string;
+  locale?: Locale;
+  /** false si la página existe solo en español (no se anuncian otras versiones). */
+  translated?: boolean;
 };
 
 /** Metadatos de una página: título, descripción, canonical y Open Graph. */
-export function pageMetadata({ title, description, path }: PageSeo): Metadata {
+export function pageMetadata({ title, description, path, locale = "es", translated = true }: PageSeo): Metadata {
+  const url = localizePath(locale, path);
+  // Versiones de la misma página en cada idioma, para que Google muestre la que corresponde a cada persona.
+  const languages = translated
+    ? { ...Object.fromEntries(locales.map((code) => [htmlLang[code], localizePath(code, path)])), "x-default": path }
+    : undefined;
   return {
     title,
     description,
-    ...(siteUrl ? { alternates: { canonical: path } } : {}),
+    ...(siteUrl ? { alternates: { canonical: url, ...(languages ? { languages } : {}) } } : {}),
     openGraph: {
       title,
       description,
       type: "website",
-      locale: "es_AR",
+      locale: ogLocale[locale],
       siteName: site.name,
-      ...(siteUrl ? { url: path } : {}),
+      ...(siteUrl ? { url } : {}),
     },
   };
 }

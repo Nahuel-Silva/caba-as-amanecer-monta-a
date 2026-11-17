@@ -1,5 +1,8 @@
 import Image from "next/image";
 import type { Attraction } from "@/content/attractions";
+import type { Locale } from "@/i18n/config";
+import { pages } from "@/i18n/pages";
+import { ui } from "@/i18n/ui";
 import "./attraction-card.css";
 
 type AttractionCardProps = {
@@ -7,9 +10,12 @@ type AttractionCardProps = {
   eager?: boolean;
   /** Nivel del título, según la sección donde va la tarjeta. */
   headingLevel?: "h2" | "h3";
+  locale?: Locale;
 };
 
-export function AttractionCard({ attraction, eager = false, headingLevel: Heading = "h2" }: AttractionCardProps) {
+const officialSource: Record<Locale, string> = { es: "Fuente oficial", pt: "Fonte oficial", en: "Official source" };
+
+export function AttractionCard({ attraction, eager = false, headingLevel: Heading = "h2", locale = "es" }: AttractionCardProps) {
   const { image } = attraction;
 
   return (
@@ -31,13 +37,13 @@ export function AttractionCard({ attraction, eager = false, headingLevel: Headin
         <p>{attraction.detail}</p>
         {attraction.sourceUrl && (
           <a className="text-link" href={attraction.sourceUrl} rel="noopener noreferrer" target="_blank">
-            {attraction.sourceLabel ?? "Fuente oficial"}{" "}
-            <span className="sr-only">(se abre en una pestaña nueva)</span>
+            {attraction.sourceLabel ?? officialSource[locale]}
+            <span className="sr-only">{ui[locale].newTab}</span>
           </a>
         )}
         {image && (
           <small className="attraction-credit">
-            Foto:{" "}
+            {pages[locale].malargue.photo}{" "}
             {image.creditUrl ? (
               <a href={image.creditUrl} rel="noopener noreferrer" target="_blank">{image.credit}</a>
             ) : (

@@ -1,3 +1,4 @@
+import { isLocale, type Locale } from "@/i18n/config";
 import { getDatabase, type DbRow } from "@/lib/db";
 import { consentVersion, type PromotionNoticeSummary, type SubscriberRecord, type SubscriberSource } from "@/lib/subscribers";
 
@@ -22,6 +23,7 @@ function toSubscriber(row: DbRow): SubscriberRecord {
     status: String(row.status) as SubscriberRecord["status"],
     createdAt: String(row.created_at),
     confirmedAt: String(row.confirmed_at),
+    locale: isLocale(row.locale) ? row.locale : "es",
   };
 }
 
@@ -44,16 +46,17 @@ export async function listSubscribers(): Promise<SubscriberRecord[]> {
  * Anota a quien marcó la casilla en el formulario de reserva. Queda activa enseguida: es su propio mail,
  * el que usó para reservar. Si ya estaba anotada, se actualizan su nombre y teléfono.
  */
-export async function subscribeFromReservation(email: string, name: string, phone: string) {
+export async function subscribeFromReservation(email: string, name: string, phone: string, locale: Locale = "es") {
   const database = await getDatabase();
   await database.execute({
-    sql: `INSERT INTO subscribers (email, name, phone, source, status, token, consent_version, confirmed_at)
-      VALUES (?, ?, ?, 'reserva', 'active', ?, ?, datetime('now'))
+    sql: `INSERT INTO subscribers (email, name, phone, source, status, token, consent_version, confirmed_at, locale)
+      VALUES (?, ?, ?, 'reserva', 'active', ?, ?, datetime('now'), ?)
       ON CONFLICT (email) DO UPDATE SET name = excluded.name, phone = excluded.phone, consent_version = excluded.consent_version,
+        locale = excluded.locale,
         source = CASE WHEN subscribers.status = 'active' THEN subscribers.source ELSE 'reserva' END,
         confirmed_at = CASE WHEN subscribers.status = 'active' THEN subscribers.confirmed_at ELSE excluded.confirmed_at END,
         status = 'active'`,
-    args: [email, name, phone, newToken(), consentVersion],
+    args: [email, name, phone, newToken(), consentVersion, locale],
   });
 }
 
@@ -62,17 +65,20 @@ export async function subscribeFromReservation(email: string, name: string, phon
  * hasta que la persona confirme desde el mail que le llega. Devuelve el código para armar ese enlace,
  * o null si ya estaba confirmada.
  */
-export async function subscribeFromWeb(email: string): Promise<string | null> {
+export async function subscribeFromWeb(email: string, locale: Locale = "es"): Promise<string | null> {
   await deleteStalePending();
   const database = await getDatabase();
   const { rows } = await database.execute({ sql: "SELECT status, token FROM subscribers WHERE email = ?", args: [email] });
   if (rows[0]?.status === "active") return null;
-  if (rows[0]) return String(rows[0].token);
+  if (rows[0]) {
+    await database.execute({ sql: "UPDATE subscribers SET locale = ? WHERE email = ?", args: [locale, email] });
+    return String(rows[0].token);
+  }
 
   const token = newToken();
   await database.execute({
-    sql: "INSERT INTO subscribers (email, source, status, token, consent_version) VALUES (?, 'web', 'pending', ?, ?)",
-    args: [email, token, consentVersion],
+    sql: "INSERT INTO subscribers (email, source, status, token, consent_version, locale) VALUES (?, 'web', 'pending', ?, ?, ?)",
+    args: [email, token, consentVersion, locale],
   });
   return token;
 }
@@ -107,12 +113,12 @@ export async function removeSubscriber(id: number) {
 export async function subscribersToNotify(promotionId: number) {
   const database = await getDatabase();
   const { rows } = await database.execute({
-    sql: `SELECT id, email, token FROM subscribers
+    sql: `SELECT id, email, token, locale FROM subscribers
       WHERE status = 'active' AND id NOT IN (SELECT subscriber_id FROM promotion_notices WHERE promotion_id = ?)
       ORDER BY id LIMIT ?`,
     args: [promotionId, noticeBatchSize],
   });
-  return rows.map((row) => ({ id: Number(row.id), email: String(row.email), token: String(row.token) }));
+  return rows.map((row) => ({ id: Number(row.id), email: String(row.email), token: String(row.token), locale: (isLocale(row.locale) ? row.locale : "es") as Locale }));
 }
 
 /** Cuántas personas confirmadas faltan avisar de esta promoción. */

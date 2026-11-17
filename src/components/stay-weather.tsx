@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { climateTip } from "@/content/climate";
+import { climateTipKey } from "@/content/climate";
+import { formatWeekday } from "@/i18n/format";
+import { useLocale, useUi } from "@/i18n/locale-context";
 import {
-  conditionLabels,
   forecastSource,
   formatDegrees,
-  formatWeekday,
   getStayWeather,
   type DayForecast,
   type Forecast,
@@ -49,6 +49,9 @@ function WeatherIcon({ condition }: { condition: WeatherCondition }) {
 
 /** Pronóstico real de los días que ya lo tienen (~10 días) y clima típico de los demás. Se actualiza solo cada hora. */
 export function StayWeather({ arrival, departure }: { arrival: string; departure: string }) {
+  const locale = useLocale();
+  const ui = useUi();
+  const t = ui.weather;
   const [days, setDays] = useState<DayForecast[] | null>(null);
 
   useEffect(() => {
@@ -70,16 +73,16 @@ export function StayWeather({ arrival, departure }: { arrival: string; departure
     <div className="stay-weather">
       {forecast.length > 0 && (
         <>
-          <p className="stay-weather-title">Pronóstico para tu estadía</p>
+          <p className="stay-weather-title">{t.forecastTitle}</p>
           <ul className="stay-weather-days">
             {forecast.map((day) => (
               <li key={day.date}>
                 <WeatherIcon condition={day.condition} />
-                <span className="stay-weather-day">{formatWeekday(day.date)}</span>
+                <span className="stay-weather-day">{formatWeekday(day.date, locale)}</span>
                 <span className="stay-weather-temp">
                   <strong>{formatDegrees(day.max)}</strong> / {formatDegrees(day.min)}
                 </span>
-                <span className="stay-weather-label">{conditionLabels[day.condition]}</span>
+                <span className="stay-weather-label">{t.conditions[day.condition]}</span>
               </li>
             ))}
           </ul>
@@ -88,11 +91,11 @@ export function StayWeather({ arrival, departure }: { arrival: string; departure
 
       {typical.length > 0 && (
         <>
-          <p className="stay-weather-title">{forecast.length > 0 ? "Clima típico para los demás días" : "Clima típico para tus fechas"}</p>
+          <p className="stay-weather-title">{forecast.length > 0 ? t.typicalOtherDays : t.typicalYourDates}</p>
           <ul className="stay-weather-days is-typical">
             {typical.map((day) => (
               <li key={day.date}>
-                <span className="stay-weather-day">{formatWeekday(day.date)}</span>
+                <span className="stay-weather-day">{formatWeekday(day.date, locale)}</span>
                 <span className="stay-weather-temp">
                   <strong>{formatDegrees(day.max)}</strong> / {formatDegrees(day.min)}
                 </span>
@@ -100,18 +103,16 @@ export function StayWeather({ arrival, departure }: { arrival: string; departure
             ))}
           </ul>
           <p className="stay-weather-note">
-            {forecast.length > 0
-              ? "Promedio de años anteriores, no es un pronóstico. El pronóstico real de estos días aparece solo a medida que se acercan."
-              : "Promedio de años anteriores, no es un pronóstico. Unos 10 días antes de tu llegada, acá vas a ver el pronóstico real."}
+            {forecast.length > 0 ? t.noteWithForecast : t.noteNoForecast}
           </p>
-          {forecast.length === 0 && <p>{climateTip(coldest)}</p>}
+          {forecast.length === 0 && <p>{t.tips[climateTipKey(coldest)]}</p>}
         </>
       )}
 
       {/* MET Norway pide citarlo junto a su pronóstico (CC BY 4.0). Los promedios (NASA POWER y SMN) se citan en src/content/daily-climate.ts. */}
       {forecast.length > 0 && (
         <p className="stay-weather-source">
-          Pronóstico: <a href={forecastSource.url} rel="noopener noreferrer" target="_blank">{forecastSource.label}<span className="sr-only"> (se abre en una pestaña nueva)</span></a>.
+          {t.source} <a href={forecastSource.url} rel="noopener noreferrer" target="_blank">{forecastSource.label}<span className="sr-only">{ui.newTab}</span></a>.
         </p>
       )}
     </div>

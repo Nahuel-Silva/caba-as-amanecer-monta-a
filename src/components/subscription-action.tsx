@@ -2,20 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { localizePath } from "@/i18n/config";
+import { useLocale } from "@/i18n/locale-context";
+import { pages } from "@/i18n/pages";
 import "./promo-subscribe.css";
-
-const texts = {
-  confirm: {
-    intro: "Tocá el botón para confirmar que querés recibir por mail las promociones de las cabañas.",
-    button: "Sí, quiero recibir promociones",
-    done: "¡Listo! Confirmaste tu mail. Te vamos a avisar cuando haya una promoción nueva.",
-  },
-  unsubscribe: {
-    intro: "Si te das de baja, borramos tu mail de la lista y no te mandamos más promociones.",
-    button: "Darme de baja",
-    done: "Listo, ya no vas a recibir más promociones. Borramos tu mail de la lista.",
-  },
-};
 
 /**
  * Botón de la página /suscripcion. La acción se hace al tocarlo, no al abrir el enlace:
@@ -23,7 +13,12 @@ const texts = {
  */
 export function SubscriptionAction({ action, token }: { action: "confirm" | "unsubscribe"; token: string }) {
   const [status, setStatus] = useState<{ kind: "idle" | "sending" | "done" | "error"; text: string }>({ kind: "idle", text: "" });
-  const text = texts[action];
+  const locale = useLocale();
+  const t = pages[locale].subscription;
+  const text =
+    action === "confirm"
+      ? { intro: t.confirmIntro, button: t.confirmButton, done: t.confirmDone }
+      : { intro: t.unsubscribeIntro, button: t.unsubscribeButton, done: t.unsubscribeDone };
 
   async function run() {
     setStatus({ kind: "sending", text: "" });
@@ -31,12 +26,12 @@ export function SubscriptionAction({ action, token }: { action: "confirm" | "uns
       const response = await fetch("/api/suscripcion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, token }),
+        body: JSON.stringify({ action, token, locale }),
       });
       const result = (await response.json()) as { ok: boolean; error?: string };
-      setStatus(result.ok ? { kind: "done", text: text.done } : { kind: "error", text: result.error ?? "No pudimos hacer el cambio." });
+      setStatus(result.ok ? { kind: "done", text: text.done } : { kind: "error", text: result.error ?? t.error });
     } catch {
-      setStatus({ kind: "error", text: "No pudimos hacer el cambio. Revisá tu conexión y probá de nuevo." });
+      setStatus({ kind: "error", text: t.errorConnection });
     }
   }
 
@@ -44,7 +39,7 @@ export function SubscriptionAction({ action, token }: { action: "confirm" | "uns
     return (
       <div className="subscription-box" role="status">
         <p><strong>{status.text}</strong></p>
-        <Link className="button button-primary" href="/promociones">Ver las promociones</Link>
+        <Link className="button button-primary" href={localizePath(locale, "/promociones")}>{t.seePromotions}</Link>
       </div>
     );
   }
@@ -54,7 +49,7 @@ export function SubscriptionAction({ action, token }: { action: "confirm" | "uns
       <p>{text.intro}</p>
       {status.kind === "error" && <p className="promo-subscribe-error" role="alert">{status.text}</p>}
       <button className="button button-primary" disabled={status.kind === "sending"} onClick={run} type="button">
-        {status.kind === "sending" ? "Un momento…" : text.button}
+        {status.kind === "sending" ? t.working : text.button}
       </button>
     </div>
   );

@@ -3,25 +3,31 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { usePanOnHover } from "@/components/use-pan-on-hover";
 import type { Review } from "@/content/reviews";
+import { formatMonthYear } from "@/i18n/format";
+import { useLocale, useUi } from "@/i18n/locale-context";
 import { getApprovedReviews, submitReview } from "@/lib/reviews-service";
 
 function ReviewCard({ review }: { review: Review }) {
+  const locale = useLocale();
+  const ui = useUi();
+  // Las opiniones se muestran tal cual se escribieron; solo se traduce lo que las rodea.
+  const date = /^\d{4}-\d{2}$/.test(review.date) ? formatMonthYear(review.date, locale) : review.date;
   return (
     <figure className="review-card">
       <span aria-hidden="true" className="review-stars">{"★".repeat(review.rating)}</span>
-      <span className="sr-only">Calificación: {review.rating} de 5</span>
+      <span className="sr-only">{ui.reviews.rating(review.rating)}</span>
       <h3>{review.title}</h3>
       <blockquote>“{review.quote}”</blockquote>
       <figcaption className="review-meta">
-        <strong>{review.author}</strong> · {review.date.charAt(0).toUpperCase() + review.date.slice(1)}
+        <strong>{review.author}</strong> · {date}
         {" · "}
         {review.sourceUrl ? (
           <a href={review.sourceUrl} rel="noopener noreferrer" target="_blank">
             {review.sourceName}
-            <span className="sr-only"> (se abre en una pestaña nueva)</span>
+            <span className="sr-only">{ui.newTab}</span>
           </a>
         ) : (
-          review.sourceName
+          ui.reviews.ownSource
         )}
       </figcaption>
     </figure>
@@ -30,6 +36,8 @@ function ReviewCard({ review }: { review: Review }) {
 
 /** Lista de opiniones y formulario para dejar una nueva. */
 export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubmit: boolean }) {
+  const t = useUi().reviews;
+  const locale = useLocale();
   const [approved, setApproved] = useState<Review[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [rating, setRating] = useState(0);
@@ -57,11 +65,11 @@ export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubm
     const quote = String(data.get("quote")).trim();
 
     if (rating === 0) {
-      setError("Elegí una calificación de 1 a 5 estrellas.");
+      setError(t.errorRating);
       return;
     }
     if (author.length < 2 || title.length < 3 || quote.length < 10) {
-      setError("Completá tu nombre, un título y un comentario de al menos 10 caracteres.");
+      setError(t.errorFields);
       return;
     }
 
@@ -74,16 +82,17 @@ export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubm
       quote,
       consent: data.get("consent") === "on",
       hp_token: String(data.get("hp_token") ?? ""),
+      locale,
     });
     setIsSending(false);
     if (!result.ok) {
-      setError(result.error ?? "No pudimos enviar tu reseña.");
+      setError(result.error ?? t.errorSend);
       return;
     }
     setRating(0);
     setIsFormOpen(false);
     if (result.published) setApproved(await getApprovedReviews());
-    setMessage(result.published ? "¡Gracias! Tu reseña ya está publicada." : "¡Gracias por tu reseña! La vamos a revisar antes de publicarla.");
+    setMessage(result.published ? t.published : t.pending);
   }
 
   function closeForm() {
@@ -95,7 +104,7 @@ export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubm
   return (
     <>
       {/* Tira que se desliza con el mouse (o con el dedo); las tarjetas se esfuman en los bordes. */}
-      <div aria-label="Opiniones de huéspedes" className="review-strip" onMouseMove={followMouse} role="region" tabIndex={0}>
+      <div aria-label={t.strip} className="review-strip" onMouseMove={followMouse} role="region" tabIndex={0}>
         {approved.map((review) => (
           <ReviewCard key={`${review.author}-${review.title}`} review={review} />
         ))}
@@ -108,11 +117,11 @@ export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubm
 
       {isFormOpen ? (
         <form className="review-form" onSubmit={handleSubmit}>
-          <h3>Dejá tu reseña</h3>
-          <p className="review-form-notice">Tu reseña se publica al enviarla. Solo revisamos antes las que tienen insultos o enlaces.</p>
+          <h3>{t.formTitle}</h3>
+          <p className="review-form-notice">{t.formNotice}</p>
 
           <fieldset className="review-rating">
-            <legend>Tu calificación</legend>
+            <legend>{t.ratingLegend}</legend>
             {[1, 2, 3, 4, 5].map((value) => (
               <label key={value}>
                 <input
@@ -124,26 +133,26 @@ export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubm
                   value={value}
                 />
                 <span aria-hidden="true" className={value <= rating ? "is-active" : undefined}>★</span>
-                <span className="sr-only">{value} de 5</span>
+                <span className="sr-only">{t.ofFive(value)}</span>
               </label>
             ))}
           </fieldset>
 
           <label className="review-field">
-            Tu nombre
+            {t.name}
             <input autoComplete="given-name" maxLength={40} name="author" required type="text" />
           </label>
           <label className="review-field">
-            Título
+            {t.reviewTitle}
             <input maxLength={60} name="title" required type="text" />
           </label>
           <label className="review-field">
-            Tu comentario
+            {t.comment}
             <textarea maxLength={500} name="quote" required rows={4} />
           </label>
           <label className="review-consent">
             <input name="consent" required type="checkbox" />
-            Acepto que mi nombre y mi opinión se publiquen en esta web.
+            {t.consent}
           </label>
 
           {/* Campo trampa para robots: las personas no lo ven. Sin "sitio web" ni nada que el navegador autocomplete. */}
@@ -165,16 +174,16 @@ export function ReviewBoard({ reviews, canSubmit }: { reviews: Review[]; canSubm
 
           <div className="review-form-actions">
             <button className="button button-primary" disabled={isSending} type="submit">
-              {isSending ? "Enviando…" : "Enviar reseña"}
+              {isSending ? t.sending : t.send}
             </button>
             <button className="review-cancel" onClick={closeForm} type="button">
-              Cancelar
+              {t.cancel}
             </button>
           </div>
         </form>
       ) : canSubmit && (
         <button className="button button-primary review-open" onClick={() => setIsFormOpen(true)} type="button">
-          Dejar una reseña
+          {t.open}
         </button>
       )}
     </>

@@ -96,6 +96,7 @@ export function AdminSubscribers({ subscribers, onChange, ask, onNotice }: Admin
           {hasPhone(person) && <>Teléfono: {person.phone}<br /></>}
           {person.source === "reserva" ? "Se anotó al pedir una reserva" : "Se anotó en la página Promociones"}, el {formatSubscriptionDay(person.createdAt)}.
           {isPending && " Le llegó un mail para confirmar; si no lo confirma en una semana, se borra solo."}
+          {person.locale !== "es" && ` Recibe los avisos en ${person.locale === "pt" ? "portugués" : "inglés"}.`}
         </p>
         <div className="admin-actions">
           <button className="admin-link is-danger" onClick={() => remove(person)} type="button">Sacar de la lista</button>

@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ReservationForm } from "@/components/reservation-form";
+import { useUi } from "@/i18n/locale-context";
 import { openReservationEvent, reservationClosedEvent, reservationSentEvent, type ReservationPrefill } from "@/lib/reservation";
 
 /** Panel del formulario de reserva. Lo abre la barra de reserva con los datos ya elegidos. */
 export function ReservationDialog() {
+  const t = useUi().reservation;
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [formVersion, setFormVersion] = useState(0);
   const [prefill, setPrefill] = useState<ReservationPrefill | null>(null);
@@ -63,10 +65,10 @@ export function ReservationDialog() {
       <div className="reservation-dialog-content">
         <div className="reservation-dialog-header">
           <div>
-            <h2 id="reservation-dialog-title">Solicitá tu reserva</h2>
-            <p>Bloqueamos tus fechas por 24 horas y te respondemos con la tarifa.</p>
+            <h2 id="reservation-dialog-title">{t.title}</h2>
+            <p>{t.intro}</p>
           </div>
-          <button aria-label="Cerrar" className="reservation-dialog-close" onClick={close} type="button">×</button>
+          <button aria-label={t.close} className="reservation-dialog-close" onClick={close} type="button">×</button>
         </div>
         {prefill && (
           <ReservationForm

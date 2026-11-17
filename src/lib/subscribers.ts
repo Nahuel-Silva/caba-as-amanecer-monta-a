@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/config";
+
 /**
  * Avisos de promociones: textos que acepta la persona y datos compartidos entre la web y el servidor.
  * Si cambian las condiciones (src/app/condiciones-promociones/page.tsx), hay que subir `consentVersion`:
@@ -24,6 +26,8 @@ export type SubscriberRecord = {
   status: "pending" | "active";
   createdAt: string;
   confirmedAt: string;
+  /** Idioma en el que se anotó: los avisos le llegan en ese idioma. */
+  locale: Locale;
 };
 
 /** Cuántas personas recibieron el aviso de cada promoción (id de la promoción → cantidad y última fecha). */
