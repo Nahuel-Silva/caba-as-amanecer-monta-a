@@ -45,12 +45,10 @@ export const attractions: Attraction[] = [
       "Reserva natural con más de 3.000 metros de galerías subterráneas de roca caliza, con estalactitas, estalagmitas y columnas, y fósiles de amonites en algunos sectores. Está en la zona de Bardas Blancas, al sur del departamento. Según el Gobierno de Mendoza, las entradas se obtienen en línea.",
     sourceUrl: "https://www.mendoza.gov.ar/prensa/turismo-low-cost-y-natural-en-el-sur-de-mendoza/",
     image: {
-      src: "/images/malargue/caverna-de-las-brujas.jpg",
-      alt: "Estalactitas de roca clara en el interior de la Caverna de las Brujas.",
-      credit: "Pablo-flores",
-      license: "CC BY-SA 2.5",
-      creditUrl: "https://commons.wikimedia.org/wiki/File:Witches%27_Cave_stalactites.jpg",
-      licenseUrl: "https://creativecommons.org/licenses/by-sa/2.5/",
+      src: "/images/malargue/caverna-de-las-brujas-interior.jpg",
+      alt: "Interior de la Caverna de las Brujas: grandes bloques y paredes de roca caliza iluminados con linterna, con la cuerda de seguridad del recorrido.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
     },
   },
   {
@@ -254,6 +252,12 @@ export const attractions: Attraction[] = [
       "Dos de los ocho laberintos que hay en la Argentina, con 31 pasillos en 4.900 m² y un mirador de 10 metros para verlos desde arriba. Hay mucha sombra para hacer picnic, parrillas, juegos para chicos, una calesita, alquiler de karting y bicicletas, y una muestra de autos antiguos.",
     sourceUrl: "https://www.malargue.tur.ar/en/city-circuit/carmona-labyrinths/",
     sourceLabel: "Turismo Malargüe (en inglés)",
+    image: {
+      src: "/images/malargue/laberintos-de-carmona.jpg",
+      alt: "Laberinto de setos verdes visto desde el mirador, rodeado de álamos y con la cordillera al fondo bajo un cielo nublado.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
+    },
   },
   {
     name: "Dique Blas Brisoli",
@@ -268,6 +272,12 @@ export const attractions: Attraction[] = [
       "Parque aéreo en la cuesta del Chihuido. Tiene puentes tibetanos, vía ferrata, la caverna de Turcará, un puente comando y las tirolesas más altas del sur de Mendoza; el circuito de aventura completo dura alrededor de 1 hora y media. También hay senderos paleontológicos autoguiados, senderos adaptados y un área de camping.",
     sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-40/turcara/",
     sourceLabel: turismoMalargue,
+    image: {
+      src: "/images/malargue/turcara.jpg",
+      alt: "Cañadón de Turcará: paredes de roca clara, laderas con monte bajo y algo de nieve, bajo un cielo despejado.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
+    },
   },
   {
     name: "Grabados Rupestres de Agua Botada",
@@ -324,6 +334,13 @@ export const attractions: Attraction[] = [
       "Complejo de cinco domos al pie del cerro Campanario, cerca del límite con Chile, para dormir en plena cordillera. Organiza cabalgatas, caminatas, mountain bike, esquí y snowboard con guías. El acceso depende del clima y de las normas del Paso Pehuenche.",
     sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-145/real-del-pehuenche/",
     sourceLabel: turismoMalargue,
+    // Foto cedida al propietario por un amigo, con permiso para usarla en la web.
+    image: {
+      src: "/images/malargue/real-del-pehuenche.jpg",
+      alt: "Vista aérea de los domos amarillos de Real del Pehuenche en la nieve, con cerros nevados y picos de roca al fondo al atardecer.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
+    },
   },
   {
     name: "Invernada del Viejo",
