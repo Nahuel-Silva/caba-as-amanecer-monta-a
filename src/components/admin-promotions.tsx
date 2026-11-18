@@ -209,11 +209,6 @@ function PromotionForm({ promotion, onDone, onSaved }: { promotion: Promotion | 
           <Hint>Por ejemplo: Mínimo 3 noches.</Hint>
         </label>
         <label>
-          Código
-          <input defaultValue={promotion?.code} maxLength={30} name="code" placeholder="OTONO" type="text" />
-          <Hint>Una palabra que el huésped menciona al consultar. Es opcional.</Hint>
-        </label>
-        <label>
           Foto
           <input accept="image/jpeg,image/png,image/webp" onChange={chooseImage} type="file" />
           <Hint>Elegí una foto de la computadora o del celular.</Hint>

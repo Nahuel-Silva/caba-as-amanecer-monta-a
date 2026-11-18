@@ -10,12 +10,11 @@ const escapeHtml = (value: string) =>
   value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]!);
 
 /** Textos del mail de aviso en cada idioma. */
-const noticeTexts: Record<Locale, { subject: (title: string) => string; price: string; conditions: string; code: string; see: string; button: string; why: string; unsubscribe: string; unsubscribeLink: string; terms: string }> = {
+const noticeTexts: Record<Locale, { subject: (title: string) => string; price: string; conditions: string; see: string; button: string; why: string; unsubscribe: string; unsubscribeLink: string; terms: string }> = {
   es: {
     subject: (title) => `Nueva promoción en ${site.name}: ${title}`,
     price: "Precio total:",
     conditions: "Condiciones:",
-    code: "Código:",
     see: "Mirá la promoción y consultá:",
     button: "Ver la promoción",
     why: "Recibís este mail porque aceptaste recibir las promociones de las cabañas.",
@@ -27,7 +26,6 @@ const noticeTexts: Record<Locale, { subject: (title: string) => string; price: s
     subject: (title) => `Nova promoção em ${site.name}: ${title}`,
     price: "Preço total:",
     conditions: "Condições:",
-    code: "Código:",
     see: "Veja a promoção e consulte:",
     button: "Ver a promoção",
     why: "Você recebe este e-mail porque aceitou receber as promoções das cabanas.",
@@ -39,7 +37,6 @@ const noticeTexts: Record<Locale, { subject: (title: string) => string; price: s
     subject: (title) => `New offer at ${site.name}: ${title}`,
     price: "Total price:",
     conditions: "Terms:",
-    code: "Code:",
     see: "See the offer and get in touch:",
     button: "See the offer",
     why: "You're receiving this email because you agreed to receive the cabins' offers.",
@@ -78,7 +75,6 @@ export function promotionNoticeEmail(promotion: Promotion, baseUrl: string, to: 
     price,
     ...promotion.details.map((detail) => `- ${detail}`),
     promotion.conditions ? `\n${t.conditions} ${promotion.conditions}` : "",
-    promotion.code ? `${t.code} ${promotion.code}` : "",
     "",
     `${t.see} ${link}`,
     "",
@@ -105,7 +101,6 @@ ${highlights ? `<p style="margin:0 0 14px;font-size:16px;font-weight:bold">${esc
 ${price ? `<p style="margin:0 0 14px;font-size:18px"><strong>${escapeHtml(price)}</strong></p>` : ""}
 ${promotion.details.length ? `<ul style="margin:0 0 14px;padding-left:20px;font-size:15px;line-height:1.5">${promotion.details.map((detail) => `<li>${escapeHtml(detail)}</li>`).join("")}</ul>` : ""}
 ${promotion.conditions ? `<p style="margin:0 0 8px;font-size:14px;color:#5d5f55">${escapeHtml(t.conditions)} ${escapeHtml(promotion.conditions)}</p>` : ""}
-${promotion.code ? `<p style="margin:0 0 14px;font-size:15px">${escapeHtml(t.code)} <strong>${escapeHtml(promotion.code)}</strong></p>` : ""}
 <p style="margin:20px 0 0"><a href="${escapeHtml(link)}" style="display:inline-block;padding:12px 22px;border-radius:4px;background:#39432f;color:#fffdf7;font-weight:bold;text-decoration:none">${escapeHtml(t.button)}</a></p>
 </div></div>
 <p style="max-width:560px;margin:16px auto 0;color:#6b6c63;font-size:12px;line-height:1.5;text-align:center">

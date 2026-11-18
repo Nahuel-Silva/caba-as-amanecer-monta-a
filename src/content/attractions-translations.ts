@@ -107,6 +107,7 @@ export const attractionTranslations: Record<"pt" | "en", Record<string, Attracti
     "Planetario Malargüe": {
       detail:
         "Centro de divulgação astronômica na cidade, com três prédios: a recepção, um museu astronômico e a sala onde acontece a sessão, com lugar para 65 pessoas. No parque há relógios de sol, e à noite os astrônomos locais também oferecem observações do céu.",
+      alt: "Prédio do Planetário em forma de pirâmide azul-clara, ao lado de um relógio de sol de metal sobre uma rocha, sob um céu com nuvens.",
     },
     "Laberintos de Carmona": {
       detail:
@@ -162,6 +163,7 @@ export const attractionTranslations: Record<"pt" | "en", Record<string, Attracti
     "La Pasarela": {
       detail:
         "Estreito do rio Grande que se formou quando grandes derrames de lava, de até cerca de 100 metros de espessura, preencheram o vale e represaram o rio. Com o tempo, o rio abriu caminho pelo basalto e esculpiu a passagem estreita que se vê hoje.",
+      alt: "O rio Grande corre por um cânion estreito de paredes de basalto escuro, com uma ponte de madeira que o atravessa de um lado ao outro.",
     },
     "Ranquil Norte": {
       detail:
@@ -241,6 +243,7 @@ export const attractionTranslations: Record<"pt" | "en", Record<string, Attracti
     "Planetario Malargüe": {
       detail:
         "An astronomy center in town with three buildings: the reception, an astronomy museum and the dome where the show takes place, with room for 65 people. There are sundials in the park, and at night local astronomers also offer stargazing sessions.",
+      alt: "The pyramid-shaped light-blue Planetarium building next to a metal sundial on a rock, under a cloudy sky.",
     },
     "Laberintos de Carmona": {
       detail:
@@ -296,6 +299,7 @@ export const attractionTranslations: Record<"pt" | "en", Record<string, Attracti
     "La Pasarela": {
       detail:
         "A narrow gorge of the Grande River that formed when huge lava flows, up to about 100 meters thick, filled the valley and dammed the river. Over time, the river cut its way through the basalt and carved the narrow passage you see today.",
+      alt: "The Grande River runs through a narrow canyon with dark basalt walls, with a wooden footbridge crossing it from side to side.",
     },
     "Ranquil Norte": {
       detail: "The southern gateway to the department, on Route 40. The Malargüe Municipality has a tourist information office there for visitors and travelers.",

@@ -245,6 +245,12 @@ export const attractions: Attraction[] = [
       "Centro de divulgación astronómica en la ciudad, con tres edificios: la recepción, un museo astronómico y la sala donde se hace la función, con lugar para 65 personas. En el parque hay relojes solares, y por la noche los astrónomos locales también ofrecen observaciones del cielo.",
     sourceUrl: "https://www.malargue.tur.ar/circuito-ciudad/planetario-malargue/",
     sourceLabel: turismoMalargue,
+    image: {
+      src: "/images/malargue/planetario-malargue.jpg",
+      alt: "Edificio del Planetario con forma de pirámide celeste, junto a un reloj solar de metal sobre una roca, bajo un cielo con nubes.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
+    },
   },
   {
     name: "Laberintos de Carmona",
@@ -355,6 +361,12 @@ export const attractions: Attraction[] = [
       "Angostura del río Grande que se formó cuando grandes coladas de lava rellenaron el valle, con hasta unos 100 metros de espesor, y lo embalsaron. Con el tiempo, el río se abrió paso a través del basalto y talló el paso angosto que se ve hoy.",
     sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-40/la-pasarela/",
     sourceLabel: turismoMalargue,
+    image: {
+      src: "/images/malargue/la-pasarela.jpg",
+      alt: "El río Grande corre por un cañón angosto de paredes de basalto oscuro, con un puente de madera que lo cruza de lado a lado.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
+    },
   },
   {
     name: "Ranquil Norte",

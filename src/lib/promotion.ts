@@ -29,8 +29,6 @@ export type Promotion = {
   details: string[];
   /** Condiciones, por ejemplo "Mínimo 3 noches. No acumulable con otras promociones." */
   conditions?: string;
-  /** Código que se suma al mensaje de consulta, por ejemplo "INVIERNO". */
-  code?: string;
   image?: { src: string; alt: string };
   /** Con false, la promoción deja de mostrarse sin borrarla. */
   active: boolean;
@@ -47,7 +45,6 @@ export type PromotionFields = {
   price: number | null;
   details: string[];
   conditions: string;
-  code: string;
   imageAlt: string;
 };
 
@@ -114,7 +111,6 @@ export function validatePromotion(input: Record<string, unknown>): { data: Promo
       validity: text(input.validity, 80),
       price: price as number | null,
       conditions: text(input.conditions, 400),
-      code: text(input.code, 30),
       imageAlt: text(input.imageAlt, 160),
     },
   };

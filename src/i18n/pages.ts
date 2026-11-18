@@ -86,7 +86,6 @@ const es = {
     notFound: "Promoción no encontrada",
     back: "← Volver a promociones",
     loadingOne: "Cargando promoción…",
-    code: "Código:",
     share: "Compartir por WhatsApp",
     /** Aviso en las versiones traducidas: las promociones se cargan en español. */
     originalLanguage: "",
@@ -215,7 +214,6 @@ const pt: Pages = {
     notFound: "Promoção não encontrada",
     back: "← Voltar para as promoções",
     loadingOne: "Carregando promoção…",
-    code: "Código:",
     share: "Compartilhar pelo WhatsApp",
     originalLanguage: "",
   },
@@ -342,7 +340,6 @@ const en: Pages = {
     notFound: "Offer not found",
     back: "← Back to offers",
     loadingOne: "Loading offer…",
-    code: "Code:",
     share: "Share on WhatsApp",
     originalLanguage: "",
   },

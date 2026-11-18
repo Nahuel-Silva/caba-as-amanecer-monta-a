@@ -3,7 +3,7 @@ import type { Locale } from "@/i18n/config";
 import { slugify, type Promotion, type PromotionFields, type PromotionTranslations } from "@/lib/promotion";
 
 const columns =
-  "id, slug, title, description, discount, validity, price, details, conditions, code, image_alt, active, updated_at, translations, image_data IS NOT NULL AS has_image";
+  "id, slug, title, description, discount, validity, price, details, conditions, image_alt, active, updated_at, translations, image_data IS NOT NULL AS has_image";
 
 function readTranslations(value: unknown): PromotionTranslations {
   try {
@@ -33,7 +33,6 @@ function toPromotion(row: DbRow, locale: Locale = "es", withTranslations = false
     price: row.price === null || row.price === undefined ? undefined : Number(row.price),
     details: translated?.details ?? (JSON.parse(String(row.details)) as string[]),
     conditions: pick(String(row.conditions), translated?.conditions) || undefined,
-    code: String(row.code) || undefined,
     image: row.has_image
       ? { src: `/api/promociones/${id}/imagen?v=${encodeURIComponent(String(row.updated_at))}`, alt: pick(String(row.image_alt), translated?.imageAlt) }
       : undefined,
@@ -107,7 +106,7 @@ export async function createPromotion(fields: PromotionFields, image: Buffer | n
   const database = await getDatabase();
   await database.execute({
     sql: `INSERT INTO promotions (slug, title, description, discount, validity, price, details, conditions, code, image_data, image_alt, translations)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, ?)`,
     args: [
       await uniqueSlug(fields.title),
       fields.title,
@@ -117,7 +116,6 @@ export async function createPromotion(fields: PromotionFields, image: Buffer | n
       fields.price,
       JSON.stringify(fields.details),
       fields.conditions,
-      fields.code,
       image,
       fields.imageAlt,
       JSON.stringify(translations),
@@ -129,7 +127,7 @@ export async function createPromotion(fields: PromotionFields, image: Buffer | n
 export async function updatePromotion(id: number, fields: PromotionFields, image: Buffer | null, removeImage: boolean, translations: PromotionTranslations = {}) {
   const database = await getDatabase();
   const { rowsAffected } = await database.execute({
-    sql: `UPDATE promotions SET title = ?, description = ?, discount = ?, validity = ?, price = ?, details = ?, conditions = ?, code = ?, image_alt = ?, translations = ?,
+    sql: `UPDATE promotions SET title = ?, description = ?, discount = ?, validity = ?, price = ?, details = ?, conditions = ?, code = '', image_alt = ?, translations = ?,
         image_data = CASE WHEN ? = 1 THEN NULL WHEN ? IS NOT NULL THEN ? ELSE image_data END,
         updated_at = datetime('now')
       WHERE id = ?`,
@@ -141,7 +139,6 @@ export async function updatePromotion(id: number, fields: PromotionFields, image
       fields.price,
       JSON.stringify(fields.details),
       fields.conditions,
-      fields.code,
       fields.imageAlt,
       JSON.stringify(translations),
       removeImage ? 1 : 0,

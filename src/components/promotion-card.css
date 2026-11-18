@@ -25,8 +25,6 @@
 .promotion-details { display: grid; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
 .promotion-details li { position: relative; padding-left: 24px; }
 .promotion-details li::before { content: "✓"; position: absolute; left: 0; color: var(--olive); font-weight: 800; }
-.promotion-code { margin: 22px 0 0; font-size: 15px; }
-.promotion-code strong { padding: 3px 10px; border: 1px dashed var(--clay); border-radius: 8px; letter-spacing: .05em; }
 .promotion-conditions { margin: 18px 0 0; color: var(--muted); font-size: 13px; }
 .promotion-share { margin-top: 20px; padding: 0; border: 0; background: none; color: var(--olive-dark); cursor: pointer; font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 

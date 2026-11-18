@@ -85,7 +85,7 @@ async function PromotionDetail({ slug, locale }: { slug: string; locale: Locale 
   if (!promotion) notFound();
 
   const t = pages[locale].promotions;
-  const { image, discount, details, conditions, code, validity, price } = promotion;
+  const { image, discount, details, conditions, validity, price } = promotion;
 
   return (
     <main className="wrap promotion-detail">
@@ -111,7 +111,6 @@ async function PromotionDetail({ slug, locale }: { slug: string; locale: Locale 
             {details.map((detail) => <li key={detail}>{detail}</li>)}
           </ul>
         )}
-        {code && <p className="promotion-code">{t.code} <strong>{code}</strong></p>}
         {conditions && <p className="promotion-conditions">{conditions}</p>}
         <ShareButton title={promotion.title} />
       </article>
