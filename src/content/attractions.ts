@@ -362,7 +362,7 @@ export const attractions: Attraction[] = [
     sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-40/la-pasarela/",
     sourceLabel: turismoMalargue,
     image: {
-      src: "/images/malargue/la-pasarela.jpg",
+      src: "/images/malargue/la-pasarela-puente.jpg",
       alt: "El río Grande corre por un cañón angosto de paredes de basalto oscuro, con un puente de madera que lo cruza de lado a lado.",
       credit: "Cabañas Amanecer de Montaña",
       license: "Foto propia",
