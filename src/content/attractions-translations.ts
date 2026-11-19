@@ -82,7 +82,7 @@ export const attractionTranslations: Record<"pt" | "en", Record<string, Attracti
     "Observatorio Pierre Auger": {
       detail:
         "O maior observatório de raios cósmicos do mundo, que estuda partículas de altíssima energia que chegam do espaço. A sala para visitantes oferece gratuitamente uma exposição interativa permanente, com detectores em tempo real, maquetes, vídeos e pôsteres.",
-      alt: "Tanque detector de raios cósmicos do Observatório Pierre Auger, com sua antena, em um campo da Pampa Amarilla.",
+      alt: "Prédio do Observatório Pierre Auger na cidade, branco e amarelo com uma janela redonda, cercado de gramado e álamos sob um céu azul.",
     },
     "Antena DS3": {
       detail:
@@ -218,7 +218,7 @@ export const attractionTranslations: Record<"pt" | "en", Record<string, Attracti
     "Observatorio Pierre Auger": {
       detail:
         "The largest cosmic-ray observatory in the world, studying extremely high-energy particles that arrive from space. Its visitor room offers a free permanent interactive exhibition, with real-time detectors, models, videos and posters.",
-      alt: "Cosmic-ray detector tank of the Pierre Auger Observatory, with its antenna, in a field of the Pampa Amarilla.",
+      alt: "The Pierre Auger Observatory building in town, white and yellow with a round window, surrounded by lawn and poplars under a blue sky.",
     },
     "Antena DS3": {
       detail:

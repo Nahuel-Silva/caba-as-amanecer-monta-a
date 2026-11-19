@@ -176,11 +176,10 @@ export const attractions: Attraction[] = [
     sourceUrl: "https://www.malargue.tur.ar/circuito-ciudad/observatorio-rayos-cosmicos/",
     sourceLabel: turismoMalargue,
     image: {
-      src: "/images/malargue/observatorio-pierre-auger.jpg",
-      alt: "Tanque detector de rayos cósmicos del Observatorio Pierre Auger, con su antena, en un campo de la Pampa Amarilla.",
-      credit: "Roberto Fiadone",
-      license: "Dominio público",
-      creditUrl: "https://commons.wikimedia.org/wiki/File:Observatorio_Pierre_Auger_Tanque_Rayos_C%C3%B3smicos.jpg",
+      src: "/images/malargue/observatorio-pierre-auger-edificio.jpg",
+      alt: "Edificio del Observatorio Pierre Auger en la ciudad, blanco y amarillo con una ventana redonda, rodeado de césped y álamos bajo un cielo azul.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
     },
   },
   {
