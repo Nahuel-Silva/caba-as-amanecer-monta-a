@@ -332,6 +332,12 @@ export const attractions: Attraction[] = [
       "Cinco piletas de aguas termales a cielo abierto, al pie del cerro Campanario, sobre la ruta 145. Sus aguas ferrosas se recomiendan para afecciones reumáticas, bronquitis y artritis. Hay camping con proveeduría y sanitarios. Como se pasa por la aduana del Paso Pehuenche, hay que tener en cuenta su horario para ir y volver.",
     sourceUrl: "https://www.malargue.tur.ar/circuito-ruta-145/termas-de-cajon-grande/",
     sourceLabel: turismoMalargue,
+    image: {
+      src: "/images/malargue/termas-de-cajon-grande.jpg",
+      alt: "Arroyo de montaña que corre entre piedras y pasto verde, con quinchos de techo de paja, una casa roja y autos estacionados al pie de un cerro, bajo un cielo azul.",
+      credit: "Cabañas Amanecer de Montaña",
+      license: "Foto propia",
+    },
   },
   {
     name: "Real del Pehuenche",

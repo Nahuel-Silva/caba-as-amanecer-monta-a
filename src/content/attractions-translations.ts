@@ -150,6 +150,7 @@ export const attractionTranslations: Record<"pt" | "en", Record<string, Attracti
     "Termas de Cajón Grande": {
       detail:
         "Cinco piscinas de águas termais ao ar livre, ao pé do cerro Campanario, na rodovia 145. Suas águas ferruginosas são recomendadas para problemas reumáticos, bronquite e artrite. Há camping com mercearia e banheiros. Como se passa pela aduana do Paso Pehuenche, é preciso levar em conta o seu horário para ir e voltar.",
+      alt: "Riacho de montanha correndo entre pedras e grama verde, com quiosques de teto de palha, uma casa vermelha e carros estacionados ao pé de um morro, sob um céu azul.",
     },
     "Real del Pehuenche": {
       detail:
@@ -286,6 +287,7 @@ export const attractionTranslations: Record<"pt" | "en", Record<string, Attracti
     "Termas de Cajón Grande": {
       detail:
         "Five open-air hot spring pools at the foot of Cerro Campanario, on Route 145. Their iron-rich waters are recommended for rheumatic conditions, bronchitis and arthritis. There is a campground with a small store and restrooms. Since you go through the Paso Pehuenche customs post, keep its opening hours in mind for the trip there and back.",
+      alt: "A mountain stream running between rocks and green grass, with thatched-roof shelters, a red house and parked cars at the foot of a hill, under a blue sky.",
     },
     "Real del Pehuenche": {
       detail:
